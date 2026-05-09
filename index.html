@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Biodata Pelajar | Digital Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --primary: #38bdf8; --bg-dark: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); }
+        .input-field { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s ease; }
+        .input-field:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); }
+        .btn-glow { background: var(--primary); color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); transition: all 0.2s ease; }
+        .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(56, 189, 248, 0.5); }
+        #profile-section { display: none; }
+        .loading-spin { animation: rotate 2s linear infinite; }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="login-section" class="w-full max-w-md glass-panel rounded-[3rem] p-10 text-center">
+        <div class="w-24 h-24 bg-sky-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-sky-500/30">
+            <i data-lucide="user-check" class="w-12 h-12 text-sky-400"></i>
+        </div>
+        <h1 class="text-4xl font-display font-bold mb-8 italic">Log Masuk</h1>
+        <div class="space-y-6 text-left">
+            <div>
+                <label class="text-[10px] font-bold text-sky-500 uppercase tracking-widest ml-2">No. Kad Pengenalan</label>
+                <input type="text" id="login-kp" placeholder="050805110551" class="w-full p-5 mt-2 rounded-2xl input-field text-center text-2xl font-bold tracking-widest">
+            </div>
+            <button onclick="prosesMasuk()" id="btn-login" class="w-full p-5 rounded-2xl btn-glow flex items-center justify-center gap-3">
+                <span>Buka Profil</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="profile-section" class="w-full max-w-6xl glass-panel rounded-[3.5rem] overflow-hidden flex flex-col lg:flex-row">
+        
+        <div class="w-full lg:w-96 bg-slate-900/40 p-12 border-r border-white/5 flex flex-col items-center text-center">
+            <div class="relative mb-8">
+                <div id="img-display" class="w-56 h-56 rounded-full bg-slate-800 border-4 border-sky-500/30 flex items-center justify-center overflow-hidden">
+                    <i data-lucide="user" class="w-24 h-24 text-slate-700"></i>
+                </div>
+                <label for="file-input" class="absolute bottom-4 right-4 w-14 h-14 bg-sky-500 rounded-full flex items-center justify-center cursor-pointer shadow-xl transition-transform hover:scale-110">
+                    <i data-lucide="camera" class="w-7 h-7 text-slate-900"></i>
+                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="previewFoto(event)">
+                </label>
+            </div>
+            <h2 id="disp-nama" class="text-2xl font-display font-bold uppercase tracking-tight leading-tight">NAMA PELAJAR</h2>
+            <p id="disp-kp" class="text-sky-400 font-bold mt-3 text-xs tracking-widest">NO. KP: --</p>
+            
+            <div class="mt-8 p-4 bg-white/5 rounded-2xl w-full flex justify-between items-center border border-white/5">
+                <span class="text-[10px] font-bold opacity-40 uppercase tracking-widest">No. Rekod</span>
+                <span id="disp-bil" class="font-display font-bold text-sky-400">#--</span>
+            </div>
+        </div>
+
+        <div class="flex-1 p-10 md:p-16">
+            <h3 class="text-3xl font-display font-bold mb-10 italic">Biodata Digital Pelajar</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nama Penuh</label>
+                    <input type="text" id="f-nama" class="w-full p-4 rounded-2xl input-field font-semibold">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">No. KP (Terkunci)</label>
+                    <input type="text" id="f-kp" readonly class="w-full p-4 rounded-2xl input-field opacity-40 font-bold">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Angka Giliran</label>
+                    <input type="text" id="f-agiliran" class="w-full p-4 rounded-2xl input-field font-semibold">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Kelas</label>
+                    <input type="text" id="f-kelas" class="w-full p-4 rounded-2xl input-field font-semibold">
+                </div>
+                <div class="md:col-span-2 space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Pensyarah Pembimbing</label>
+                    <select id="f-pensyarah" class="w-full p-4 rounded-2xl input-field font-semibold appearance-none">
+                        <option value="">Pilih Pensyarah...</option>
+                        <option value="Pn. Nor Azura">Pn. Nor Azura</option>
+                        <option value="En. Ahmad Fauzi">En. Ahmad Fauzi</option>
+                        <option value="Dr. Siti Aminah">Dr. Siti Aminah</option>
+                    </select>
+                </div>
+                <input type="hidden" id="f-bil">
+                <input type="hidden" id="f-urlgambar">
+            </div>
+            <div class="mt-12 flex flex-col sm:flex-row gap-4">
+                <button onclick="simpanProfil()" id="btn-save" class="flex-1 p-5 rounded-2xl btn-glow flex items-center justify-center gap-3">
+                    <i data-lucide="save" class="w-6 h-6"></i>
+                    <span>Kemas Kini Maklumat</span>
+                </button>
+                <button onclick="location.reload()" class="p-5 px-8 rounded-2xl bg-white/5 border border-white/10 text-red-400 hover:bg-red-500/10 transition-all">
+                    <i data-lucide="log-out" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // PASTI KAN URL INI ADALAH URL DEPLOYMENT TERBARU ANDA
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNeTlBTtnv9-reJVGl2mEDiXlyMUcftHOS4vrJTG-D7rAwbzQxJkKP6hObPeCYy2kNfw/exec';
+
+        async function prosesMasuk() {
+            const kpInput = document.getElementById('login-kp').value.trim();
+            if(!kpInput) return alert("Sila masukkan No. KP!");
+            
+            const btn = document.getElementById('btn-login');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-5 h-5 loading-spin"></i>`;
+            lucide.createIcons();
+
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                const kpBersih = kpInput.replace(/[^0-9]/g, '');
+                const p = data.find(item => item.nokp.toString().replace(/[^0-9]/g, '') === kpBersih);
+
+                if(p) {
+                    document.getElementById('f-bil').value = p.bil || '';
+                    document.getElementById('f-nama').value = p.namapelajar || '';
+                    document.getElementById('f-kp').value = p.nokp || '';
+                    document.getElementById('f-agiliran').value = p.agiliran || '';
+                    document.getElementById('f-kelas').value = p.kelas || '';
+                    document.getElementById('f-pensyarah').value = p.pensyarah || '';
+                    document.getElementById('f-urlgambar').value = p.urlgmbar || '';
+                    
+                    document.getElementById('disp-nama').innerText = p.namapelajar || 'PELAJAR';
+                    document.getElementById('disp-kp').innerText = `NO. KP: ${p.nokp}`;
+                    document.getElementById('disp-bil').innerText = `#${p.bil || '--'}`;
+                    
+                    if(p.urlgmbar && p.urlgmbar.toString().startsWith('http')) {
+                        document.getElementById('img-display').innerHTML = `<img src="${p.urlgmbar}" class="w-full h-full object-cover">`;
+                    } else {
+                        document.getElementById('img-display').innerHTML = `<i data-lucide="user" class="w-24 h-24 text-slate-700"></i>`;
+                        lucide.createIcons();
+                    }
+                } else {
+                    document.getElementById('f-kp').value = kpInput;
+                    document.getElementById('disp-kp').innerText = `NO. KP: ${kpInput}`;
+                }
+                
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('profile-section').style.display = 'flex';
+                lucide.createIcons();
+            } catch (e) {
+                alert("Ralat sambungan API.");
+                btn.disabled = false;
+                btn.innerHTML = `<span>Buka Profil</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>`;
+                lucide.createIcons();
+            }
+        }
+
+        function previewFoto(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('img-display').innerHTML = `<img src="${reader.result}" class="w-full h-full object-cover">`;
+                document.getElementById('f-urlgambar').value = reader.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function simpanProfil() {
+            const btn = document.getElementById('btn-save');
+            const dataObj = {
+                bil: document.getElementById('f-bil').value,
+                namapelajar: document.getElementById('f-nama').value,
+                nokp: document.getElementById('f-kp').value,
+                agiliran: document.getElementById('f-agiliran').value,
+                kelas: document.getElementById('f-kelas').value,
+                urlgambar: document.getElementById('f-urlgambar').value,
+                pensyarah: document.getElementById('f-pensyarah').value
+            };
+
+            if(!dataObj.namapelajar || !dataObj.pensyarah) return alert("Sila isi Nama dan Pensyarah.");
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-6 h-6 loading-spin"></i> <span>Sedang Menyimpan...</span>`;
+            lucide.createIcons();
+
+            try {
+                // Post data ke Apps Script
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(dataObj)
+                });
+                
+                alert("BERJAYA! Data dan gambar sedang diproses ke dalam database. Sila tunggu 5 saat sebelum refresh.");
+                document.getElementById('disp-nama').innerText = dataObj.namapelajar;
+            } catch (e) {
+                alert("Ralat penghantaran data.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="save" class="w-6 h-6"></i> <span>Kemas Kini Maklumat</span>`;
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>
