@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Biodata Pelajar | Digital Profile</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         :root { --primary: #38bdf8; --bg-dark: #0f172a; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
@@ -31,7 +33,7 @@
         <div class="space-y-6 text-left">
             <div>
                 <label class="text-[10px] font-bold text-sky-500 uppercase tracking-widest ml-2">No. Kad Pengenalan</label>
-                <input type="text" id="login-kp" placeholder="050805110551" class="w-full p-5 mt-2 rounded-2xl input-field text-center text-2xl font-bold tracking-widest">
+                <input type="text" id="login-kp" placeholder="Contoh: 050805110551" class="w-full p-5 mt-2 rounded-2xl input-field text-center text-2xl font-bold tracking-widest">
             </div>
             <button onclick="prosesMasuk()" id="btn-login" class="w-full p-5 rounded-2xl btn-glow flex items-center justify-center gap-3">
                 <span>Buka Profil</span>
@@ -70,7 +72,7 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">No. KP (Terkunci)</label>
-                    <input type="text" id="f-kp" readonly class="w-full p-4 rounded-2xl input-field opacity-40 font-bold">
+                    <input type="text" id="f-kp" readonly class="w-full p-4 rounded-2xl input-field opacity-40 font-bold cursor-not-allowed">
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Angka Giliran</label>
@@ -82,7 +84,7 @@
                 </div>
                 <div class="md:col-span-2 space-y-2">
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Pensyarah Pembimbing</label>
-                    <select id="f-pensyarah" class="w-full p-4 rounded-2xl input-field font-semibold appearance-none">
+                    <select id="f-pensyarah" class="w-full p-4 rounded-2xl input-field font-semibold appearance-none cursor-pointer">
                         <option value="">Pilih Pensyarah...</option>
                         <option value="Pn. Nor Azura">Pn. Nor Azura</option>
                         <option value="En. Ahmad Fauzi">En. Ahmad Fauzi</option>
@@ -95,7 +97,7 @@
             <div class="mt-12 flex flex-col sm:flex-row gap-4">
                 <button onclick="simpanProfil()" id="btn-save" class="flex-1 p-5 rounded-2xl btn-glow flex items-center justify-center gap-3">
                     <i data-lucide="save" class="w-6 h-6"></i>
-                    <span>Kemas Kini Maklumat</span>
+                    <span>Kemaskini Maklumat</span>
                 </button>
                 <button onclick="location.reload()" class="p-5 px-8 rounded-2xl bg-white/5 border border-white/10 text-red-400 hover:bg-red-500/10 transition-all">
                     <i data-lucide="log-out" class="w-6 h-6"></i>
@@ -107,7 +109,7 @@
     <script>
         lucide.createIcons();
         
-        // PASTI KAN URL INI ADALAH URL DEPLOYMENT TERBARU ANDA
+        // GANTIKAN DENGAN URL WEB APP DEPLOYMENT TERBARU ANDA
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNeTlBTtnv9-reJVGl2mEDiXlyMUcftHOS4vrJTG-D7rAwbzQxJkKP6hObPeCYy2kNfw/exec';
 
         async function prosesMasuk() {
@@ -123,6 +125,8 @@
                 const res = await fetch(SCRIPT_URL);
                 const data = await res.json();
                 const kpBersih = kpInput.replace(/[^0-9]/g, '');
+                
+                // Cari data pelajar
                 const p = data.find(item => item.nokp.toString().replace(/[^0-9]/g, '') === kpBersih);
 
                 if(p) {
@@ -138,10 +142,12 @@
                     document.getElementById('disp-kp').innerText = `NO. KP: ${p.nokp}`;
                     document.getElementById('disp-bil').innerText = `#${p.bil || '--'}`;
                     
-                    if(p.urlgmbar && p.urlgmbar.toString().startsWith('http')) {
-                        document.getElementById('img-display').innerHTML = `<img src="${p.urlgmbar}" class="w-full h-full object-cover">`;
+                    const imgBox = document.getElementById('img-display');
+                    // Menggunakan p.urlgmbar secara terus dari sheet
+                    if(p.urlgmbar && p.urlgmbar.toString().includes('http')) {
+                        imgBox.innerHTML = `<img src="${p.urlgmbar}" class="w-full h-full object-cover">`;
                     } else {
-                        document.getElementById('img-display').innerHTML = `<i data-lucide="user" class="w-24 h-24 text-slate-700"></i>`;
+                        imgBox.innerHTML = `<i data-lucide="user" class="w-24 h-24 text-slate-700"></i>`;
                         lucide.createIcons();
                     }
                 } else {
@@ -153,7 +159,7 @@
                 document.getElementById('profile-section').style.display = 'flex';
                 lucide.createIcons();
             } catch (e) {
-                alert("Ralat sambungan API.");
+                alert("Ralat memuat data API.");
                 btn.disabled = false;
                 btn.innerHTML = `<span>Buka Profil</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>`;
                 lucide.createIcons();
@@ -183,27 +189,26 @@
                 pensyarah: document.getElementById('f-pensyarah').value
             };
 
-            if(!dataObj.namapelajar || !dataObj.pensyarah) return alert("Sila isi Nama dan Pensyarah.");
+            if(!dataObj.namapelajar || !dataObj.pensyarah) return alert("Sila lengkapkan maklumat.");
 
             btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-6 h-6 loading-spin"></i> <span>Sedang Menyimpan...</span>`;
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-6 h-6 loading-spin"></i> <span>Menyimpan...</span>`;
             lucide.createIcons();
 
             try {
-                // Post data ke Apps Script
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify(dataObj)
                 });
                 
-                alert("BERJAYA! Data dan gambar sedang diproses ke dalam database. Sila tunggu 5 saat sebelum refresh.");
+                alert("BERJAYA! Maklumat sedang diproses. Sila tunggu 5 saat sebelum memuat semula laman web untuk melihat gambar.");
                 document.getElementById('disp-nama').innerText = dataObj.namapelajar;
             } catch (e) {
-                alert("Ralat penghantaran data.");
+                alert("Ralat teknikal semasa menyimpan.");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="save" class="w-6 h-6"></i> <span>Kemas Kini Maklumat</span>`;
+                btn.innerHTML = `<i data-lucide="save" class="w-6 h-6"></i> <span>Kemaskini Maklumat</span>`;
                 lucide.createIcons();
             }
         }
