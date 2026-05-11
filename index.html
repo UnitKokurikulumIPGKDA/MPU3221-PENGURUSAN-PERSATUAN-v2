@@ -3,314 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal MPU3221 | Glassmorphism Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Portal MPU3221 | Glassmorphism</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --accent-color: #6366f1;
-        }
-
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
             min-height: 100vh;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             overflow-x: hidden;
-            position: relative;
         }
-
-        /* Elemen Hiasan Latar Belakang (Blob) */
-        .blob {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--accent-color);
-            filter: blur(80px);
-            border-radius: 50%;
-            z-index: -1;
-            opacity: 0.4;
-            animation: move 20s infinite alternate;
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
-        @keyframes move {
-            from { transform: translate(-50%, -50%); }
-            to { transform: translate(50%, 50%); }
+        .btn-prime {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* Glassmorphism Card */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.4s ease;
+        .btn-prime:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.2);
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
         }
-
-        .glass-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-        }
-
-        .glass-input:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-color);
-            outline: none;
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-gradient {
-            background: linear-gradient(90deg, #6366f1, #a855f7);
-            transition: all 0.3s ease;
-        }
-
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
-        }
-
         .hidden-section { display: none; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        
+        /* Animasi masuk */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body>
-    <div class="blob" style="top: 20%; left: 20%;"></div>
-    <div class="blob" style="bottom: 10%; right: 10%; background: #a855f7;"></div>
+<body class="p-4">
 
-    <div class="container mx-auto px-4 flex justify-center">
-        
-        <div id="loginSection" class="glass-card w-full max-w-md p-10 animate-fade-in">
-            <div class="text-center mb-10">
-                <h1 class="text-4xl font-extrabold tracking-tight mb-2">Portal MPU3221</h1>
-                <p class="text-indigo-200 opacity-70">Sila masukkan identiti untuk akses</p>
+    <div id="loginScreen" class="glass w-full max-w-md p-10 fade-in">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold tracking-tighter uppercase mb-2">Portal MPU3221</h1>
+            <p class="text-indigo-300/60 text-xs font-bold tracking-[0.2em] uppercase text-center w-full">Sistem Pemarkahan Persatuan</p>
+        </div>
+        <div class="space-y-6">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest mb-3 ml-1 opacity-50">No. Kad Pengenalan</label>
+                <input type="text" id="noKP" maxlength="12" placeholder="Sila Masukkan 12 Digit" 
+                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:outline-none focus:border-indigo-500 font-mono text-lg transition-all">
             </div>
+            <button onclick="handleLogin()" id="loginBtn" class="btn-prime w-full p-4 rounded-2xl font-bold uppercase tracking-widest text-sm">
+                Authenticate Access
+            </button>
+            <p id="loginError" class="text-red-400 text-center text-xs font-bold hidden bg-red-500/10 p-3 rounded-xl border border-red-500/20"></p>
+        </div>
+    </div>
 
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-xs uppercase tracking-widest font-semibold mb-2 ml-1 opacity-60">No. Kad Pengenalan</label>
-                    <input type="text" id="noKP" maxlength="12" placeholder="Cth: 010203010405" 
-                           class="glass-input w-full p-4 rounded-xl text-lg font-medium tracking-widest">
-                </div>
-
-                <button onclick="handleLogin()" id="loginBtn"
-                        class="btn-gradient w-full p-4 rounded-xl font-bold text-lg uppercase tracking-wider">
-                    Authenticate
-                </button>
-                
-                <p id="loginError" class="text-red-400 text-sm text-center font-medium hidden bg-red-400/10 p-2 rounded-lg"></p>
+    <div id="dashScreen" class="glass w-full max-w-4xl p-8 hidden-section fade-in">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-white/5 pb-6 gap-4">
+            <div>
+                <h2 class="text-2xl font-bold italic tracking-tight">Student_Dashboard</h2>
+                <p id="sysID" class="text-[10px] font-mono text-indigo-400 mt-1 uppercase opacity-70">ID: --</p>
             </div>
+            <button onclick="logout()" class="px-6 py-2 border border-white/10 rounded-full text-[10px] font-black uppercase hover:bg-red-500/20 transition-all tracking-widest">Logout Session</button>
         </div>
 
-        <div id="dashboardSection" class="glass-card w-full max-w-4xl p-8 hidden-section">
-            <div class="flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-6 mb-8 gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold italic">Student_Dashboard</h2>
-                    <p class="text-xs text-indigo-300 font-mono" id="systemID">ACCESS_ID: MPU-3221-XXXX</p>
-                </div>
-                <button onclick="logout()" class="px-6 py-2 border border-red-400/50 text-red-400 rounded-full text-xs font-bold hover:bg-red-400/10 transition-all uppercase tracking-widest">
-                    Terminate Session
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="bg-white/5 border border-white/5 rounded-[2rem] p-8">
+                <h3 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-8 border-b border-white/5 pb-2">Digital Profile</h3>
                 <div class="space-y-6">
-                    <div class="glass-card bg-white/5 p-6 border-white/5">
-                        <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-tighter mb-4">Profil Digital</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-[10px] uppercase opacity-50">Nama Penuh</p>
-                                <p class="text-lg font-semibold" id="dispNama">--</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] uppercase opacity-50">No. Kad Pengenalan</p>
-                                <p class="font-mono text-indigo-200" id="dispKP">--</p>
-                            </div>
-                            <div class="flex gap-10">
-                                <div>
-                                    <p class="text-[10px] uppercase opacity-50">Kelas</p>
-                                    <p class="font-bold" id="dispKelas">--</p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] uppercase opacity-50">Status</p>
-                                    <p id="dispStatus" class="text-orange-400 font-bold">Menunggu Muat Naik</p>
-                                </div>
-                            </div>
+                    <div>
+                        <p class="text-[9px] uppercase opacity-40 font-bold tracking-widest">Nama Penuh Pelajar</p>
+                        <p id="dN" class="text-xl font-semibold tracking-tight mt-1">--</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] uppercase opacity-40 font-bold tracking-widest">Identification No.</p>
+                        <p id="dK" class="font-mono text-indigo-200 text-lg">--</p>
+                    </div>
+                    <div class="flex gap-12">
+                        <div>
+                            <p class="text-[9px] uppercase opacity-40 font-bold tracking-widest">Kelas</p>
+                            <p id="dC" class="font-bold text-lg">--</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] uppercase opacity-40 font-bold tracking-widest">Status</p>
+                            <p id="dS" class="text-orange-400 font-black">PENDING</p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="space-y-4">
-                    <div id="imageBox" class="glass-card aspect-video w-full overflow-hidden flex items-center justify-center relative border-dashed border-2 border-white/20">
-                        <p id="uploadPlaceholder" class="text-sm opacity-40 uppercase font-bold tracking-widest text-center">Tiada Imej<br>Dikesan</p>
-                        <img id="liveImg" class="w-full h-full object-cover hidden">
-                    </div>
-
-                    <input type="file" id="fileInput" hidden accept="image/*" onchange="previewImage(this)">
-                    
-                    <div class="flex gap-3">
-                        <button onclick="document.getElementById('fileInput').click()" 
-                                class="flex-1 bg-white/10 hover:bg-white/20 p-4 rounded-xl font-bold uppercase text-xs tracking-widest border border-white/10 transition-all">
-                            Pilih Fail
-                        </button>
-                        <button id="upBtn" onclick="handleUpload()"
-                                class="flex-1 btn-gradient p-4 rounded-xl font-bold uppercase text-xs tracking-widest transition-all">
-                            Muat Naik Cloud
-                        </button>
-                    </div>
-                    <p id="upStatus" class="text-[10px] text-center uppercase tracking-widest opacity-60"></p>
+            <div class="space-y-5">
+                <div id="imgContainer" class="w-full aspect-[4/3] rounded-[2rem] overflow-hidden bg-black/40 border border-white/10 flex items-center justify-center relative group">
+                    <p id="placeholder" class="text-[10px] font-bold uppercase opacity-30 tracking-[0.2em]">No Evidence Detected</p>
+                    <img id="liveImg" class="w-full h-full object-cover hidden transition-transform duration-500 group-hover:scale-105">
                 </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="document.getElementById('fIn').click()" class="bg-white/5 hover:bg-white/10 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-white/5 transition-all">Pilih Fail</button>
+                    <button id="upBtn" onclick="handleUpload()" class="btn-prime p-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest">Muat Naik</button>
+                </div>
+                <input type="file" id="fIn" hidden accept="image/*" onchange="preview(this)">
+                <p id="upMsg" class="text-[9px] text-center uppercase opacity-50 font-bold tracking-widest"></p>
             </div>
         </div>
-
     </div>
 
     <script>
-        const API = "https://script.google.com/macros/s/AKfycbxyt0-pomCxkk56f5K2Udb-agKG2DaXbyToZ_3sKIFzzU_1k1YuzvHtTtvhDd8BfSV8Dg/exec";
-        
+        const API = "https://script.google.com/macros/s/AKfycbxPEHF9kU-b7NwdizFSpylKpQZ0ZNZFE-UyGzonUjcTRdv_MEHLnhxjBmQW69BcjCXOzw/exec";
+
         // Logik Log Masuk
         async function handleLogin() {
             const kp = document.getElementById('noKP').value;
-            const btn = document.getElementById('loginBtn');
-            const err = document.getElementById('loginError');
-
             if(kp.length < 12) {
-                showError("Masukkan 12 digit No. KP");
+                showError("Sila masukkan 12 digit No. KP.");
                 return;
             }
-
-            btn.textContent = "VERIFYING...";
-            btn.disabled = true;
-            err.classList.add('hidden');
+            const btn = document.getElementById('loginBtn');
+            btn.textContent = "VERIFYING ACCESS..."; btn.disabled = true;
 
             try {
                 const res = await fetch(`${API}?action=checkLogin&noKP=${kp}`);
                 const out = await res.json();
-
                 if(out.status === "success") {
                     localStorage.setItem('userMPU', JSON.stringify(out.data));
-                    showDashboard(out.data);
+                    renderDash(out.data);
                 } else {
                     showError(out.message);
-                    btn.textContent = "Authenticate";
-                    btn.disabled = false;
+                    btn.textContent = "Authenticate Access"; btn.disabled = false;
                 }
-            } catch(e) {
-                showError("Gagal menghubungi pelayan.");
-                btn.disabled = false;
+            } catch(e) { 
+                showError("Sambungan gagal. Pastikan API URL betul."); 
+                btn.disabled = false; 
+                btn.textContent = "Authenticate Access";
             }
         }
 
         // Papar Dashboard
-        function showDashboard(data) {
-            document.getElementById('loginSection').classList.add('hidden-section');
-            document.getElementById('dashboardSection').classList.remove('hidden-section');
-            
-            document.getElementById('dispNama').textContent = data.Nama_Pelajar;
-            document.getElementById('dispKP').textContent = data.No_KP;
-            document.getElementById('dispKelas').textContent = data.Kelas;
-            document.getElementById('systemID').textContent = `ACCESS_ID: ${data.ID_SISTEM || 'MPU-3221'}`;
+        function renderDash(data) {
+            document.getElementById('loginScreen').classList.add('hidden-section');
+            document.getElementById('dashScreen').classList.remove('hidden-section');
+            document.getElementById('dN').textContent = data.Nama_Pelajar;
+            document.getElementById('dK').textContent = data.No_KP;
+            document.getElementById('dC').textContent = data.Kelas;
+            document.getElementById('sysID').textContent = "ID: " + (data.ID_SISTEM || "MPU3221_STUDENT");
 
             if(data.Status_Upload === "Selesai") {
-                const statusEl = document.getElementById('dispStatus');
-                statusEl.textContent = "✓ Selesai";
-                statusEl.classList.replace('text-orange-400', 'text-green-400');
+                const st = document.getElementById('dS');
+                st.textContent = "COMPLETED";
+                st.className = "text-green-400 font-black tracking-widest";
                 
                 if(data.Link_Gambar) {
                     const img = document.getElementById('liveImg');
-                    img.src = data.Link_Gambar.replace("open?id=", "thumbnail?id=");
+                    // Format pautan untuk paparan live
+                    img.src = data.Link_Gambar;
                     img.classList.remove('hidden');
-                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    document.getElementById('placeholder').classList.add('hidden');
                 }
             }
         }
 
-        // Preview Gambar Sebelum Muat Naik
-        function previewImage(input) {
-            if(input.files && input.files[0]) {
+        // Preview sebelum muat naik
+        function preview(input) {
+            if(input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = e => {
                     const img = document.getElementById('liveImg');
                     img.src = e.target.result;
                     img.classList.remove('hidden');
-                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    document.getElementById('placeholder').classList.add('hidden');
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // Muat Naik Gambar
+        // Muat Naik Fail
         async function handleUpload() {
-            const fileInput = document.getElementById('fileInput');
+            const fIn = document.getElementById('fIn');
             const user = JSON.parse(localStorage.getItem('userMPU'));
+            if(!fIn.files[0]) return alert("Sila pilih gambar terlebih dahulu!");
+            
             const btn = document.getElementById('upBtn');
-            const status = document.getElementById('upStatus');
-
-            if(!fileInput.files[0]) return alert("Pilih imej dahulu!");
-
-            btn.disabled = true;
-            btn.textContent = "Uploading...";
-            status.textContent = "Sila tunggu, sedang memproses...";
+            const msg = document.getElementById('upMsg');
+            btn.disabled = true; btn.textContent = "Processing...";
+            msg.textContent = "Sedang menghantar ke server...";
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const base64 = e.target.result.split(',')[1];
                 const payload = {
                     action: "uploadImage",
                     noKP: user.No_KP.toString(),
-                    imageData: base64,
-                    mimeType: fileInput.files[0].type,
-                    fileName: `MPU3221_${user.No_KP}`
+                    imageData: e.target.result.split(',')[1],
+                    mimeType: fIn.files[0].type,
+                    fileName: "MPU3221_" + user.No_KP
                 };
-
                 try {
-                    // Menggunakan no-cors untuk kestabilan Google Apps Script
-                    await fetch(API, { 
-                        method: 'POST', 
-                        mode: 'no-cors', 
-                        body: JSON.stringify(payload) 
-                    });
-                    
-                    status.textContent = "Berjaya! Sila refresh laman untuk kemaskini.";
-                    status.classList.add('text-green-400');
-                    document.getElementById('dispStatus').textContent = "✓ Selesai";
-                    document.getElementById('dispStatus').classList.replace('text-orange-400', 'text-green-400');
-                } catch(err) {
-                    status.textContent = "Gagal muat naik.";
-                    btn.disabled = false;
+                    // Gunakan mode no-cors untuk kestabilan Google Apps Script POST
+                    await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                    msg.textContent = "MUAT NAIK BERJAYA! SILA LOG MASUK SEMULA UNTUK UPDATE GAMBAR.";
+                    msg.classList.replace('opacity-50', 'text-green-400');
+                    btn.textContent = "SUCCESS";
+                } catch(err) { 
+                    alert("Gagal muat naik!"); 
+                    btn.disabled = false; 
+                    btn.textContent = "Muat Naik";
                 }
             };
-            reader.readAsDataURL(fileInput.files[0]);
+            reader.readAsDataURL(fIn.files[0]);
         }
 
         function showError(msg) {
             const err = document.getElementById('loginError');
-            err.textContent = msg;
+            err.textContent = "ERR_SYSTEM: " + msg;
             err.classList.remove('hidden');
         }
 
-        function logout() {
-            localStorage.removeItem('userMPU');
-            location.reload();
+        function logout() { 
+            localStorage.removeItem('userMPU'); 
+            location.reload(); 
         }
 
-        // Semak sesi sedia ada
+        // Kekalkan sesi jika sudah log masuk
         window.onload = () => {
-            const savedUser = localStorage.getItem('userMPU');
-            if(savedUser) showDashboard(JSON.parse(savedUser));
+            const u = localStorage.getItem('userMPU');
+            if(u) renderDash(JSON.parse(u));
         }
     </script>
 </body>
