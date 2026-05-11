@@ -3,214 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Biodata Pelajar | Digital Profile</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-
+    <title>Log Masuk | MPU3221</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #38bdf8; --bg-dark: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .font-display { font-family: 'Space Grotesk', sans-serif; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); }
-        .input-field { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); color: white; transition: all 0.3s ease; }
-        .input-field:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); }
-        .btn-glow { background: var(--primary); color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); transition: all 0.2s ease; }
-        .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(56, 189, 248, 0.5); }
-        #profile-section { display: none; }
-        .loading-spin { animation: rotate 2s linear infinite; }
-        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        :root { --bg: #0a0a0c; --cyan: #00f2ff; --border: #1e1e24; --text: #e0e0e0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        body::before { content: ""; position: absolute; width: 100%; height: 100%; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; z-index: -1; opacity: 0.2; }
+        .login-card { width: 100%; max-width: 400px; padding: 3rem; background: rgba(15, 15, 18, 0.9); border: 1px solid var(--border); backdrop-filter: blur(10px); position: relative; }
+        .login-card::before { content: "DATA_ACCESS_v1.0"; position: absolute; top: 10px; right: 15px; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--cyan); }
+        h1 { font-size: 1.5rem; letter-spacing: 2px; color: var(--cyan); margin-bottom: 2rem; border-left: 3px solid var(--cyan); padding-left: 15px; }
+        label { display: block; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; margin-bottom: 10px; }
+        input { width: 100%; padding: 1rem; background: transparent; border: 1px solid var(--border); color: white; font-family: 'JetBrains Mono'; margin-bottom: 1.5rem; }
+        input:focus { outline: none; border-color: var(--cyan); background: rgba(0, 242, 255, 0.05); }
+        button { width: 100%; padding: 1rem; background: var(--cyan); color: #000; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        #err { color: #ff4d4d; font-family: 'JetBrains Mono'; font-size: 0.7rem; margin-top: 1rem; display: none; }
     </style>
 </head>
-<body class="p-4 md:p-8">
-
-    <div id="login-section" class="w-full max-w-md glass-panel rounded-[3rem] p-10 text-center">
-        <div class="w-24 h-24 bg-sky-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-sky-500/30">
-            <i data-lucide="user-check" class="w-12 h-12 text-sky-400"></i>
-        </div>
-        <h1 class="text-4xl font-display font-bold mb-8 italic">Log Masuk</h1>
-        <div class="space-y-6 text-left">
-            <div>
-                <label class="text-[10px] font-bold text-sky-500 uppercase tracking-widest ml-2">No. Kad Pengenalan</label>
-                <input type="text" id="login-kp" placeholder="Contoh: 050805110551" class="w-full p-5 mt-2 rounded-2xl input-field text-center text-2xl font-bold tracking-widest">
-            </div>
-            <button onclick="prosesMasuk()" id="btn-login" class="w-full p-5 rounded-2xl btn-glow flex items-center justify-center gap-3">
-                <span>Buka Profil</span>
-                <i data-lucide="arrow-right" class="w-5 h-5"></i>
-            </button>
-        </div>
+<body>
+    <div class="login-card">
+        <h1>PORTAL MPU3221</h1>
+        <label>NO. KAD PENGENALAN</label>
+        <input type="text" id="noKP" placeholder="Masukkan 12 Digit" maxlength="12">
+        <button onclick="login()">Authenticate</button>
+        <p id="err"></p>
     </div>
-
-    <div id="profile-section" class="w-full max-w-6xl glass-panel rounded-[3.5rem] overflow-hidden flex flex-col lg:flex-row">
-        
-        <div class="w-full lg:w-96 bg-slate-900/40 p-12 border-r border-white/5 flex flex-col items-center text-center">
-            <div class="relative mb-8">
-                <div id="img-display" class="w-56 h-56 rounded-full bg-slate-800 border-4 border-sky-500/30 flex items-center justify-center overflow-hidden">
-                    <i data-lucide="user" class="w-24 h-24 text-slate-700"></i>
-                </div>
-                <label for="file-input" class="absolute bottom-4 right-4 w-14 h-14 bg-sky-500 rounded-full flex items-center justify-center cursor-pointer shadow-xl transition-transform hover:scale-110">
-                    <i data-lucide="camera" class="w-7 h-7 text-slate-900"></i>
-                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="previewFoto(event)">
-                </label>
-            </div>
-            <h2 id="disp-nama" class="text-2xl font-display font-bold uppercase tracking-tight leading-tight">NAMA PELAJAR</h2>
-            <p id="disp-kp" class="text-sky-400 font-bold mt-3 text-xs tracking-widest">NO. KP: --</p>
-            
-            <div class="mt-8 p-4 bg-white/5 rounded-2xl w-full flex justify-between items-center border border-white/5">
-                <span class="text-[10px] font-bold opacity-40 uppercase tracking-widest">No. Rekod</span>
-                <span id="disp-bil" class="font-display font-bold text-sky-400">#--</span>
-            </div>
-        </div>
-
-        <div class="flex-1 p-10 md:p-16">
-            <h3 class="text-3xl font-display font-bold mb-10 italic">Biodata Digital Pelajar</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nama Penuh</label>
-                    <input type="text" id="f-nama" class="w-full p-4 rounded-2xl input-field font-semibold">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">No. KP (Terkunci)</label>
-                    <input type="text" id="f-kp" readonly class="w-full p-4 rounded-2xl input-field opacity-40 font-bold cursor-not-allowed">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Angka Giliran</label>
-                    <input type="text" id="f-agiliran" class="w-full p-4 rounded-2xl input-field font-semibold">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Kelas</label>
-                    <input type="text" id="f-kelas" class="w-full p-4 rounded-2xl input-field font-semibold">
-                </div>
-                <div class="md:col-span-2 space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Pensyarah Pembimbing</label>
-                    <select id="f-pensyarah" class="w-full p-4 rounded-2xl input-field font-semibold appearance-none cursor-pointer">
-                        <option value="">Pilih Pensyarah...</option>
-                        <option value="Pn. Nor Azura">Pn. Nor Azura</option>
-                        <option value="En. Ahmad Fauzi">En. Ahmad Fauzi</option>
-                        <option value="Dr. Siti Aminah">Dr. Siti Aminah</option>
-                    </select>
-                </div>
-                <input type="hidden" id="f-bil">
-                <input type="hidden" id="f-urlgambar">
-            </div>
-            <div class="mt-12 flex flex-col sm:flex-row gap-4">
-                <button onclick="simpanProfil()" id="btn-save" class="flex-1 p-5 rounded-2xl btn-glow flex items-center justify-center gap-3">
-                    <i data-lucide="save" class="w-6 h-6"></i>
-                    <span>Kemaskini Maklumat</span>
-                </button>
-                <button onclick="location.reload()" class="p-5 px-8 rounded-2xl bg-white/5 border border-white/10 text-red-400 hover:bg-red-500/10 transition-all">
-                    <i data-lucide="log-out" class="w-6 h-6"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        lucide.createIcons();
-        
-        // GANTIKAN DENGAN URL WEB APP DEPLOYMENT TERBARU ANDA
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNeTlBTtnv9-reJVGl2mEDiXlyMUcftHOS4vrJTG-D7rAwbzQxJkKP6hObPeCYy2kNfw/exec';
-
-        async function prosesMasuk() {
-            const kpInput = document.getElementById('login-kp').value.trim();
-            if(!kpInput) return alert("Sila masukkan No. KP!");
+        const API = "https://script.google.com/macros/s/AKfycbxyt0-pomCxkk56f5K2Udb-agKG2DaXbyToZ_3sKIFzzU_1k1YuzvHtTtvhDd8BfSV8Dg/exec";
+        async function login() {
+            const kp = document.getElementById('noKP').value;
+            const err = document.getElementById('err');
+            if(kp.length < 12) { err.textContent = "Err: Masukkan 12 digit"; err.style.display = 'block'; return; }
             
-            const btn = document.getElementById('btn-login');
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-5 h-5 loading-spin"></i>`;
-            lucide.createIcons();
-
             try {
-                const res = await fetch(SCRIPT_URL);
-                const data = await res.json();
-                const kpBersih = kpInput.replace(/[^0-9]/g, '');
-                
-                // Cari data pelajar
-                const p = data.find(item => item.nokp.toString().replace(/[^0-9]/g, '') === kpBersih);
-
-                if(p) {
-                    document.getElementById('f-bil').value = p.bil || '';
-                    document.getElementById('f-nama').value = p.namapelajar || '';
-                    document.getElementById('f-kp').value = p.nokp || '';
-                    document.getElementById('f-agiliran').value = p.agiliran || '';
-                    document.getElementById('f-kelas').value = p.kelas || '';
-                    document.getElementById('f-pensyarah').value = p.pensyarah || '';
-                    document.getElementById('f-urlgambar').value = p.urlgmbar || '';
-                    
-                    document.getElementById('disp-nama').innerText = p.namapelajar || 'PELAJAR';
-                    document.getElementById('disp-kp').innerText = `NO. KP: ${p.nokp}`;
-                    document.getElementById('disp-bil').innerText = `#${p.bil || '--'}`;
-                    
-                    const imgBox = document.getElementById('img-display');
-                    // Menggunakan p.urlgmbar secara terus dari sheet
-                    if(p.urlgmbar && p.urlgmbar.toString().includes('http')) {
-                        imgBox.innerHTML = `<img src="${p.urlgmbar}" class="w-full h-full object-cover">`;
-                    } else {
-                        imgBox.innerHTML = `<i data-lucide="user" class="w-24 h-24 text-slate-700"></i>`;
-                        lucide.createIcons();
-                    }
+                const res = await fetch(`${API}?action=checkLogin&noKP=${kp}`);
+                const out = await res.json();
+                if(out.status === "success") {
+                    localStorage.setItem('userMPU', JSON.stringify(out.data));
+                    window.location.href = "profile.html";
                 } else {
-                    document.getElementById('f-kp').value = kpInput;
-                    document.getElementById('disp-kp').innerText = `NO. KP: ${kpInput}`;
+                    err.textContent = "Err: " + out.message;
+                    err.style.display = 'block';
                 }
-                
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('profile-section').style.display = 'flex';
-                lucide.createIcons();
-            } catch (e) {
-                alert("Ralat memuat data API.");
-                btn.disabled = false;
-                btn.innerHTML = `<span>Buka Profil</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>`;
-                lucide.createIcons();
-            }
-        }
-
-        function previewFoto(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                document.getElementById('img-display').innerHTML = `<img src="${reader.result}" class="w-full h-full object-cover">`;
-                document.getElementById('f-urlgambar').value = reader.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function simpanProfil() {
-            const btn = document.getElementById('btn-save');
-            const dataObj = {
-                bil: document.getElementById('f-bil').value,
-                namapelajar: document.getElementById('f-nama').value,
-                nokp: document.getElementById('f-kp').value,
-                agiliran: document.getElementById('f-agiliran').value,
-                kelas: document.getElementById('f-kelas').value,
-                urlgambar: document.getElementById('f-urlgambar').value,
-                pensyarah: document.getElementById('f-pensyarah').value
-            };
-
-            if(!dataObj.namapelajar || !dataObj.pensyarah) return alert("Sila lengkapkan maklumat.");
-
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-6 h-6 loading-spin"></i> <span>Menyimpan...</span>`;
-            lucide.createIcons();
-
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(dataObj)
-                });
-                
-                alert("BERJAYA! Maklumat sedang diproses. Sila tunggu 5 saat sebelum memuat semula laman web untuk melihat gambar.");
-                document.getElementById('disp-nama').innerText = dataObj.namapelajar;
-            } catch (e) {
-                alert("Ralat teknikal semasa menyimpan.");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="save" class="w-6 h-6"></i> <span>Kemaskini Maklumat</span>`;
-                lucide.createIcons();
-            }
+            } catch(e) { err.textContent = "Err: Server Offline"; err.style.display = 'block'; }
         }
     </script>
 </body>
