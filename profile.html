@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Pelajar | MPU3221</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0a0a0c; --cyan: #00f2ff; --border: #1e1e24; --card: #111114; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: #e0e0e0; font-family: 'Space Grotesk', sans-serif; padding: 2rem; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
+        h1 { font-size: 1.2rem; letter-spacing: 2px; color: var(--cyan); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 2rem; position: relative; }
+        .card h2 { font-size: 0.8rem; color: var(--cyan); text-transform: uppercase; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .data-item { margin-bottom: 1.2rem; }
+        .label { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #666; text-transform: uppercase; }
+        .val { font-size: 1.1rem; color: #fff; margin-top: 5px; font-weight: 500; }
+        .upload-box { border: 2px dashed var(--border); padding: 2rem; text-align: center; cursor: pointer; transition: 0.3s; min-height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .upload-box:hover { border-color: var(--cyan); background: rgba(0,242,255,0.03); }
+        .btn { width: 100%; padding: 1.2rem; background: var(--cyan); color: #000; border: none; font-weight: 700; margin-top: 1rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        #preview { width: 100%; max-height: 300px; object-fit: contain; margin-top: 1rem; display: none; border: 1px solid var(--border); }
+        .logout-btn { background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 8px 15px; cursor: pointer; font-family: 'JetBrains Mono'; font-size: 0.7rem; transition: 0.3s; }
+        .logout-btn:hover { background: #ff4d4d; color: #fff; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div><h1>STUDENT_DASHBOARD</h1><p style="font-size: 0.7rem; color:#666">MPU3221 ACCESS GRANTED</p></div>
+            <button class="logout-btn" onclick="logout()">LOGOUT</button>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Identiti Pelajar</h2>
+                <div class="data-item"><p class="label">Nama Penuh</p><p class="val" id="nama">--</p></div>
+                <div class="data-item"><p class="label">No. Kad Pengenalan</p><p class="val" id="kp">--</p></div>
+                <div class="data-item"><p class="label">Unit / No. Giliran</p><p class="val" id="kelas">--</p></div>
+                <div class="data-item"><p class="label">Status Dokumen</p><p class="val" id="status" style="color:var(--cyan)">MENUNGGU MUAT NAIK</p></div>
+            </div>
+
+            <div class="card">
+                <h2>Muat Naik Bukti</h2>
+                <div class="upload-box" id="dropzone" onclick="document.getElementById('file').click()">
+                    <p id="msg" style="font-size:0.8rem; font-family:'JetBrains Mono'">TAP TO CAPTURE / SELECT IMAGE</p>
+                    <img id="preview">
+                </div>
+                <input type="file" id="file" hidden accept="image/*" onchange="previewImage(this)">
+                <button class="btn" id="upBtn" onclick="uploadFile()">Execute Upload</button>
+                <p id="upStatus" style="font-size: 0.7rem; font-family:'JetBrains Mono'; margin-top: 10px; text-align: center;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "https://script.google.com/macros/s/AKfycbxyt0-pomCxkk56f5K2Udb-agKG2DaXbyToZ_3sKIFzzU_1k1YuzvHtTtvhDd8BfSV8Dg/exec";
+        const user = JSON.parse(localStorage.getItem('userMPU'));
+        
+        if(!user) {
+            window.location.href = "index.html";
+        } else {
+            document.getElementById('nama').textContent = user.Nama_Pelajar;
+            document.getElementById('kp').textContent = user.No_KP;
+            document.getElementById('kelas').textContent = user.Kelas + " / " + user.No_Giliran;
+            if(user.Status_Upload === "Selesai") {
+                document.getElementById('status').textContent = "VERIFIED_COMPLETED";
+                document.getElementById('status').style.color = "#00ff88";
+            }
+        }
+
+        function previewImage(input) {
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.getElementById('preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('msg').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('file');
+            const btn = document.getElementById('upBtn');
+            const upStatus = document.getElementById('upStatus');
+            
+            if(!fileInput.files[0]) {
+                alert("Sila pilih fail imej terlebih dahulu.");
+                return;
+            }
+            
+            btn.textContent = "UPLOADING TO DRIVE...";
+            btn.disabled = true;
+            upStatus.textContent = "STATUS: Encrypting and sending data...";
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result.split(',')[1];
+                const payload = {
+                    action: "uploadImage",
+                    noKP: user.No_KP,
+                    imageData: base64,
+                    mimeType: file.type,
+                    fileName: "MPU3221_" + user.No_KP + "_" + user.Nama_Pelajar
+                };
+
+                try {
+                    const res = await fetch(API, { 
+                        method: 'POST', 
+                        body: JSON.stringify(payload) 
+                    });
+                    const out = await res.json();
+                    
+                    if(out.status === "success") {
+                        upStatus.style.color = "#00ff88";
+                        upStatus.textContent = "STATUS: Upload Successful. File ID stored.";
+                        document.getElementById('status').textContent = "VERIFIED_COMPLETED";
+                        document.getElementById('status').style.color = "#00ff88";
+                        btn.textContent = "UPLOAD SUCCESS";
+                    } else {
+                        throw new Error(out.message);
+                    }
+                } catch(err) { 
+                    upStatus.style.color = "#ff4d4d";
+                    upStatus.textContent = "STATUS: Error - " + err.message;
+                    btn.disabled = false;
+                    btn.textContent = "RETRY UPLOAD";
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function logout() { 
+            localStorage.removeItem('userMPU'); 
+            window.location.href = "index.html"; 
+        }
+    </script>
+</body>
+</html>
