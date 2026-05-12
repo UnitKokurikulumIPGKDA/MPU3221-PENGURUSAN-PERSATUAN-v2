@@ -389,14 +389,28 @@
 
     <!-- ---- TAB: KEPUTUSAN ---- -->
     <div id="stab-result" style="padding:20px 24px; flex:1; display:none;">
-        <div class="alert-info mb-5">
-            <i class="fas fa-lock"></i>
-            <span>Keputusan peer evaluation anda adalah sulit. Markah akhir akan ditetapkan oleh pensyarah berdasarkan keputusan agregat.</span>
-        </div>
-        <div id="myResultBox" class="glass p-6">
-            <div style="text-align:center; color:rgba(255,255,255,0.2); padding:40px;">
-                <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
-                <p style="margin-top:12px; font-size:13px;">Memuatkan keputusan...</p>
+        <!-- Mesej kerahsiaan markah -->
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:24px; max-width:480px; margin:0 auto; text-align:center;">
+            <div style="width:80px; height:80px; border-radius:50%; background:rgba(99,102,241,0.1); border:2px solid rgba(99,102,241,0.25); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-lock" style="font-size:2rem; color:#6366f1;"></i>
+            </div>
+            <div>
+                <h3 style="font-size:20px; font-weight:800; margin-bottom:10px;">Markah Adalah Sulit</h3>
+                <p style="font-size:13px; color:rgba(255,255,255,0.45); line-height:1.8;">
+                    Markah akhir bagi HP1, HP5, HP8 dan HP10 anda adalah <strong style="color:rgba(255,255,255,0.7);">maklumat sulit</strong> dan hanya diketahui oleh pensyarah anda.<br><br>
+                    Sila rujuk pensyarah secara langsung untuk mengetahui markah anda setelah proses pemarkahan selesai.
+                </p>
+            </div>
+            <!-- Status peer eval sahaja yang boleh ditunjuk -->
+            <div id="myPeerStatusBox" style="width:100%; padding:20px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:16px;">
+                <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; text-align:left;">
+                    <i class="fas fa-chart-radar me-1"></i> Status Peer Evaluation Anda
+                </div>
+                <div id="myPeerStatusContent">
+                    <div style="text-align:center; color:rgba(255,255,255,0.2); padding:20px;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -898,34 +912,44 @@ async function submitPeerEval() {
     }
 }
 
+// Hanya tunjuk status peer eval pelajar — TANPA markah (markah sulit)
 async function loadMyResult() {
     if (!curUser) return;
-    const box = document.getElementById('myResultBox');
+    const box = document.getElementById('myPeerStatusContent');
+    if (!box) return;
     try {
-        const r = await fetch(`${API}?action=getMyResult&noKP=${encodeURIComponent(curUser.No_KP)}`);
+        // Dapatkan senarai rakan sekelas & siapa yang sudah dinilai
+        const r = await fetch(`${API}?action=getClassmates&noKP=${encodeURIComponent(curUser.No_KP)}&kelas=${encodeURIComponent(curUser.Kelas)}`);
         const o = await r.json();
-        if (o.status === 'success' && o.markah) {
-            const m = o.markah;
-            const total = (m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0);
-            const gred = calculateGred(total);
+        if (o.status === 'success') {
+            const total = o.data.length;
+            const done  = (o.done || []).length;
+            const pct   = total > 0 ? Math.round((done/total)*100) : 0;
+            const allDone = done === total && total > 0;
             box.innerHTML = `
-                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; margin-bottom:20px;">
-                    ${[['HP1',m.hp1||'-','30'],['HP5',m.hp5||'-','10'],['HP8 (Peer)',m.hp8||'-','30'],['HP10',m.hp10||'-','30']].map(([label,val,max])=>`
-                    <div style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:14px; text-align:center;">
-                        <div style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">${label}</div>
-                        <div style="font-size:28px; font-weight:800; font-family:'Space Mono',monospace; color:white;">${val}</div>
-                        <div style="font-size:9px; color:rgba(255,255,255,0.2);">/ ${max}</div>
-                    </div>`).join('')}
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="font-size:12px; color:rgba(255,255,255,0.5);">Kemajuan Penilaian</span>
+                            <span style="font-size:12px; font-weight:800; font-family:'Space Mono',monospace; color:${allDone?'#10b981':'#6366f1'};">${done} / ${total}</span>
+                        </div>
+                        <div style="height:8px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden;">
+                            <div style="height:100%; width:${pct}%; background:${allDone?'linear-gradient(90deg,#10b981,#06b6d4)':'linear-gradient(90deg,#6366f1,#a855f7)'}; border-radius:8px; transition:width 0.5s;"></div>
+                        </div>
+                    </div>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 24px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:16px;">
-                    <div><div style="font-size:10px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">JUMLAH</div><div style="font-size:42px; font-weight:800; font-family:'Space Mono',monospace; color:var(--indigo);">${total}</div></div>
-                    <div style="text-align:right;"><div style="font-size:10px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">GRED</div><div style="font-size:52px; font-weight:800; color:var(--indigo);">${gred}</div></div>
+                <div style="display:flex; align-items:center; gap:10px; padding:14px; border-radius:12px; background:${allDone?'rgba(16,185,129,0.1)':'rgba(99,102,241,0.08)'}; border:1px solid ${allDone?'rgba(16,185,129,0.25)':'rgba(99,102,241,0.2)'};">
+                    <i class="fas ${allDone?'fa-circle-check':'fa-hourglass-half'}" style="font-size:1.4rem; color:${allDone?'#10b981':'#6366f1'};"></i>
+                    <div>
+                        <div style="font-size:12px; font-weight:700; color:${allDone?'#6ee7b7':'#a5b4fc'};">${allDone ? 'Semua penilaian selesai!' : 'Masih ada rakan yang belum dinilai'}</div>
+                        <div style="font-size:11px; color:rgba(255,255,255,0.35); margin-top:2px;">${allDone ? 'Terima kasih. Data anda telah dihantar kepada pensyarah.' : `Pergi ke tab Peer Eval untuk melengkapkan ${total-done} penilaian yang tinggal.`}</div>
+                    </div>
                 </div>`;
         } else {
-            box.innerHTML = `<div style="text-align:center; padding:40px; color:rgba(255,255,255,0.3);"><i class="fas fa-clock" style="font-size:2rem; margin-bottom:12px;"></i><p style="font-size:13px;">Markah belum ditetapkan oleh pensyarah</p></div>`;
+            box.innerHTML = `<p style="font-size:12px; color:rgba(255,255,255,0.3); text-align:center;">Tiada data kelas ditemui.</p>`;
         }
     } catch(e) {
-        box.innerHTML = `<div style="text-align:center; padding:40px; color:rgba(255,255,255,0.2); font-size:13px;">Ralat memuatkan keputusan</div>`;
+        box.innerHTML = `<p style="font-size:12px; color:rgba(255,255,255,0.3); text-align:center;">Ralat memuatkan status.</p>`;
     }
 }
 
@@ -995,13 +1019,15 @@ function renderLecStudentList() {
     document.getElementById('classInfo').textContent = kelas;
     document.getElementById('sList').innerHTML = sData.map(s => {
         const hasMark = s.markahSediaAda;
-        return `<div class="s-card ${hasMark?'done':''}" onclick="selectStudent('${s.No_KP}')">
+        const hasPeer = s.peerSummary && s.peerSummary.count > 0;
+        return `<div class="s-card ${hasMark?'done':''}" data-kp="${s.No_KP}" onclick="selectStudent('${s.No_KP}')">
             <div style="display:flex; align-items:center; gap:8px;">
                 <div class="eval-dot ${hasMark?'done':'pending'}"></div>
                 <div style="flex:1;">
                     <div style="font-size:13px; font-weight:600;">${s.Nama_Pelajar}</div>
                     <div style="font-size:9px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.3); margin-top:1px;">${s.Kelas} · ${s.No_KP}</div>
                 </div>
+                ${hasPeer ? `<span title="${s.peerSummary.count} penilaian rakan" style="font-size:9px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); color:#67e8f9; padding:2px 8px; border-radius:20px; font-weight:700; white-space:nowrap;">${s.peerSummary.count} <i class="fas fa-users"></i></span>` : ''}
             </div>
         </div>`;
     }).join('');
@@ -1023,11 +1049,12 @@ async function selectStudent(kp) {
     curS = sData.find(s => s.No_KP == kp);
     if (!curS) return;
 
-    // Highlight
+    // Highlight kad yang dipilih
     document.querySelectorAll('#sList .s-card').forEach(c => c.classList.remove('selected'));
-    event?.currentTarget?.classList.add('selected');
+    const clicked = document.querySelector(`#sList .s-card[data-kp="${kp}"]`);
+    if (clicked) clicked.classList.add('selected');
 
-    // Show grading panel
+    // Tunjuk panel pemarkahan
     document.getElementById('gradingPanel').style.display = 'block';
     document.getElementById('gradingEmpty').style.display = 'none';
 
@@ -1036,7 +1063,7 @@ async function selectStudent(kp) {
 
     loadImage(document.getElementById('li'), document.getElementById('liPh'), curS.Link_Gambar);
 
-    // Load existing marks
+    // Isi semula markah sedia ada
     if (curS.markahSediaAda) {
         document.getElementById('h1').value = curS.markahSediaAda.hp1 || '';
         document.getElementById('h5').value = curS.markahSediaAda.hp5 || '';
@@ -1048,23 +1075,47 @@ async function selectStudent(kp) {
     }
     calc(); checkLimits();
 
-    // Load peer eval data for this student
+    // Muatkan data peer eval — guna peerSummary dalam sData dulu (lebih pantas)
+    // kemudian refresh dari API untuk data terkini
+    if (curS.peerSummary && curS.peerSummary.count > 0) {
+        // Tunjuk dahulu dari cache sData
+        showPeerBadge(curS.peerSummary);
+        showMiniRadar(curS.peerSummary);
+        updateRadarPanel(kp, curS.peerSummary);
+    }
+    // Sentiasa fetch semula dari API untuk pastikan data terkini
     await loadPeerData(kp);
 }
 
 async function loadPeerData(kp) {
+    // Normalize KP — buang ruang dan tukar kepada string
+    const kpClean = kp.toString().trim();
     try {
-        const r = await fetch(`${API}?action=getPeerSummary&targetKP=${encodeURIComponent(kp)}`);
+        const r = await fetch(`${API}?action=getPeerSummary&targetKP=${encodeURIComponent(kpClean)}`);
         const o = await r.json();
         if (o.status === 'success' && o.evals && o.evals.length > 0) {
             showPeerBadge(o);
             showMiniRadar(o);
-            updateRadarPanel(kp, o);
+            updateRadarPanel(kpClean, o);
         } else {
+            // Tiada data peer eval — tunjuk status kosong
             document.getElementById('peerScoreBadge').style.display = 'none';
-            document.getElementById('miniRadarBox').style.display = 'none';
+            document.getElementById('miniRadarBox').style.display  = 'none';
+            // Update radar panel dengan mesej tiada data
+            document.getElementById('radarEmpty').style.display   = 'flex';
+            document.getElementById('radarContent').style.display = 'none';
+            // Tulis info dalam radarEmpty untuk bantu debug
+            document.getElementById('radarEmpty').innerHTML = `
+                <div style="text-align:center; color:rgba(255,255,255,0.25);">
+                    <i class="fas fa-spider" style="font-size:2.5rem; margin-bottom:12px; display:block;"></i>
+                    <p style="font-size:13px; margin-bottom:6px;">${curS?.Nama_Pelajar || '--'}</p>
+                    <p style="font-size:11px; color:rgba(255,255,255,0.18);">Belum ada penilaian rakan diterima</p>
+                    <p style="font-size:10px; color:rgba(255,255,255,0.12); margin-top:4px; font-family:'Space Mono',monospace;">KP: ${kpClean}</p>
+                </div>`;
         }
-    } catch(e) {}
+    } catch(e) {
+        console.error('loadPeerData error:', e);
+    }
 }
 
 function showPeerBadge(o) {
