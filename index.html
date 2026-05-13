@@ -178,8 +178,6 @@
         <div class="tab-bar" style="max-width:500px;">
             <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-user me-1"></i> Profil</button>
             <button class="tab" onclick="showStudentTab('peer')"><i class="fas fa-users me-1"></i> Peer Eval</button>
-            <button class="tab" onclick="showStudentTab('rubrik')"><i class="fas fa-list-check me-1"></i> Rubrik HP5/HP6</button>
-            <button class="tab" onclick="showStudentTab('result')"><i class="fas fa-lock me-1"></i> Status</button>
         </div>
     </div>
 
@@ -889,13 +887,11 @@ function showStudentTab(t) {
         if (el) el.style.display = 'none';
     });
     const target = document.getElementById('stab-'+t);
-    if (target) target.style.display = (t==='rubrik'||t==='result'||t==='peer') ? 'flex' : 'flex';
+    if (target) target.style.display = 'flex';
     document.querySelectorAll('#studentDash .tab').forEach((btn,i) => {
-        const tabs = ['profile','peer','rubrik','result'];
+        const tabs = ['profile','peer'];
         btn.classList.toggle('active', tabs[i] === t);
     });
-    if (t === 'result')  loadMyResult();
-    if (t === 'rubrik')  loadRubrikStatus();
 }
 
 // Load senarai rakan sekelas — selalu fetch dari server (bukan localStorage)
@@ -1226,18 +1222,80 @@ function renderLecStudentList() {
 }
 
 function showLecTab(t) {
+    // Sembunyikan semua tab content
     ['marking','peer','rubrik','summary'].forEach(id => {
         const el = document.getElementById('ltab-'+id);
         if (el) el.style.display = 'none';
     });
+    // Tunjuk tab yang dipilih
     const el = document.getElementById('ltab-'+t);
     if (el) el.style.display = 'block';
+
+    // Kemaskini tab button highlight
     document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => {
         const tabs = ['marking','peer','rubrik','summary'];
         btn.classList.toggle('active', tabs[i] === t);
     });
+
+    // ── Tab: Pemarkahan
+    if (t === 'marking') {
+        const gp = document.getElementById('gradingPanel');
+        const ge = document.getElementById('gradingEmpty');
+        if (curS && gp && ge) {
+            gp.style.display = 'block';
+            ge.style.display = 'none';
+        } else if (ge) {
+            if (gp) gp.style.display = 'none';
+            ge.style.display = 'flex';
+        }
+    }
+
+    // ── Tab: Peer Radar — destroy chart dulu, recreate selepas tab benar-benar visible
+    if (t === 'peer') {
+        if (radarChart)     { radarChart.destroy();     radarChart = null; }
+        if (miniRadarChart) { miniRadarChart.destroy();  miniRadarChart = null; }
+        // Tunggu 150ms untuk pastikan DOM render tab content dulu
+        setTimeout(() => {
+            if (!curS) {
+                document.getElementById('radarEmpty').style.display = 'flex';
+                document.getElementById('radarContent').style.display = 'none';
+                document.getElementById('radarEmpty').innerHTML = `
+                    <div style="text-align:center; color:rgba(255,255,255,0.2);">
+                        <i class="fas fa-hand-pointer" style="font-size:3rem; margin-bottom:12px; display:block;"></i>
+                        <p style="font-size:13px;">Pilih pelajar untuk lihat Spider Web Radar</p>
+                    </div>`;
+                return;
+            }
+            // Jika ada cached data, render terus tanpa fetch baru
+            if (window._lastRadarKP === curS.No_KP.toString().trim() && window._lastRadarDims) {
+                const canvas = document.getElementById('radarChart');
+                if (canvas) {
+                    document.getElementById('radarEmpty').style.display = 'none';
+                    document.getElementById('radarContent').style.display = 'block';
+                    if (radarChart) { radarChart.destroy(); radarChart = null; }
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    radarChart = new Chart(ctx, buildRadarConfig(window._lastRadarDims, 'full'));
+                }
+            } else {
+                // Fetch data baru dari API
+                loadPeerData(curS.No_KP.toString().trim());
+            }
+        }, 150);
+    }
+
+    // ── Tab: Rubrik
+    if (t === 'rubrik') {
+        if (curS) {
+            showRubrikLecPanel(curS);
+        } else {
+            document.getElementById('rubrikLecEmpty').style.display = 'flex';
+            document.getElementById('rubrikLecPanel').style.display = 'none';
+        }
+    }
+
+    // ── Tab: Ringkasan
     if (t === 'summary') renderSummaryTable();
-    if (t === 'rubrik' && curS) showRubrikLecPanel(curS);
 }
 
 async function selectStudent(kp) {
@@ -1249,20 +1307,23 @@ async function selectStudent(kp) {
     const clicked = document.querySelector(`#sList .s-card[data-kp="${kp}"]`);
     if (clicked) clicked.classList.add('selected');
 
-    // Tunjuk panel pemarkahan
+    // Cari tab yang sedang aktif
+    const activeTabId = ['marking','peer','rubrik','summary'].find(id => {
+        const el = document.getElementById('ltab-'+id);
+        return el && el.style.display !== 'none';
+    }) || 'marking';
+
+    // ── UPDATE PANEL PEMARKAHAN (sentiasa kemaskini walaupun tab lain aktif)
     document.getElementById('gradingPanel').style.display = 'block';
     document.getElementById('gradingEmpty').style.display = 'none';
-
     document.getElementById('ln').textContent = curS.Nama_Pelajar;
     document.getElementById('lk').textContent = `KP: ${curS.No_KP} | ${curS.Kelas}`;
-
     loadImage(document.getElementById('li'), document.getElementById('liPh'), curS.Link_Gambar);
 
-    // Isi semula markah sedia ada
     if (curS.markahSediaAda) {
-        document.getElementById('h1').value = curS.markahSediaAda.hp1 || '';
-        document.getElementById('h5').value = curS.markahSediaAda.hp5 || '';
-        document.getElementById('h8').value = curS.markahSediaAda.hp8 || '';
+        document.getElementById('h1').value  = curS.markahSediaAda.hp1  || '';
+        document.getElementById('h5').value  = curS.markahSediaAda.hp5  || '';
+        document.getElementById('h8').value  = curS.markahSediaAda.hp8  || '';
         document.getElementById('h10').value = curS.markahSediaAda.hp10 || '';
         document.getElementById('justTxt').value = (curS.markahSediaAda.just === "-") ? "" : (curS.markahSediaAda.just||"");
     } else {
@@ -1270,16 +1331,37 @@ async function selectStudent(kp) {
     }
     calc(); checkLimits();
 
-    // Muatkan data peer eval — guna peerSummary dalam sData dulu (lebih pantas)
-    // kemudian refresh dari API untuk data terkini
+    // ── Pastikan gradingPanel sentiasa dikemaskini (tanpa tukar tab)
+    // Tab kekal seperti mana pelajar klik — hanya data dikemaskini
+    const gp = document.getElementById('gradingPanel');
+    const ge = document.getElementById('gradingEmpty');
+    if (gp) gp.style.display = 'block';
+    if (ge) ge.style.display = 'none';
+
+    // ── Jika tab rubrik aktif, refresh panel rubrik
+    if (activeTabId === 'rubrik') {
+        showRubrikLecPanel(curS);
+    }
+
+    // ── Fetch peer data (untuk mini radar + badge dalam marking tab)
     if (curS.peerSummary && curS.peerSummary.count > 0) {
-        // Tunjuk dahulu dari cache sData
         showPeerBadge(curS.peerSummary);
         showMiniRadar(curS.peerSummary);
-        updateRadarPanel(kp, curS.peerSummary);
+    } else {
+        const pb = document.getElementById('peerScoreBadge');
+        const mr = document.getElementById('miniRadarBox');
+        if (pb) pb.style.display = 'none';
+        if (mr) mr.style.display = 'none';
     }
-    // Sentiasa fetch semula dari API untuk pastikan data terkini
+
+    // ── Fetch dari API (untuk pastikan data terkini)
     await loadPeerData(kp);
+
+    // ── Jika tab peer radar aktif, render chart selepas data dimuatkan
+    if (activeTabId === 'peer') {
+        // loadPeerData sudah handle updateRadarPanel — trigger redraw
+        setTimeout(() => { if (radarChart) radarChart.update(); }, 200);
+    }
 }
 
 async function loadPeerData(kp) {
@@ -1291,7 +1373,16 @@ async function loadPeerData(kp) {
         if (o.status === 'success' && o.evals && o.evals.length > 0) {
             showPeerBadge(o);
             showMiniRadar(o);
+            // Update radar panel — akan render selepas tab visible
+            const peerTabEl = document.getElementById('ltab-peer');
+            const peerTabVisible = peerTabEl && peerTabEl.style.display !== 'none';
             updateRadarPanel(kpClean, o);
+            // Jika tab peer sedang visible, force redraw selepas 100ms
+            if (peerTabVisible && radarChart) {
+                setTimeout(() => {
+                    if (radarChart) { radarChart.update(); }
+                }, 150);
+            }
         } else {
             // Tiada data peer eval — tunjuk status kosong
             document.getElementById('peerScoreBadge').style.display = 'none';
@@ -1335,14 +1426,22 @@ function showMiniRadar(o) {
     document.getElementById('miniDimScores').innerHTML = dimHtml;
 
     if (miniRadarChart) { miniRadarChart.destroy(); miniRadarChart = null; }
-    const ctx = document.getElementById('miniRadar').getContext('2d');
-    miniRadarChart = new Chart(ctx, buildRadarConfig(avgDims, 'mini'));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        const canvas = document.getElementById('miniRadar');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        miniRadarChart = new Chart(ctx, buildRadarConfig(avgDims, 'mini'));
+    }));
 }
 
 function updateRadarPanel(kp, o) {
     if (!curS) return;
-    document.getElementById('radarEmpty').style.display = 'none';
-    document.getElementById('radarContent').style.display = 'block';
+    // Tunjuk content, sembunyikan empty
+    const radarEmptyEl   = document.getElementById('radarEmpty');
+    const radarContentEl = document.getElementById('radarContent');
+    if (radarEmptyEl)   radarEmptyEl.style.display   = 'none';
+    if (radarContentEl) radarContentEl.style.display = 'block';
     document.getElementById('radarStudentName').textContent = curS.Nama_Pelajar;
     document.getElementById('radarMeta').textContent = `KP: ${curS.No_KP} | Kelas: ${curS.Kelas} | ${o.count} penilai`;
 
@@ -1393,10 +1492,22 @@ function updateRadarPanel(kp, o) {
         }).join('');
     }
 
-    // Draw main radar
+    // Cache data untuk re-render bila tab di-switch
+    window._lastRadarDims = avgDims;
+    window._lastRadarKP   = kp;
+
+    // Draw main radar — double rAF untuk pastikan canvas benar-benar visible
     if (radarChart) { radarChart.destroy(); radarChart = null; }
-    const ctx = document.getElementById('radarChart').getContext('2d');
-    radarChart = new Chart(ctx, buildRadarConfig(avgDims, 'full'));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        const canvas = document.getElementById('radarChart');
+        if (!canvas) return;
+        // Pastikan parent visible
+        const peerTab = document.getElementById('ltab-peer');
+        if (peerTab && peerTab.style.display === 'none') return; // Tab tak visible, skip
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        radarChart = new Chart(ctx, buildRadarConfig(avgDims, 'full'));
+    }));
 }
 
 function buildRadarConfig(dims, size) {
@@ -1746,16 +1857,7 @@ async function saveRubrik() {
     btn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN MARKAH RUBRIK (HP5 + HP6)';
 }
 
-// Override selectStudent to also update rubrik panel if on rubrik tab
-const _origSelectStudent = selectStudent;
-async function selectStudent(kp) {
-    await _origSelectStudent(kp);
-    // Jika tab rubrik aktif, refresh panel
-    const rubrikTab = document.getElementById('ltab-rubrik');
-    if (rubrikTab && rubrikTab.style.display !== 'none' && curS) {
-        showRubrikLecPanel(curS);
-    }
-}
+// Override dihapus — logik digabung terus dalam selectStudent di atas
 
 function logout() { localStorage.clear(); location.reload(); }
 
