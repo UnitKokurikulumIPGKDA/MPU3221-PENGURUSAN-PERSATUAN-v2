@@ -178,7 +178,8 @@
         <div class="tab-bar" style="max-width:500px;">
             <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-user me-1"></i> Profil</button>
             <button class="tab" onclick="showStudentTab('peer')"><i class="fas fa-users me-1"></i> Peer Eval</button>
-            <button class="tab" onclick="showStudentTab('result')"><i class="fas fa-chart-bar me-1"></i> Keputusan</button>
+            <button class="tab" onclick="showStudentTab('rubrik')"><i class="fas fa-list-check me-1"></i> Rubrik HP5/HP6</button>
+            <button class="tab" onclick="showStudentTab('result')"><i class="fas fa-lock me-1"></i> Status</button>
         </div>
     </div>
 
@@ -387,6 +388,80 @@
         </div>
     </div>
 
+
+    <!-- ---- TAB: RUBRIK HP5 & HP6 ---- -->
+    <div id="stab-rubrik" style="padding:20px 24px; flex:1; display:none; flex-direction:column; gap:16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div>
+                <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">Senarai Semak Rubrik — HP5 &amp; HP6</h3>
+                <p style="font-size:11px; color:rgba(255,255,255,0.4);">Tugasan 1: Kertas Cadangan Persatuan. Pensyarah menilai dan markah dihantar secara automatik.</p>
+            </div>
+            <div id="rubrikStatusBadge" style="display:none; padding:8px 16px; border-radius:20px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); font-size:11px; font-weight:700; color:#6ee7b7;">
+                <i class="fas fa-check-circle me-1"></i> <span id="rubrikStatusText">Dinilai</span>
+            </div>
+        </div>
+
+        <!-- HP5 Rubrik -->
+        <div class="glass p-5">
+            <div style="font-size:10px; font-weight:800; color:#a855f7; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-file-alt"></i> HP5 — Kertas Cadangan (Max: 30 markah)
+            </div>
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                            <th style="padding:8px 10px; text-align:left; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase; width:30px;">#</th>
+                            <th style="padding:8px 10px; text-align:left; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase;">Kriteria</th>
+                            <th style="padding:8px 10px; text-align:left; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase;">Penerangan</th>
+                            <th style="padding:8px 10px; text-align:center; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase; width:60px;">Max</th>
+                            <th style="padding:8px 10px; text-align:center; color:#a855f7; font-size:9px; text-transform:uppercase; width:80px;">Markah</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rubrikHP5Body">
+                        <tr><td colspan="5" style="padding:20px; text-align:center; color:rgba(255,255,255,0.2); font-size:11px;"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+                <div style="text-align:right;">
+                    <span style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-right:12px;">Jumlah HP5</span>
+                    <span id="hp5Total" style="font-size:24px; font-weight:800; font-family:'Space Mono',monospace; color:#a855f7;">—</span>
+                    <span style="font-size:12px; color:rgba(255,255,255,0.3);"> / 30</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- HP6 Rubrik -->
+        <div class="glass p-5">
+            <div style="font-size:10px; font-weight:800; color:#06b6d4; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-pen-nib"></i> HP6 — Kualiti Penulisan &amp; Kerjasama (Max: 10 markah)
+            </div>
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                            <th style="padding:8px 10px; text-align:left; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase; width:30px;">#</th>
+                            <th style="padding:8px 10px; text-align:left; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase;">Kriteria</th>
+                            <th style="padding:8px 10px; text-align:left; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase;">Penerangan</th>
+                            <th style="padding:8px 10px; text-align:center; color:rgba(255,255,255,0.35); font-size:9px; text-transform:uppercase; width:60px;">Max</th>
+                            <th style="padding:8px 10px; text-align:center; color:#06b6d4; font-size:9px; text-transform:uppercase; width:80px;">Markah</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rubrikHP6Body">
+                        <tr><td colspan="5" style="padding:20px; text-align:center; color:rgba(255,255,255,0.2); font-size:11px;"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+                <div style="text-align:right;">
+                    <span style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-right:12px;">Jumlah HP6</span>
+                    <span id="hp6Total" style="font-size:24px; font-weight:800; font-family:'Space Mono',monospace; color:#06b6d4;">—</span>
+                    <span style="font-size:12px; color:rgba(255,255,255,0.3);"> / 10</span>
+                </div>
+            </div>
+        </div>
+        <p style="font-size:10px; color:rgba(255,255,255,0.25); text-align:center; padding-bottom:10px;"><i class="fas fa-lock me-1"></i> Penilaian ini dilakukan oleh pensyarah. Paparan ini adalah untuk rujukan pelajar sahaja.</p>
+    </div>
     <!-- ---- TAB: KEPUTUSAN ---- -->
     <div id="stab-result" style="padding:20px 24px; flex:1; display:none;">
         <!-- Mesej kerahsiaan markah -->
@@ -439,6 +514,7 @@
         <div class="tab-bar" style="max-width:600px;">
             <button class="tab active" onclick="showLecTab('marking')"><i class="fas fa-pen-to-square me-1"></i> Pemarkahan</button>
             <button class="tab" onclick="showLecTab('peer')"><i class="fas fa-spider me-1"></i> Peer Radar</button>
+            <button class="tab" onclick="showLecTab('rubrik')"><i class="fas fa-list-check me-1"></i> Rubrik HP5/HP6</button>
             <button class="tab" onclick="showLecTab('summary')"><i class="fas fa-table me-1"></i> Ringkasan</button>
         </div>
     </div>
@@ -606,6 +682,65 @@
                 </div>
             </div>
 
+
+            <!-- TAB: RUBRIK HP5/HP6 (LECTURER INPUT) -->
+            <div id="ltab-rubrik" style="display:none;">
+                <div id="rubrikLecEmpty" style="display:flex; align-items:center; justify-content:center; height:400px; color:rgba(255,255,255,0.2);">
+                    <div style="text-align:center;">
+                        <i class="fas fa-list-check" style="font-size:3rem; margin-bottom:12px;"></i>
+                        <p style="font-size:13px;">Pilih pelajar untuk masukkan markah rubrik</p>
+                    </div>
+                </div>
+                <div id="rubrikLecPanel" style="display:none;" class="fade-in">
+                    <div class="glass p-6">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                            <div>
+                                <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">RUBRIK TUGASAN 1</div>
+                                <div id="rubrikLecStudentName" style="font-size:20px; font-weight:700;">--</div>
+                                <div id="rubrikLecStudentKP" style="font-size:10px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.35);">--</div>
+                            </div>
+                            <div id="rubrikLecExistBadge" style="display:none; padding:8px 16px; border-radius:20px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); font-size:11px; font-weight:700; color:#6ee7b7;">
+                                <i class="fas fa-check-circle me-1"></i> Sudah dinilai
+                            </div>
+                        </div>
+
+                        <!-- HP5 Scoring -->
+                        <div style="margin-bottom:20px;">
+                            <div style="font-size:10px; font-weight:800; color:#a855f7; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(168,85,247,0.2);">
+                                <i class="fas fa-file-alt me-1"></i> HP5 — Kertas Cadangan (Jumlah: 30 markah)
+                            </div>
+                            <div id="rubrikHP5Inputs" style="display:flex; flex-direction:column; gap:8px;"></div>
+                            <div style="display:flex; justify-content:flex-end; margin-top:12px; align-items:center; gap:12px;">
+                                <span style="font-size:11px; color:rgba(255,255,255,0.35);">Jumlah HP5:</span>
+                                <span id="lec_hp5Total" style="font-size:22px; font-weight:800; font-family:'Space Mono',monospace; color:#a855f7;">0</span>
+                                <span style="font-size:11px; color:rgba(255,255,255,0.3);">/ 30</span>
+                            </div>
+                        </div>
+
+                        <!-- HP6 Scoring -->
+                        <div style="margin-bottom:20px;">
+                            <div style="font-size:10px; font-weight:800; color:#06b6d4; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(6,182,212,0.2);">
+                                <i class="fas fa-pen-nib me-1"></i> HP6 — Kualiti Penulisan (Jumlah: 10 markah)
+                            </div>
+                            <div id="rubrikHP6Inputs" style="display:flex; flex-direction:column; gap:8px;"></div>
+                            <div style="display:flex; justify-content:flex-end; margin-top:12px; align-items:center; gap:12px;">
+                                <span style="font-size:11px; color:rgba(255,255,255,0.35);">Jumlah HP6:</span>
+                                <span id="lec_hp6Total" style="font-size:22px; font-weight:800; font-family:'Space Mono',monospace; color:#06b6d4;">0</span>
+                                <span style="font-size:11px; color:rgba(255,255,255,0.3);">/ 10</span>
+                            </div>
+                        </div>
+
+                        <div id="rubrikAutoMsg" class="alert-info mb-4" style="display:none;">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Markah HP5 akan dikemas kini secara <strong>automatik</strong> dalam rekod pemarkahan pelajar selepas disimpan.</span>
+                        </div>
+
+                        <button onclick="saveRubrik()" id="saveRubrikBtn" class="btn-grad w-full p-4 rounded-2xl text-sm">
+                            <i class="fas fa-save me-2"></i> SIMPAN MARKAH RUBRIK (HP5 + HP6)
+                        </button>
+                    </div>
+                </div>
+            </div>
             <!-- TAB: RINGKASAN -->
             <div id="ltab-summary" style="display:none;">
                 <div class="glass p-6">
@@ -749,28 +884,33 @@ function renderStudent(d) {
 }
 
 function showStudentTab(t) {
-    ['profile','peer','result'].forEach(id => {
-        document.getElementById('stab-'+id).style.display = 'none';
+    ['profile','peer','rubrik','result'].forEach(id => {
+        const el = document.getElementById('stab-'+id);
+        if (el) el.style.display = 'none';
     });
-    document.getElementById('stab-'+t).style.display = 'flex';
+    const target = document.getElementById('stab-'+t);
+    if (target) target.style.display = (t==='rubrik'||t==='result'||t==='peer') ? 'flex' : 'flex';
     document.querySelectorAll('#studentDash .tab').forEach((btn,i) => {
-        const tabs = ['profile','peer','result'];
+        const tabs = ['profile','peer','rubrik','result'];
         btn.classList.toggle('active', tabs[i] === t);
     });
-    if (t === 'result') loadMyResult();
+    if (t === 'result')  loadMyResult();
+    if (t === 'rubrik')  loadRubrikStatus();
 }
 
-// Load senarai rakan sekelas untuk peer eval
+// Load senarai rakan sekelas — selalu fetch dari server (bukan localStorage)
 async function loadPeerList() {
     if (!curUser) return;
-    const kp = curUser.No_KP;
-    const kelas = curUser.Kelas;
+    const kp    = curUser.No_KP.toString().trim();
+    const kelas = curUser.Kelas.toString().trim();
     try {
         const r = await fetch(`${API}?action=getClassmates&noKP=${encodeURIComponent(kp)}&kelas=${encodeURIComponent(kelas)}`);
         const o = await r.json();
         if (o.status === "success") {
-            const classmates = o.data.filter(s => s.No_KP.toString() !== kp.toString());
-            renderPeerList(classmates, o.done || []);
+            // FIX: done list datang terus dari server — bukan localStorage
+            const classmates = o.data;
+            const doneList   = (o.done || []).map(d => d.toString().trim());
+            renderPeerList(classmates, doneList);
         }
     } catch(e) {
         document.getElementById('peerList').innerHTML = `<div style="color:rgba(255,255,255,0.3); font-size:12px; padding:20px; text-align:center;">Ralat memuatkan senarai rakan</div>`;
@@ -878,39 +1018,91 @@ function setLikert(qid, val, btn) {
 
 async function submitPeerEval() {
     if (!peerTarget) return;
-    const scores = peerScores[peerTarget.No_KP] || {};
+    const tgKP = peerTarget.No_KP.toString().trim();
+    const evKP = curUser.No_KP.toString().trim();
+
+    const scores = peerScores[tgKP] || {};
     const missing = ['q1','q2','q3','q4','q5'].filter(q => !scores[q]);
     if (missing.length > 0) {
         showToast(`Sila jawab semua ${missing.length} soalan yang tinggal!`, 'warn');
         return;
     }
+
     const btn = document.getElementById('submitPeerBtn');
-    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> MENGHANTAR...';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> MENGHANTAR...';
+
+    // FIX: Semak dengan server dahulu sama ada sudah dinilai
+    try {
+        const chk = await fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(evKP)}&targetKP=${encodeURIComponent(tgKP)}`);
+        const chkO = await chk.json();
+        if (chkO.done) {
+            showToast('Anda sudah menilai rakan ini!', 'warn');
+            markPeerDone(tgKP);
+            return;
+        }
+    } catch(e) {}
 
     const payload = {
         action: "submitPeerEval",
-        evaluatorKP: curUser.No_KP,
+        evaluatorKP: evKP,
         evaluatorName: curUser.Nama_Pelajar,
         evaluatorKelas: curUser.Kelas,
-        targetKP: peerTarget.No_KP,
+        targetKP: tgKP,
         targetName: peerTarget.Nama_Pelajar,
         targetKelas: peerTarget.Kelas,
         q1: scores.q1, q2: scores.q2, q3: scores.q3,
         q4: scores.q4, q5: scores.q5,
-        note: document.getElementById('peerNote').value
+        note: document.getElementById('peerNote').value || ''
     };
 
     try {
+        // POST dengan no-cors (wajib untuk Apps Script dari browser)
         await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        showToast('Penilaian berjaya dihantar!', 'success');
-        btn.innerHTML = '<i class="fas fa-check me-2"></i> SUDAH DIHANTAR';
-        document.getElementById('peerDoneTag').style.display = 'flex';
-        loadPeerList(); // Refresh progress
+        // Tunggu 1.5 saat untuk server proses, kemudian verify dari server
+        await new Promise(r => setTimeout(r, 1500));
+        // Verify dari server — jika berjaya, server akan confirm done=true
+        const vr = await fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(evKP)}&targetKP=${encodeURIComponent(tgKP)}`);
+        const vO = await vr.json();
+        if (vO.done) {
+            showToast('Penilaian berjaya dihantar dan disahkan!', 'success');
+        } else {
+            showToast('Data dihantar. Muat semula untuk sahkan.', 'warn');
+        }
+        markPeerDone(tgKP);
+        await loadPeerList(); // Refresh dari server
     } catch(e) {
         showToast('Ralat menghantar penilaian', 'err');
-        btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> HANTAR PENILAIAN';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> HANTAR PENILAIAN';
     }
 }
+
+// ── Tandakan panel penilaian semasa sebagai selesai
+function markPeerDone(tgKP) {
+    document.getElementById('submitPeerBtn').disabled = true;
+    document.getElementById('submitPeerBtn').innerHTML = '<i class="fas fa-check me-2"></i> SUDAH DIHANTAR';
+    document.getElementById('peerDoneTag').style.display = 'flex';
+    // Tandakan kad dalam senarai
+    const card = document.querySelector(`#peerList .s-card[onclick*="${tgKP}"]`);
+    if (card) {
+        card.classList.add('done');
+        const dot = card.querySelector('.eval-dot');
+        if (dot) { dot.classList.remove('pending'); dot.classList.add('done'); }
+        if (!card.querySelector('.fa-check')) {
+            card.querySelector('div').insertAdjacentHTML('beforeend',
+                '<i class="fas fa-check" style="color:#10b981; font-size:11px;"></i>');
+        }
+    }
+    // Kemas kini kaunter progress dari server (melalui loadPeerList)
+    // loadPeerList akan dipanggil selepas ini oleh submitPeerEval
+}
+
+// FIX: Hapus localStorage — done list kini sepenuhnya dari server
+// Fungsi ini dikekalkan supaya kod lain tidak pecah tetapi tidak digunakan lagi
+function localDoneKey()  { return 'peer_done_' + (curUser?.No_KP?.toString().trim() || 'x'); }
+function localDoneList() { return []; } // Selalu kosong — guna server
+function addToLocalDoneList(tgKP) {}   // No-op — server adalah sumber kebenaran
 
 // Hanya tunjuk status peer eval pelajar — TANPA markah (markah sulit)
 async function loadMyResult() {
@@ -1034,15 +1226,18 @@ function renderLecStudentList() {
 }
 
 function showLecTab(t) {
-    ['marking','peer','summary'].forEach(id => {
-        document.getElementById('ltab-'+id).style.display = 'none';
+    ['marking','peer','rubrik','summary'].forEach(id => {
+        const el = document.getElementById('ltab-'+id);
+        if (el) el.style.display = 'none';
     });
-    document.getElementById('ltab-'+t).style.display = 'block';
+    const el = document.getElementById('ltab-'+t);
+    if (el) el.style.display = 'block';
     document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => {
-        const tabs = ['marking','peer','summary'];
+        const tabs = ['marking','peer','rubrik','summary'];
         btn.classList.toggle('active', tabs[i] === t);
     });
     if (t === 'summary') renderSummaryTable();
+    if (t === 'rubrik' && curS) showRubrikLecPanel(curS);
 }
 
 async function selectStudent(kp) {
@@ -1322,6 +1517,244 @@ function renderSummaryTable() {
             <td style="padding:10px 12px; text-align:center; font-size:10px; color:rgba(255,255,255,0.3);">--</td>
         </tr>`;
     }).join('');
+}
+
+
+// ================================================================
+// RUBRIK HP5 / HP6 — Data & Rendering
+// ================================================================
+const RUBRIK_HP5_DATA = [
+    {no:1,  nama:"Tajuk Kertas Cadangan",        penerangan:"Tajuk ringkas, tepat, menggambarkan jenis & tujuan persatuan", max:1},
+    {no:2,  nama:"Jenis Persatuan",              penerangan:"Nyataan jelas tentang kategori: akademik, sukan, kebajikan, dll.", max:1},
+    {no:3,  nama:"Pengenalan",                   penerangan:"Latar belakang penubuhan, isu yang relevan, keperluan persatuan dalam konteks sekolah", max:2},
+    {no:4,  nama:"Tujuan",                       penerangan:"Penjelasan umum mengapa persatuan ini perlu ditubuhkan, selaras dengan dasar sekolah", max:2},
+    {no:5,  nama:"Objektif",                     penerangan:"3–5 objektif spesifik, realistik, boleh diukur, menggunakan kata kerja tindakan", max:3},
+    {no:6,  nama:"Logo dan Moto",                penerangan:"Reka bentuk logo dengan simbol bermakna; moto menyokong misi", max:2},
+    {no:7,  nama:"Misi dan Visi",                penerangan:"Pernyataan misi (fungsi semasa) dan visi (aspirasi masa depan), selaras dengan matlamat sekolah", max:2},
+    {no:8,  nama:"Jawatankuasa & Tugas",         penerangan:"Senarai jawatan, bilangan ahli munasabah, perincian tugas setiap jawatan", max:3},
+    {no:9,  nama:"Perlembagaan & Peraturan",     penerangan:"Struktur formal: keahlian, mesyuarat, pemilihan, tanggungjawab, etika, tindakan disiplin", max:4},
+    {no:10, nama:"Perancangan Aktiviti & Takwim",penerangan:"Sekurang-kurangnya 4 aktiviti dengan tarikh/minggu, selaras objektif. Tambahan jika ada kolaborasi.", max:4},
+    {no:11, nama:"Carta Alir Penubuhan",         penerangan:"Paparan langkah demi langkah dengan elemen visual: permohonan → kelulusan → mesyuarat → pelantikan", max:2},
+    {no:12, nama:"Surat Penubuhan",              penerangan:"Surat rasmi kepada Pengetua/Guru Penyelaras, format betul, bahasa formal, tandatangan", max:2},
+    {no:13, nama:"Penutup",                      penerangan:"Ringkasan isi utama, harapan sokongan, kesediaan ahli, komitmen. Gaya bahasa positif.", max:2},
+];
+
+const RUBRIK_HP6_DATA = [
+    {no:1, nama:"Gaya Bahasa",       penerangan:"Penggunaan bahasa rasmi, tatabahasa betul, kosa kata sesuai konteks. Tiada singkatan/slanga.", max:3},
+    {no:2, nama:"Struktur Idea",     penerangan:"Susunan bahagian konsisten mengikut format kertas cadangan. Perenggan tersusun, idea mengalir.", max:4},
+    {no:3, nama:"Kerjasama Kumpulan",penerangan:"Bukti kesepaduan dari segi gaya penulisan. Kandungan selari dan tidak berulang antara ahli.", max:3},
+];
+
+// Muatkan status rubrik dari server dan render jadual
+async function loadRubrikStatus() {
+    if (!curUser) return;
+    renderRubrikTables(null); // Render jadual kosong dahulu
+    try {
+        const r = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(curUser.No_KP)}`);
+        const o = await r.json();
+        if (o.status === 'success' && o.ada) {
+            document.getElementById('rubrikStatusBadge').style.display = 'flex';
+            document.getElementById('rubrikStatusText').textContent = `Dinilai pada ${o.tarikh ? new Date(o.tarikh).toLocaleDateString('ms-MY') : '--'}`;
+            renderRubrikTables(o);
+        } else {
+            document.getElementById('rubrikStatusBadge').style.display = 'none';
+            renderRubrikTables(null);
+        }
+    } catch(e) {
+        renderRubrikTables(null);
+    }
+}
+
+function renderRubrikTables(data) {
+    // HP5 table
+    const hp5Keys = ['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12','r13'];
+    let hp5Sum = 0;
+    const hp5Rows = RUBRIK_HP5_DATA.map((item, idx) => {
+        const mark = data ? (Number(data['r'+(idx+1)]) || 0) : null;
+        if (mark !== null) hp5Sum += mark;
+        const pct  = mark !== null ? (mark/item.max)*100 : 0;
+        const col  = pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : pct > 0 ? '#ef4444' : 'rgba(255,255,255,0.2)';
+        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.02)'" 
+                    onmouseout="this.style.background=''">
+            <td style="padding:10px; color:rgba(255,255,255,0.3); font-family:'Space Mono',monospace; font-size:10px; text-align:center;">${item.no}</td>
+            <td style="padding:10px; font-weight:600; font-size:12px;">${item.nama}</td>
+            <td style="padding:10px; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.5;">${item.penerangan}</td>
+            <td style="padding:10px; text-align:center; font-family:'Space Mono',monospace; font-size:11px; color:rgba(255,255,255,0.35);">${item.max}</td>
+            <td style="padding:10px; text-align:center;">
+                ${data ? `<span style="font-family:'Space Mono',monospace; font-size:15px; font-weight:800; color:${col};">${mark}</span>` 
+                       : `<span style="color:rgba(255,255,255,0.15); font-size:11px;">—</span>`}
+            </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('rubrikHP5Body').innerHTML = hp5Rows;
+    document.getElementById('hp5Total').textContent = data ? hp5Sum : '—';
+
+    // HP6 table
+    let hp6Sum = 0;
+    const hp6Rows = RUBRIK_HP6_DATA.map((item, idx) => {
+        const mark = data ? (Number(data['g'+(idx+1)]) || 0) : null;
+        if (mark !== null) hp6Sum += mark;
+        const pct  = mark !== null ? (mark/item.max)*100 : 0;
+        const col  = pct >= 80 ? '#06b6d4' : pct >= 50 ? '#f59e0b' : pct > 0 ? '#ef4444' : 'rgba(255,255,255,0.2)';
+        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.02)'" 
+                    onmouseout="this.style.background=''">
+            <td style="padding:10px; color:rgba(255,255,255,0.3); font-family:'Space Mono',monospace; font-size:10px; text-align:center;">${item.no}</td>
+            <td style="padding:10px; font-weight:600; font-size:12px;">${item.nama}</td>
+            <td style="padding:10px; font-size:11px; color:rgba(255,255,255,0.45); line-height:1.5;">${item.penerangan}</td>
+            <td style="padding:10px; text-align:center; font-family:'Space Mono',monospace; font-size:11px; color:rgba(255,255,255,0.35);">${item.max}</td>
+            <td style="padding:10px; text-align:center;">
+                ${data ? `<span style="font-family:'Space Mono',monospace; font-size:15px; font-weight:800; color:${col};">${mark}</span>`
+                       : `<span style="color:rgba(255,255,255,0.15); font-size:11px;">—</span>`}
+            </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('rubrikHP6Body').innerHTML = hp6Rows;
+    document.getElementById('hp6Total').textContent = data ? hp6Sum : '—';
+}
+
+
+// ================================================================
+// RUBRIK — LECTURER INPUT FUNCTIONS
+// ================================================================
+const LEC_HP5 = [
+    {id:'r1',  nama:"Tajuk Kertas Cadangan",         max:1},
+    {id:'r2',  nama:"Jenis Persatuan",               max:1},
+    {id:'r3',  nama:"Pengenalan",                    max:2},
+    {id:'r4',  nama:"Tujuan",                        max:2},
+    {id:'r5',  nama:"Objektif",                      max:3},
+    {id:'r6',  nama:"Logo dan Moto",                 max:2},
+    {id:'r7',  nama:"Misi dan Visi",                 max:2},
+    {id:'r8',  nama:"Jawatankuasa & Tugas",           max:3},
+    {id:'r9',  nama:"Perlembagaan & Peraturan",      max:4},
+    {id:'r10', nama:"Perancangan Aktiviti & Takwim", max:4},
+    {id:'r11', nama:"Carta Alir Penubuhan",          max:2},
+    {id:'r12', nama:"Surat Penubuhan",               max:2},
+    {id:'r13', nama:"Penutup",                       max:2},
+];
+const LEC_HP6 = [
+    {id:'g1', nama:"Gaya Bahasa",        max:3},
+    {id:'g2', nama:"Struktur Idea",      max:4},
+    {id:'g3', nama:"Kerjasama Kumpulan", max:3},
+];
+
+function renderRubrikInputs(dataObj) {
+    // HP5 inputs
+    document.getElementById('rubrikHP5Inputs').innerHTML = LEC_HP5.map(item => {
+        const v = dataObj ? (Number(dataObj[item.id])||0) : 0;
+        return `<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:rgba(168,85,247,0.05); border:1px solid rgba(168,85,247,0.1); border-radius:12px;">
+            <div style="flex:1; font-size:12px; font-weight:600;">${item.nama}</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.3); white-space:nowrap;">max ${item.max}</div>
+            <input type="number" id="rub_${item.id}" min="0" max="${item.max}" value="${v}"
+                oninput="clampRubrik('${item.id}',${item.max}); calcRubrikTotal();"
+                style="width:60px; padding:6px 8px; text-align:center; border-radius:8px; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border-color:rgba(168,85,247,0.3);">
+        </div>`;
+    }).join('');
+    // HP6 inputs
+    document.getElementById('rubrikHP6Inputs').innerHTML = LEC_HP6.map(item => {
+        const v = dataObj ? (Number(dataObj[item.id])||0) : 0;
+        return `<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:rgba(6,182,212,0.05); border:1px solid rgba(6,182,212,0.1); border-radius:12px;">
+            <div style="flex:1; font-size:12px; font-weight:600;">${item.nama}</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.3); white-space:nowrap;">max ${item.max}</div>
+            <input type="number" id="rub_${item.id}" min="0" max="${item.max}" value="${v}"
+                oninput="clampRubrik('${item.id}',${item.max}); calcRubrikTotal();"
+                style="width:60px; padding:6px 8px; text-align:center; border-radius:8px; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; border-color:rgba(6,182,212,0.3);">
+        </div>`;
+    }).join('');
+    calcRubrikTotal();
+    document.getElementById('rubrikAutoMsg').style.display = 'flex';
+}
+
+function clampRubrik(id, max) {
+    const el = document.getElementById('rub_' + id);
+    if (!el) return;
+    let v = Number(el.value);
+    if (v > max) { el.value = max; v = max; }
+    if (v < 0)   { el.value = 0;   v = 0;   }
+    el.style.color = v >= max*0.8 ? '#10b981' : v >= max*0.5 ? '#f59e0b' : '#ef4444';
+}
+
+function calcRubrikTotal() {
+    const hp5 = LEC_HP5.reduce((s,i) => s + (Number(document.getElementById('rub_'+i.id)?.value)||0), 0);
+    const hp6 = LEC_HP6.reduce((s,i) => s + (Number(document.getElementById('rub_'+i.id)?.value)||0), 0);
+    const hp5El = document.getElementById('lec_hp5Total');
+    const hp6El = document.getElementById('lec_hp6Total');
+    if (hp5El) { hp5El.textContent = hp5; hp5El.style.color = hp5 >= 24 ? '#10b981' : hp5 >= 15 ? '#f59e0b' : '#a855f7'; }
+    if (hp6El) { hp6El.textContent = hp6; hp6El.style.color = hp6 >= 8  ? '#10b981' : hp6 >= 5  ? '#f59e0b' : '#06b6d4'; }
+}
+
+async function showRubrikLecPanel(student) {
+    if (!student) return;
+    document.getElementById('rubrikLecEmpty').style.display = 'none';
+    document.getElementById('rubrikLecPanel').style.display = 'block';
+    document.getElementById('rubrikLecStudentName').textContent = student.Nama_Pelajar;
+    document.getElementById('rubrikLecStudentKP').textContent  = `KP: ${student.No_KP} | ${student.Kelas}`;
+
+    // Fetch existing rubrik data
+    try {
+        const r = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(student.No_KP)}`);
+        const o = await r.json();
+        if (o.status === 'success' && o.ada) {
+            document.getElementById('rubrikLecExistBadge').style.display = 'flex';
+            renderRubrikInputs(o); // Prefill with existing data
+        } else {
+            document.getElementById('rubrikLecExistBadge').style.display = 'none';
+            renderRubrikInputs(null);
+        }
+    } catch(e) {
+        renderRubrikInputs(null);
+    }
+}
+
+async function saveRubrik() {
+    if (!curS) return;
+    const btn = document.getElementById('saveRubrikBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> MENYIMPAN...';
+
+    const rubrik = {};
+    LEC_HP5.forEach(i => { rubrik[i.id] = Math.min(i.max, Math.max(0, Number(document.getElementById('rub_'+i.id)?.value)||0)); });
+    const gaya = {};
+    LEC_HP6.forEach(i => { gaya[i.id] = Math.min(i.max, Math.max(0, Number(document.getElementById('rub_'+i.id)?.value)||0)); });
+
+    const payload = {
+        action:  "submitRubrik",
+        noKP:    curS.No_KP.toString().trim(),
+        nama:    curS.Nama_Pelajar,
+        kelas:   curS.Kelas,
+        rubrik,
+        gaya,
+        penilai: curLecEmail
+    };
+
+    try {
+        await fetch(API, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
+        await new Promise(r => setTimeout(r, 1500));
+        showToast(`Rubrik disimpan! HP5 auto-dikemas kini dalam pemarkahan.`, 'success');
+        document.getElementById('rubrikLecExistBadge').style.display = 'flex';
+        // Refresh data pelajar supaya markah HP5 baru ditunjuk
+        const r2 = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(curLecEmail)}`);
+        const o2 = await r2.json();
+        sData = o2.data || [];
+        renderLecStudentList();
+        renderSummaryTable();
+    } catch(e) {
+        showToast('Ralat menyimpan rubrik', 'err');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN MARKAH RUBRIK (HP5 + HP6)';
+}
+
+// Override selectStudent to also update rubrik panel if on rubrik tab
+const _origSelectStudent = selectStudent;
+async function selectStudent(kp) {
+    await _origSelectStudent(kp);
+    // Jika tab rubrik aktif, refresh panel
+    const rubrikTab = document.getElementById('ltab-rubrik');
+    if (rubrikTab && rubrikTab.style.display !== 'none' && curS) {
+        showRubrikLecPanel(curS);
+    }
 }
 
 function logout() { localStorage.clear(); location.reload(); }
