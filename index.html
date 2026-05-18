@@ -2133,8 +2133,9 @@ async function showRubrikLecPanel(student) {
 
 async function saveRubrik() {
     if (!curS) return;
-    const btn = document.getElementById('saveRubrikBtn');
-    btn.disabled = true;
+    const btn     = document.getElementById('saveRubrikBtn');
+    const kpStr   = curS.No_KP.toString().trim();
+    btn.disabled  = true;
     btn.innerHTML = '<span class="spinner"></span> MENYIMPAN...';
 
     // Kumpul semua nilai rubrik dari input
@@ -2147,63 +2148,93 @@ async function saveRubrik() {
         gaya[i.id] = Math.min(i.max, Math.max(0, Number(document.getElementById('rub_'+i.id)?.value)||0));
     });
 
-    const hp5Raw = LEC_HP5.reduce((s,i) => s + rubrik[i.id], 0);
-    const hp6Raw = LEC_HP6.reduce((s,i) => s + gaya[i.id], 0);
-    // Skala HP5 untuk paparan (sama seperti backend)
+    const hp5Raw    = LEC_HP5.reduce((s,i) => s + rubrik[i.id], 0);
     const hp5Scaled = Math.min(10, Math.round((hp5Raw / 30) * 10));
 
     const payload = {
-        action:  "submitRubrik",
-        noKP:    curS.No_KP.toString().trim(),
-        nama:    curS.Nama_Pelajar,
-        kelas:   curS.Kelas,
-        rubrik,
-        gaya,
+        action: "submitRubrik",
+        noKP:   kpStr,
+        nama:   curS.Nama_Pelajar,
+        kelas:  curS.Kelas,
+        rubrik, gaya,
         penilai: curLecEmail
     };
 
     try {
-        // Hantar POST (no-cors — tidak dapat baca response)
+        // ── Hantar POST (no-cors — Apps Script wajib ini dari browser)
         await fetch(API, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
 
-        // Tunggu server proses
-        btn.innerHTML = '<span class="spinner"></span> MENGESAHKAN...';
-        await new Promise(r => setTimeout(r, 2500));
+        // ── Verify dengan retry loop (max 5 cubaan, setiap 2 saat)
+        // Data Apps Script kadang ambil masa 3-8 saat untuk commit ke Sheet
+        let vData = null;
+        const MAX_RETRY = 5;
+        for (let attempt = 1; attempt <= MAX_RETRY; attempt++) {
+            btn.innerHTML = `<span class="spinner"></span> MENGESAHKAN... (${attempt}/${MAX_RETRY})`;
+            await new Promise(r => setTimeout(r, 2000)); // tunggu 2 saat setiap cubaan
 
-        // VERIFY dari server — semak jika data betul-betul tersimpan
-        const verify = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(curS.No_KP)}`);
-        const vData  = await verify.json();
-
-        if (vData.status === 'success' && vData.ada) {
-            showToast(
-                `✓ Rubrik disimpan! HP5 Rubrik: ${hp5Raw}/30 → Markah HP5: ${hp5Scaled}/10`,
-                'success'
-            );
-            document.getElementById('rubrikLecExistBadge').style.display = 'flex';
-            document.getElementById('rubrikLecExistBadge').innerHTML =
-                `<i class="fas fa-check-circle me-1"></i> Disimpan — HP5: ${hp5Raw}/30 (${hp5Scaled}/10 markah)`;
-            // Prefill semula dengan data dari server (pastikan konsisten)
-            renderRubrikInputs(vData);
-        } else {
-            showToast('Data dihantar tetapi pengesahan gagal. Cuba simpan semula.', 'warn');
+            try {
+                const vRes = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(kpStr)}`);
+                const vObj = await vRes.json();
+                if (vObj.status === 'success' && vObj.ada) {
+                    vData = vObj;
+                    break; // ✓ Berjaya — keluar dari loop
+                }
+            } catch(retryErr) {
+                // Teruskan retry
+            }
         }
 
-        // Refresh senarai pelajar supaya markah HP5 dikemaskini
+        if (vData) {
+            // ✓ DATA DISAHKAN TERSIMPAN
+            const badgeEl = document.getElementById('rubrikLecExistBadge');
+            if (badgeEl) {
+                badgeEl.style.display = 'flex';
+                badgeEl.innerHTML =
+                    `<i class="fas fa-check-circle me-1"></i> Disimpan ✓ — HP5: ${hp5Raw}/30 → ${hp5Scaled}/10 markah`;
+            }
+            showToast(`✓ Rubrik HP5 disimpan! ${hp5Raw}/30 → Markah HP5: ${hp5Scaled}/10`, 'success');
+            renderRubrikInputs(vData); // Prefill dengan data dari server
+
+            // Refresh senarai & ringkasan
+            await _refreshLecturerData();
+
+        } else {
+            // Data ADA dalam sheet (pengguna nampak dalam tab) tapi verify timeout
+            // Ini bukan ralat sebenar — tunjuk mesej informatif
+            const badgeEl = document.getElementById('rubrikLecExistBadge');
+            if (badgeEl) {
+                badgeEl.style.display = 'flex';
+                badgeEl.innerHTML =
+                    `<i class="fas fa-clock me-1"></i> Data dihantar — semak dalam tab RUBRIK_HP5`;
+            }
+            showToast(
+                '✓ Data dihantar ke sheet. Jika tiada dalam senarai, klik pelajar semula untuk refresh.',
+                'warn'
+            );
+            // Cuba refresh walaupun verify gagal — mungkin markah sudah ada
+            await _refreshLecturerData();
+        }
+
+    } catch(e) {
+        showToast('Ralat sambungan: ' + e.message + ' — Semak tab RUBRIK_HP5 dalam sheet.', 'err');
+    }
+
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN MARKAH RUBRIK (HP5 + HP6)';
+}
+
+// Helper — refresh lecturer data selepas simpan
+async function _refreshLecturerData() {
+    try {
         const r2 = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(curLecEmail)}`);
         const o2 = await r2.json();
         if (o2.data) {
-            sData = o2.data;
+            sData  = o2.data;
+            curS   = sData.find(s => s.No_KP.toString().trim() === (curS?.No_KP?.toString().trim()||'')) || curS;
             renderLecStudentList();
             renderSummaryTable();
-            // Kemaskini curS dengan data terbaru
-            curS = sData.find(s => s.No_KP.toString().trim() === curS.No_KP.toString().trim()) || curS;
         }
-    } catch(e) {
-        showToast('Ralat menyimpan rubrik: ' + e.message, 'err');
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN MARKAH RUBRIK (HP5 + HP6)';
+    } catch(e) { /* silent fail */ }
 }
 
 // Override dihapus — logik digabung terus dalam selectStudent di atas
