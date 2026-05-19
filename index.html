@@ -1074,6 +1074,13 @@ function calculateGred(m) {
     if (m >= 30) return "D+"; if (m >= 20) return "D"; return "F";
 }
 
+// FIX: normalizeKP — buang leading zero supaya padanan KP konsisten
+// '060809060070' === '60809060070' selepas normalize
+function normalizeKP(kp) {
+    if (!kp) return "";
+    return kp.toString().trim().replace(/^0+/, '') || "0";
+}
+
 // ---- AUTH ----
 function setType(t) {
     mode = t;
@@ -1165,8 +1172,10 @@ async function loadPeerList() {
 function renderPeerList(classmates, doneList) {
     const total = classmates.length;
     let doneCount = 0;
+    // Normalize semua KP dalam doneList untuk padanan yang konsisten
+    const doneNorm = doneList.map(k => normalizeKP(k));
     const html = classmates.map(s => {
-        const isDone = doneList.includes(s.No_KP.toString());
+        const isDone = doneNorm.includes(normalizeKP(s.No_KP));
         if (isDone) doneCount++;
         return `<div class="s-card ${isDone?'done':''}" onclick="selectPeer('${s.No_KP}')">
             <div style="display:flex; align-items:center; gap:10px;">
