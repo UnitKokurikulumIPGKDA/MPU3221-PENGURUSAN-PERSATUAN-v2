@@ -2,6 +2,7 @@
 /**
  * BACKEND API — PORTAL PEMARKAHAN MPU3221
  * VERSI: RUBRIK PENUH (HP1, HP5, HP8, HP10) - TEMA AKADEMIK CERAH
+ * KEMAS KINI: Markah disembunyikan daripada paparan pelajar (SULIT)
  */
 -->
 
@@ -298,9 +299,8 @@
     </div>
 
     <div style="padding:24px 32px 0;">
-        <div class="tab-bar" style="max-width:500px;">
+        <div class="tab-bar" style="max-width:350px;">
             <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-id-badge me-1"></i> Profil</button>
-            <button class="tab" onclick="showStudentTab('rubrik')"><i class="fas fa-file-contract me-1"></i> Rekod Markah</button>
             <button class="tab" onclick="showStudentTab('peer')"><i class="fas fa-users me-1"></i> Penilaian Rakan</button>
         </div>
     </div>
@@ -346,26 +346,8 @@
                     <button onclick="document.getElementById('fIn').click()" class="btn-outline py-3 px-4 rounded-lg"><i class="fas fa-folder-open me-2"></i> Pilih Fail</button>
                     <button onclick="hUp()" id="uploadBtn" class="btn-primary py-3 px-4 rounded-lg"><i class="fas fa-upload me-2"></i> Muat Naik</button>
                 </div>
-                <input type="file" id="fIn" hidden accept="image/*" onchange="pImg(this)">
                 <p style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:12px; line-height:1.5;">*Sila muat naik gambar berukuran pasport yang jelas dan sopan untuk rekod rasmi pemarkahan.</p>
             </div>
-        </div>
-    </div>
-
-    <!-- Tab: Semak Rubrik (Pelajar) -->
-    <div id="stab-rubrik" style="padding:24px 32px; flex:1; display:none; flex-direction:column; gap:20px;">
-        <div class="academic-card p-6 flex items-center justify-between flex-wrap gap-4 bg-white border-l-4" style="border-left-color: var(--primary);">
-            <div>
-                <h3 class="font-serif-title" style="font-size:20px; font-weight:700; margin-bottom:4px; color:var(--text-main);">Penyata Keputusan Semakan Rubrik</h3>
-                <p style="font-size:13px; color:var(--text-muted);">Pecahan markah terperinci bagi setiap komponen yang telah disemak oleh pensyarah kursus.</p>
-            </div>
-            <div id="rubrikStatusBadge" style="display:none; padding:10px 20px; border-radius:8px; background:#f0fdf4; border:1px solid #bbf7d0; font-size:13px; font-weight:700; color:#15803d; box-shadow:var(--shadow-sm);">
-                <i class="fas fa-check-circle me-2"></i> <span id="rubrikStatusText">Telah Disahkan</span>
-            </div>
-        </div>
-        
-        <div id="studentRubrikContainer">
-            <!-- Kandungan rubrik dijana oleh JS -->
         </div>
     </div>
 
@@ -836,14 +818,14 @@ function renderStudent(d) {
         sS.style.background = "#f0fdf4"; sS.style.color = "#15803d"; sS.style.borderColor = "#bbf7d0";
     }
     loadImage(document.getElementById('sImg'), document.getElementById('sPl'), d.Link_Gambar);
-    loadPeerList(); loadRubrikStatus();
+    loadPeerList(); 
     renderPeerQuestions();
 }
 
 function showStudentTab(t) {
-    ['profile','peer','rubrik'].forEach(id => { const el = document.getElementById('stab-'+id); if (el) el.style.display = 'none'; });
+    ['profile','peer'].forEach(id => { const el = document.getElementById('stab-'+id); if (el) el.style.display = 'none'; });
     const target = document.getElementById('stab-'+t); if (target) target.style.display = 'flex';
-    document.querySelectorAll('#studentDash .tab').forEach((btn,i) => { btn.classList.toggle('active', ['profile','rubrik','peer'][i] === t); });
+    document.querySelectorAll('#studentDash .tab').forEach((btn,i) => { btn.classList.toggle('active', ['profile','peer'][i] === t); });
 }
 
 async function hUp() {
@@ -856,67 +838,6 @@ async function hUp() {
     } catch(e) {}
 }
 function pImg(i) { if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ document.getElementById('sImg').src=e.target.result; document.getElementById('sImg').style.display='block'; document.getElementById('sPl').style.display='none'; }; r.readAsDataURL(i.files[0]); } }
-
-async function loadRubrikStatus() {
-    if (!curUser) return;
-    renderStudentRubrikTables(null);
-    try {
-        const r = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(curUser.No_KP)}`); const o = await r.json();
-        if (o.status === 'success' && o.ada) {
-            document.getElementById('rubrikStatusBadge').style.display = 'inline-flex';
-            document.getElementById('rubrikStatusText').textContent = `Disahkan pada: ${o.tarikh ? new Date(o.tarikh).toLocaleDateString('ms-MY') : '--'}`;
-            renderStudentRubrikTables(o.data);
-        } else { document.getElementById('rubrikStatusBadge').style.display = 'none'; }
-    } catch(e) {}
-}
-
-function renderStudentRubrikTables(data) {
-    const cont = document.getElementById('studentRubrikContainer');
-    cont.innerHTML = RUBRIK_CONFIG.map(cat => {
-        let sum = 0;
-        const rows = cat.items.map((item, idx) => {
-            const k = cat.prefix + (idx + 1); const mark = data && data[k] !== undefined ? Number(data[k]) : null;
-            if (mark !== null) sum += mark;
-            const isFull = mark !== null && mark === item.max;
-            return `<tr class="hover:bg-slate-50 transition-colors">
-                <td style="padding:12px; color:var(--text-muted); font-size:11px; text-align:center;">${item.no}</td>
-                <td style="padding:12px; font-weight:700; font-size:13px; color:var(--text-main);">${item.nama}</td>
-                <td style="padding:12px; font-size:12px; color:var(--text-muted); line-height:1.5;">${item.penerangan}</td>
-                <td style="padding:12px; text-align:center; font-family:'Space Mono',monospace; font-size:12px; color:var(--text-muted);">${item.max}</td>
-                <td style="padding:12px; text-align:center; font-weight:800; font-family:'Space Mono',monospace; font-size:15px; color:${mark !== null ? cat.color : 'var(--text-muted)'};">
-                    ${mark !== null ? mark : '—'} ${isFull ? '<i class="fas fa-star text-yellow-400 text-[10px] ml-1"></i>' : ''}
-                </td>
-            </tr>`;
-        }).join('');
-        return `
-        <div class="academic-card mb-6 border-t-4 overflow-hidden" style="border-top-color: ${cat.color};">
-            <div style="background: ${cat.bg}; padding: 16px 24px; border-bottom: 1px solid var(--border);">
-                <h4 style="font-size:13px; font-weight:800; color:${cat.color}; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
-                    <i class="fas ${cat.icon}"></i> ${cat.title}
-                </h4>
-            </div>
-            <div style="overflow-x:auto;">
-                <table class="academic-table w-full">
-                    <thead><tr>
-                        <th style="width:40px; text-align:center;">No.</th>
-                        <th>Perincian Kriteria</th>
-                        <th>Huraian Kualiti</th>
-                        <th style="width:60px; text-align:center;">Max</th>
-                        <th style="width:80px; text-align:center;">Markah</th>
-                    </tr></thead>
-                    <tbody>${rows}</tbody>
-                </table>
-            </div>
-            <div style="background:var(--bg-alt); padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jumlah Sub-Markah ${cat.id.toUpperCase()}</span>
-                <div>
-                    <span class="font-mono-score text-3xl font-black" style="color:${cat.color};">${data ? sum : '—'}</span>
-                    <span class="text-sm font-bold text-slate-400 ml-1">/ ${cat.max}</span>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
 
 function renderPeerQuestions() {
     document.getElementById('peerQuestions').innerHTML = PEER_Q.map((q,i) => `
@@ -1017,7 +938,6 @@ async function submitPeerEval() {
         document.getElementById('peerNote').disabled = true;
     } catch(e) { showToast('Ralat pelayan. Cuba sebentar lagi.', 'warn'); btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian'; }
 }
-
 
 // ---------------------------------------------------------------------------------------------------
 // LECTURER FUNCTIONS
