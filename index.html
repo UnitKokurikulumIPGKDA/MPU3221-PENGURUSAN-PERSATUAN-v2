@@ -2,7 +2,7 @@
 /**
  * BACKEND API — PORTAL PEMARKAHAN MPU3221
  * VERSI: RUBRIK PENUH (HP1, HP5, HP8, HP10) - TEMA AKADEMIK CERAH
- * KEMAS KINI: Markah disembunyikan daripada paparan pelajar (SULIT)
+ * STATUS: LENGKAP & STABIL (Fix Rendering Carta Radar Tersembunyi)
  */
 -->
 
@@ -27,19 +27,16 @@
     
     <style>
         :root {
-            /* Palet Warna Institusi (Akademik) */
             --primary: #1e3a8a;    /* Royal Blue */
             --primary-hover: #1e40af;
             --secondary: #9f1239;  /* Crimson / Maroon */
             
-            /* Warna Markah / HP */
             --hp1-color: #4338ca;  /* Indigo */
             --hp5-color: #0369a1;  /* Teal */
             --hp8-color: #15803d;  /* Forest Green */
             --hp10-color: #b45309; /* Academic Gold */
             
-            /* Warna Asas UI */
-            --bg-body: #f8fafc;    /* Slate 50 (Sangat cerah kelabu/biru cair) */
+            --bg-body: #f8fafc;    /* Slate 50 */
             --bg-surface: #ffffff; /* Putih tulen */
             --bg-alt: #f1f5f9;     /* Slate 100 */
             
@@ -53,76 +50,27 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-body); 
-            min-height: 100vh; 
-            color: var(--text-main); 
-        }
-        
-        /* Fon serif untuk tajuk rasmi */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); min-height: 100vh; color: var(--text-main); }
         .font-serif-title { font-family: 'Lora', serif; }
         .font-mono-score { font-family: 'Space Mono', monospace; }
-
-        /* Struktur Utama */
         .shell { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
+        .academic-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 1rem; box-shadow: var(--shadow-sm); }
         
-        /* Kad Permukaan (Menggantikan Glassmorphism) */
-        .academic-card { 
-            background: var(--bg-surface); 
-            border: 1px solid var(--border); 
-            border-radius: 1rem; 
-            box-shadow: var(--shadow-sm);
-        }
-        
-        /* Butang Rasmi */
-        .btn-primary { 
-            background: var(--primary); 
-            border: 1px solid var(--primary); 
-            cursor: pointer; 
-            transition: all 0.2s ease-in-out; 
-            color: white; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            font-weight: 700; 
-            letter-spacing: 0.05em; 
-            text-transform: uppercase; 
-            box-shadow: var(--shadow-sm);
-        }
+        .btn-primary { background: var(--primary); border: 1px solid var(--primary); cursor: pointer; transition: all 0.2s ease-in-out; color: white; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: var(--shadow-sm); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
         .btn-primary:disabled { background: #94a3b8; border-color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .btn-outline { 
-            background: transparent; 
-            border: 1px solid var(--border); 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            color: var(--text-muted); 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            font-size: 11px;
-        }
+        .btn-outline { background: transparent; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #f8fafc; }
 
-        /* Tab Navigation */
         .tab-bar { display: flex; gap: 6px; background: var(--bg-alt); padding: 6px; border-radius: 0.75rem; border: 1px solid var(--border); }
-        .tab { 
-            flex: 1; padding: 10px; border-radius: 0.5rem; font-size: 11px; font-weight: 700; 
-            text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; 
-            background: transparent; border: none; color: var(--text-muted); 
-        }
+        .tab { flex: 1; padding: 10px; border-radius: 0.5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; background: transparent; border: none; color: var(--text-muted); }
         .tab.active { background: var(--bg-surface); color: var(--primary); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
 
         .screen { display: none; }
         .screen.active { display: flex; }
 
-        /* Skala Likert */
         .likert-group { display: flex; gap: 6px; }
-        .likert-btn { 
-            flex: 1; padding: 12px 4px; border-radius: 0.5rem; border: 1px solid var(--border); 
-            background: var(--bg-surface); cursor: pointer; font-size: 12px; font-weight: 700; 
-            color: var(--text-muted); transition: all 0.2s; text-align: center; 
-        }
+        .likert-btn { flex: 1; padding: 12px 4px; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--bg-surface); cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-muted); transition: all 0.2s; text-align: center; }
         .likert-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; }
         .likert-btn.sel-1 { background: #fef2f2; border-color: #ef4444; color: #b91c1c; }
         .likert-btn.sel-2 { background: #fffbeb; border-color: #f59e0b; color: #b45309; }
@@ -130,12 +78,7 @@
         .likert-btn.sel-4 { background: #f0fdf4; border-color: #10b981; color: #15803d; }
         .likert-btn.sel-5 { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
 
-        /* Senarai Pelajar */
-        .s-card { 
-            padding: 14px 16px; background: var(--bg-surface); border: 1px solid var(--border); 
-            border-radius: 0.75rem; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; 
-            border-left: 4px solid transparent; 
-        }
+        .s-card { padding: 14px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 0.75rem; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border-left: 4px solid transparent; }
         .s-card:hover { background: var(--bg-alt); border-left-color: #94a3b8; }
         .s-card.selected { background: #eff6ff; border-left-color: var(--primary); border-color: #bfdbfe; }
         .s-card.done { border-left-color: var(--hp8-color); }
@@ -145,20 +88,13 @@
         .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .scroll-thin::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Input / Textarea */
-        input[type=number], input[type=text], input[type=password], textarea {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            color: var(--text-main); font-family: inherit; outline: none; transition: all 0.2s;
-            border-radius: 0.5rem; padding: 0.75rem 1rem;
-        }
+        input[type=number], input[type=text], input[type=password], textarea { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); outline: none; transition: all 0.2s; border-radius: 0.5rem; padding: 0.75rem 1rem; }
         input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
         input:disabled { background: var(--bg-alt); color: var(--text-muted); cursor: not-allowed; }
 
-        /* Notifikasi Peringatan */
         .alert-info { padding: 12px 16px; border-radius: 0.5rem; font-size: 13px; font-weight: 600; display: flex; align-items: flex-start; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
         .alert-warn { padding: 12px 16px; border-radius: 0.5rem; font-size: 13px; font-weight: 600; display: flex; align-items: flex-start; gap: 10px; background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
 
-        /* Toast Popup */
         #toast { position: fixed; top: 24px; right: 24px; z-index: 9999; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         #toast.show { transform: translateX(0); }
 
@@ -172,34 +108,15 @@
         .q-block { padding: 20px; border-radius: 0.75rem; background: var(--bg-surface); border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
         .dim-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; display: block; }
 
-        /* Header Amaran / Penafian */
-        .disclaimer-bar {
-            background: #1e293b; border-bottom: 2px solid var(--secondary);
-            padding: 10px 24px; display: flex; align-items: center; justify-content: center;
-            gap: 12px; font-size: 11px; color: #f8fafc; letter-spacing: 0.02em;
-            text-align: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
-        }
+        .disclaimer-bar { background: #1e293b; border-bottom: 2px solid var(--secondary); padding: 10px 24px; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 11px; color: #f8fafc; letter-spacing: 0.02em; text-align: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
         .disclaimer-bar strong { color: #facc15; font-weight: 700; }
         .disclaimer-bar .sep { opacity: 0.3; margin: 0 4px; }
 
-        .disclaimer-footer {
-            background: #f1f5f9; border-top: 1px solid var(--border);
-            padding: 24px; text-align: center; font-size: 11px; color: var(--text-muted); line-height: 1.8;
-            margin-top: auto;
-        }
+        .disclaimer-footer { background: #f1f5f9; border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 11px; color: var(--text-muted); line-height: 1.8; margin-top: auto; }
 
-        /* Jadual Rubrik Akademik */
         .academic-table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--bg-surface); }
-        .academic-table th { 
-            background: var(--bg-alt); padding: 12px; text-align: left; 
-            font-size: 10px; font-weight: 700; text-transform: uppercase; 
-            letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--border); 
-            border-top: 1px solid var(--border);
-        }
-        .academic-table td { 
-            padding: 12px; border-bottom: 1px solid var(--border); 
-            vertical-align: top; color: var(--text-main);
-        }
+        .academic-table th { background: var(--bg-alt); padding: 12px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--border); border-top: 1px solid var(--border); }
+        .academic-table td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text-main); }
         .academic-table tr:last-child td { border-bottom: none; }
         .academic-table tbody tr:hover { background: #f8fafc; }
 
@@ -298,9 +215,10 @@
         <button onclick="logout()" class="btn-outline px-4 py-2 rounded-lg"><i class="fas fa-sign-out-alt me-1"></i> Log Keluar</button>
     </div>
 
+    <!-- Navigasi Pelajar -->
     <div style="padding:24px 32px 0;">
-        <div class="tab-bar" style="max-width:350px;">
-            <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-id-badge me-1"></i> Profil</button>
+        <div class="tab-bar" style="max-width:400px;">
+            <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-id-badge me-1"></i> Profil Pengguna</button>
             <button class="tab" onclick="showStudentTab('peer')"><i class="fas fa-users me-1"></i> Penilaian Rakan</button>
         </div>
     </div>
@@ -342,10 +260,14 @@
                         <span style="font-size:11px; font-weight:600; text-transform:uppercase;">Tiada Imej</span>
                     </div>
                 </div>
+                
+                <!-- KOD PENTING UNTUK FAIL UPLOAD DIMASUKKAN DI SINI -->
                 <div style="display:grid; grid-template-columns:1fr; gap:10px; margin-top:20px; max-width:200px; margin-left:auto; margin-right:auto;">
                     <button onclick="document.getElementById('fIn').click()" class="btn-outline py-3 px-4 rounded-lg"><i class="fas fa-folder-open me-2"></i> Pilih Fail</button>
                     <button onclick="hUp()" id="uploadBtn" class="btn-primary py-3 px-4 rounded-lg"><i class="fas fa-upload me-2"></i> Muat Naik</button>
                 </div>
+                <input type="file" id="fIn" hidden accept="image/*" onchange="pImg(this)">
+                
                 <p style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:12px; line-height:1.5;">*Sila muat naik gambar berukuran pasport yang jelas dan sopan untuk rekod rasmi pemarkahan.</p>
             </div>
         </div>
@@ -356,8 +278,8 @@
         <div class="alert-info mb-6 shadow-sm">
             <i class="fas fa-info-circle text-lg mt-1"></i>
             <div>
-                <strong style="display:block; margin-bottom:4px; font-size:14px;">Arahan Penilaian Rakan Sebaya </strong>
-                Sila berikan penilaian yang jujur, objektif dan profesional terhadap semua rakan kumpulan/kelas anda SEPANJANG MELAKSANAKAN TUGASAN PENGANJURAN. Data ini adalah sulit dan nama penilai tidak akan didedahkan kepada pelajar yang dinilai.
+                <strong style="display:block; margin-bottom:4px; font-size:14px;">Arahan Penilaian Rakan Sebaya (HP8)</strong>
+                Sila berikan penilaian yang jujur, objektif dan profesional terhadap semua rakan kumpulan/kelas anda. Data ini adalah sulit dan nama penilai tidak akan didedahkan kepada pelajar yang dinilai.
             </div>
         </div>
         
@@ -492,7 +414,7 @@
                         <i class="fas fa-lightbulb text-lg mt-1"></i>
                         <div>
                             <strong style="display:block; font-size:13px; margin-bottom:4px;">Integrasi Automatik</strong>
-                            Maklumat dalam panel ini dijana <strong>secara automatik</strong> dari tab "Panel Rubrik". Sila ke tab Panel Rubrik untuk mengisi borang pemarkahan.
+                            Maklumat dalam panel ini dijana <strong>secara automatik</strong> dari tab "Panel Rubrik". Sila ke tab Panel Rubrik untuk mengisi borang pemarkahan terperinci.
                         </div>
                     </div>
 
@@ -630,7 +552,8 @@
                         </div>
 
                         <div class="flex flex-wrap gap-8 items-center">
-                            <div class="relative w-[320px] h-[320px] shrink-0 mx-auto">
+                            <!-- DIV INI DIKEMAS KINI DENGAN STAIL INLINE UNTUK MENJAMIN GRAF DILUKIS -->
+                            <div style="position:relative; width:100%; max-width:320px; height:320px; flex-shrink:0; margin:0 auto;">
                                 <canvas id="radarChart"></canvas>
                             </div>
                             
@@ -688,7 +611,7 @@
 </div>
 
 <script>
-// CONFIGURATIONS API - Kekalkan URL ini
+// CONFIGURATIONS API
 const API = "https://script.google.com/macros/s/AKfycbxufZgAB9OWBbVzGzBascudDu498uJB80q9PtWDAFWLzDCZD5MxYqGKvIRyC38JgkId1Q/exec";
 
 let mode = 'student', sData = [], curS = null, curUser = null, curLecEmail = null;
@@ -696,42 +619,42 @@ let peerScores = {}, peerTarget = null, radarChart = null;
 const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
 const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
 
-// KONFIGURASI RUBRIK TEPAT BERDASARKAN CSV MUAT NAIK
+// KONFIGURASI RUBRIK 
 const RUBRIK_CONFIG = [
     {
         id: 'hp1', title: 'TUGASAN 1: Asas & Identiti, Operasi, Artifak (HP1)', max: 30, color: 'var(--hp1-color)', bg:'rgba(67,56,202,0.05)', icon: 'fa-file-alt', prefix: 'r',
         items: [
             {no:1, nama:"Pengenalan, Konsep & Rasional", penerangan:"Pengenalan dan konsep, Tujuan, Objektif, dan Rasional penubuhan.", max:5},
-            {no:2, nama:"Logo, Moto & Kepentingan", penerangan:"Rekaan Logo dan Moto Persatuan yang inovatif beserta huraian kepentingan persatuan/kelab dalam ekosistem sekolah.", max:5},
+            {no:2, nama:"Logo, Moto & Kepentingan", penerangan:"Rekaan Logo dan Moto Persatuan yang inovatif beserta huraian kepentingan.", max:5},
             {no:3, nama:"Struktur Organisasi & Perlembagaan", penerangan:"Struktur Jawatankuasa (organisasi) dan Perlembagaan/Peraturan Kelab yang lengkap.", max:5},
             {no:4, nama:"Takwim Aktiviti Tahunan", penerangan:"Perancangan Takwim Aktiviti Tahunan yang realistik dan berimpak.", max:5},
-            {no:5, nama:"Carta Alir & Surat Penubuhan", penerangan:"Lampiran Fizikal: Carta Alir Penubuhan dan draf Surat Permohonan Penubuhan Persatuan yang sah.", max:5},
-            {no:6, nama:"Analisis Mitigasi Risiko", penerangan:"Analisis mitigasi risiko isu pengurusan persatuan/kelab (Pemikiran Kritis - GC6).", max:5}
+            {no:5, nama:"Carta Alir & Surat Penubuhan", penerangan:"Lampiran Fizikal: Carta Alir Penubuhan dan draf Surat Permohonan Penubuhan.", max:5},
+            {no:6, nama:"Analisis Mitigasi Risiko", penerangan:"Analisis mitigasi risiko isu pengurusan persatuan/kelab.", max:5}
         ]
     },
     {
         id: 'hp5', title: 'TUGASAN 1: Komunikasi Penulisan (HP5)', max: 10, color: 'var(--hp5-color)', bg:'rgba(3,105,161,0.05)', icon: 'fa-pen-nib', prefix: 'g',
         items: [
-            {no:1, nama:"Kelancaran & Koheren Idea", penerangan:"Aliran perenggan yang lancar, hujah yang logik, dan penyampaian idea yang berkesinambungan.", max:2.5},
-            {no:2, nama:"Justifikasi & Keyakinan Hujah", penerangan:"Keupayaan membina wacana yang matang, meyakinkan khalayak akademik, serta disokong oleh bukti yang jitu.", max:2.5},
-            {no:3, nama:"Keaslian Idea & Laras Bahasa", penerangan:"Esei mempamerkan keaslian idea yang tinggi (kalis plagiat) dan menggunakan laras bahasa akademik yang tepat.", max:2.5},
-            {no:4, nama:"Ketepatan Tatabahasa & Format", penerangan:"Ketepatan aspek tatabahasa, struktur ayat gramatis, sifar ralat ejaan, serta format rujukan (APA) yang sangat sistematik.", max:2.5}
+            {no:1, nama:"Kelancaran & Koheren Idea", penerangan:"Aliran perenggan yang lancar, hujah yang logik.", max:2.5},
+            {no:2, nama:"Justifikasi & Keyakinan Hujah", penerangan:"Keupayaan membina wacana yang matang, meyakinkan khalayak akademik.", max:2.5},
+            {no:3, nama:"Keaslian Idea & Laras Bahasa", penerangan:"Esei mempamerkan keaslian idea yang tinggi dan laras bahasa akademik yang tepat.", max:2.5},
+            {no:4, nama:"Ketepatan Tatabahasa & Format", penerangan:"Ketepatan aspek tatabahasa, struktur ayat gramatis, rujukan (APA).", max:2.5}
         ]
     },
     {
         id: 'hp8', title: 'TUGASAN 2: Kapasiti Kepemimpinan (HP8)', max: 30, color: 'var(--hp8-color)', bg:'rgba(21,128,61,0.05)', icon: 'fa-users-cog', prefix: 'p',
         items: [
-            {no:1, nama:"Perancangan & Agihan", penerangan:"Kejelasan penyediaan kertas kerja penganjuran. Kecekapan membuat agihan tugas dan kuasa kepada ahli pasukan secara adil.", max:10},
-            {no:2, nama:"Kepimpinan Lapangan", penerangan:"Keupayaan mengemudi dan mengurus penganjuran aktiviti. Menunjukkan interaksi, komunikasi, dan kolaboratif yang positif.", max:10},
-            {no:3, nama:"Akuntabiliti Individu", penerangan:"Menyertakan bukti fizikal penglibatan yang sah secara individu (cth: log tindakan, klip video) dalam aspek kepimpinan.", max:10}
+            {no:1, nama:"Perancangan & Agihan", penerangan:"Kejelasan penyediaan kertas kerja penganjuran. Kecekapan agihan tugas.", max:10},
+            {no:2, nama:"Kepimpinan Lapangan", penerangan:"Keupayaan mengemudi dan mengurus penganjuran aktiviti.", max:10},
+            {no:3, nama:"Akuntabiliti Individu", penerangan:"Menyertakan bukti fizikal penglibatan individu (cth: log tindakan).", max:10}
         ]
     },
     {
         id: 'hp10', title: 'TUGASAN 2: Minda Keusahawanan (HP10)', max: 30, color: 'var(--hp10-color)', bg:'rgba(180,83,9,0.05)', icon: 'fa-lightbulb', prefix: 'k',
         items: [
-            {no:1, nama:"Visi & Kreativiti Impak", penerangan:"Wawasan inovasi dalam mencipta nilai. Aktiviti yang dianjurkan kreatif dan menarik minat khalayak sekolah.", max:10},
-            {no:2, nama:"Pengurusan Kewangan", penerangan:"Keupayaan mengendalikan pengurusan dana, modal, atau penajaan. Menyediakan pelaporan bajet secara sistematik dan berintegriti.", max:10},
-            {no:3, nama:"Bukti Fizikal Individu", penerangan:"Bukti ketara penglibatan individu dalam elemen keusahawanan (media digital, promosi, log jualan, laporan transaksi).", max:10}
+            {no:1, nama:"Visi & Kreativiti Impak", penerangan:"Wawasan inovasi dalam mencipta nilai. Aktiviti yang dianjurkan kreatif.", max:10},
+            {no:2, nama:"Pengurusan Kewangan", penerangan:"Keupayaan mengendalikan pengurusan dana, modal, atau penajaan.", max:10},
+            {no:3, nama:"Bukti Fizikal Individu", penerangan:"Bukti ketara penglibatan individu dalam elemen keusahawanan.", max:10}
         ]
     }
 ];
@@ -745,81 +668,36 @@ const PEER_Q = [
 ];
 
 // UTILITIES
-function fixDriveUrl(url) {
-    if (!url) return ""; let id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1];
-    return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w800` : url;
-}
-function loadImage(iEl, pEl, url) {
-    if (!url) { iEl.style.display='none'; pEl.style.display='flex'; return; }
-    iEl.onload = () => { iEl.style.display='block'; pEl.style.display='none'; };
-    iEl.onerror = () => { iEl.style.display='none'; pEl.style.display='flex'; };
-    iEl.src = fixDriveUrl(url);
-}
-function showToast(msg, type='success') {
-    const t = document.getElementById('toast'), m = document.getElementById('toastMsg');
-    const icon = type === 'success' ? 'fa-check-circle text-green-600' : 'fa-exclamation-triangle text-amber-600';
-    const bColor = type === 'success' ? 'var(--hp8-color)' : 'var(--hp10-color)';
-    t.style.borderLeftColor = bColor;
-    m.innerHTML = `<i class="fas ${icon} text-lg"></i><span class="text-slate-700">${msg}</span>`;
-    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
-}
-function calculateGred(m) {
-    if (m>=90) return "A+"; if (m>=80) return "A"; if (m>=75) return "A-"; if (m>=70) return "B+";
-    if (m>=65) return "B"; if (m>=60) return "B-"; if (m>=55) return "C+"; if (m>=50) return "C";
-    if (m>=40) return "C-"; if (m>=30) return "D+"; if (m>=20) return "D"; return "F";
-}
+function fixDriveUrl(url) { if (!url) return ""; let id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1]; return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w800` : url; }
+function loadImage(iEl, pEl, url) { if (!url) { iEl.style.display='none'; pEl.style.display='flex'; return; } iEl.onload = () => { iEl.style.display='block'; pEl.style.display='none'; }; iEl.onerror = () => { iEl.style.display='none'; pEl.style.display='flex'; }; iEl.src = fixDriveUrl(url); }
+function showToast(msg, type='success') { const t = document.getElementById('toast'), m = document.getElementById('toastMsg'); const icon = type === 'success' ? 'fa-check-circle text-green-600' : 'fa-exclamation-triangle text-amber-600'; const bColor = type === 'success' ? 'var(--hp8-color)' : 'var(--hp10-color)'; t.style.borderLeftColor = bColor; m.innerHTML = `<i class="fas ${icon} text-lg"></i><span class="text-slate-700">${msg}</span>`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+function calculateGred(m) { if (m>=90) return "A+"; if (m>=80) return "A"; if (m>=75) return "A-"; if (m>=70) return "B+"; if (m>=65) return "B"; if (m>=60) return "B-"; if (m>=55) return "C+"; if (m>=50) return "C"; if (m>=40) return "C-"; if (m>=30) return "D+"; if (m>=20) return "D"; return "F"; }
 function normalizeKP(kp) { return kp ? kp.toString().trim().replace(/^0+/, '') || "0" : ""; }
 
-// AUTH & NAVIGATION
-function setType(t) { 
-    mode = t; 
-    document.getElementById('ts').classList.toggle('active', t === 'student'); 
-    document.getElementById('tl').classList.toggle('active', t === 'lecturer'); 
-    document.getElementById('pwField').className = t === 'student' ? 'hidden' : 'block mt-4'; 
-}
+function setType(t) { mode = t; document.getElementById('ts').classList.toggle('active', t === 'student'); document.getElementById('tl').classList.toggle('active', t === 'lecturer'); document.getElementById('pwField').className = t === 'student' ? 'hidden' : 'block mt-4'; }
 
 async function handleAuth() {
     const id = document.getElementById('idIn').value.trim(), pw = document.getElementById('pwIn').value;
     if (!id) return showToast('Sila masukkan maklumat!', 'err');
-    const btn = document.getElementById('loginBtn'); 
-    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Mengesahkan...';
+    const btn = document.getElementById('loginBtn'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Mengesahkan...';
     try {
         if (mode === 'student') {
-            const r = await fetch(`${API}?action=checkLogin&noKP=${encodeURIComponent(id)}`); 
-            const o = await r.json();
-            if (o.status === "success") { 
-                curUser = o.data; 
-                localStorage.setItem('userMPU', JSON.stringify(o.data)); 
-                renderStudent(o.data); 
-            } else showToast(o.message, 'warn');
+            const r = await fetch(`${API}?action=checkLogin&noKP=${encodeURIComponent(id)}`); const o = await r.json();
+            if (o.status === "success") { curUser = o.data; localStorage.setItem('userMPU', JSON.stringify(o.data)); renderStudent(o.data); } else showToast(o.message, 'warn');
         } else {
-            const r = await fetch(`${API}?action=lecturerLogin&email=${encodeURIComponent(id)}&pass=${encodeURIComponent(pw)}`); 
-            const o = await r.json();
-            if (o.status === "success") { 
-                curLecEmail = id; 
-                localStorage.setItem('le', id); localStorage.setItem('leName', o.name || id); 
-                initLecturer(id, o.name); 
-            } else showToast(o.message, 'warn');
+            const r = await fetch(`${API}?action=lecturerLogin&email=${encodeURIComponent(id)}&pass=${encodeURIComponent(pw)}`); const o = await r.json();
+            if (o.status === "success") { curLecEmail = id; localStorage.setItem('le', id); localStorage.setItem('leName', o.name || id); initLecturer(id, o.name); } else showToast(o.message, 'warn');
         }
     } catch (e) { showToast('Ralat rangkaian', 'warn'); }
     btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> Akses Sistem';
 }
 
-// ---------------------------------------------------------------------------------------------------
-// STUDENT FUNCTIONS
-// ---------------------------------------------------------------------------------------------------
 function renderStudent(d) {
     document.getElementById('loginScreen').style.display = 'none'; document.getElementById('studentDash').style.display = 'flex';
     document.getElementById('hdrName').textContent = d.Nama_Pelajar || '--'; document.getElementById('sN').textContent = d.Nama_Pelajar || '--';
     document.getElementById('sK').textContent = d.No_KP || '--'; document.getElementById('sC').textContent = d.Kelas || '--';
-    if (d.Status_Upload === "Selesai") { 
-        const sS = document.getElementById('sS');
-        sS.innerHTML = "<i class='fas fa-check-circle'></i> Selesai Muat Naik"; 
-        sS.style.background = "#f0fdf4"; sS.style.color = "#15803d"; sS.style.borderColor = "#bbf7d0";
-    }
-    loadImage(document.getElementById('sImg'), document.getElementById('sPl'), d.Link_Gambar);
-    loadPeerList(); 
-    renderPeerQuestions();
+    if (d.Status_Upload === "Selesai") { const sS = document.getElementById('sS'); sS.innerHTML = "<i class='fas fa-check-circle'></i> Selesai Muat Naik"; sS.style.background = "#f0fdf4"; sS.style.color = "#15803d"; sS.style.borderColor = "#bbf7d0"; }
+    loadImage(document.getElementById('sImg'), document.getElementById('sPl'), d.Link_Gambar); loadPeerList(); renderPeerQuestions();
 }
 
 function showStudentTab(t) {
@@ -840,18 +718,7 @@ async function hUp() {
 function pImg(i) { if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ document.getElementById('sImg').src=e.target.result; document.getElementById('sImg').style.display='block'; document.getElementById('sPl').style.display='none'; }; r.readAsDataURL(i.files[0]); } }
 
 function renderPeerQuestions() {
-    document.getElementById('peerQuestions').innerHTML = PEER_Q.map((q,i) => `
-        <div class="q-block hover:shadow-md transition-shadow">
-            <div class="dim-label mb-2 text-slate-400"><i class="fas fa-check-circle me-1" style="color:${DIM_COLORS[i]};"></i>Aspek ${i+1}: ${q.title}</div>
-            <p class="text-sm font-bold text-slate-800 mb-4">${q.label}</p>
-            <div class="likert-group" id="${q.id}">
-                ${[1,2,3,4,5].map(v => `<button class="likert-btn" onclick="setLikert('${q.id}',${v},this)">${v}<br><span class="text-[9px] font-normal mt-1 block">${v===1?'Sangat Kurang':v===5?'Sangat Cemerlang':v===3?'Sederhana':''}</span></button>`).join('')}
-            </div>
-        </div>`).join('') + `
-        <div class="q-block">
-            <div class="dim-label mb-2"><i class="fas fa-comment-dots me-1 text-slate-400"></i>Komen & Ulasan (Pilihan)</div>
-            <textarea id="peerNote" rows="3" placeholder="Berikan komen membina mengenai penglibatan rakan ini..." class="w-full text-sm"></textarea>
-        </div>`;
+    document.getElementById('peerQuestions').innerHTML = PEER_Q.map((q,i) => `<div class="q-block hover:shadow-md transition-shadow"><div class="dim-label mb-2 text-slate-400"><i class="fas fa-check-circle me-1" style="color:${DIM_COLORS[i]};"></i>Aspek ${i+1}: ${q.title}</div><p class="text-sm font-bold text-slate-800 mb-4">${q.label}</p><div class="likert-group" id="${q.id}">${[1,2,3,4,5].map(v => `<button class="likert-btn" onclick="setLikert('${q.id}',${v},this)">${v}<br><span class="text-[9px] font-normal mt-1 block">${v===1?'Sangat Kurang':v===5?'Sangat Cemerlang':v===3?'Sederhana':''}</span></button>`).join('')}</div></div>`).join('') + `<div class="q-block"><div class="dim-label mb-2"><i class="fas fa-comment-dots me-1 text-slate-400"></i>Komen & Ulasan (Pilihan)</div><textarea id="peerNote" rows="3" placeholder="Berikan komen membina mengenai penglibatan rakan ini..." class="w-full text-sm"></textarea></div>`;
 }
 
 async function loadPeerList() {
@@ -862,23 +729,10 @@ async function loadPeerList() {
             const dn = o.done.map(k=>normalizeKP(k)); let dc = 0;
             document.getElementById('peerList').innerHTML = o.data.map(s => {
                 const isD = dn.includes(normalizeKP(s.No_KP)); if(isD) dc++;
-                return `<div class="s-card ${isD?'done':''}" onclick="selectPeer('${s.No_KP}')">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="eval-dot ${isD?'done':'pending'}"></div>
-                        <div style="flex:1;">
-                            <div style="font-size:13px; font-weight:700; color:var(--text-main);">${s.Nama_Pelajar}</div>
-                            <div class="font-mono-score mt-1" style="font-size:10px; color:var(--text-muted);">${s.No_KP}</div>
-                        </div>
-                        ${isD?'<i class="fas fa-check-circle text-green-600"></i>':''}
-                    </div>
-                </div>`;
+                return `<div class="s-card ${isD?'done':''}" onclick="selectPeer('${s.No_KP}')"><div style="display:flex; align-items:center; gap:12px;"><div class="eval-dot ${isD?'done':'pending'}"></div><div style="flex:1;"><div style="font-size:13px; font-weight:700; color:var(--text-main);">${s.Nama_Pelajar}</div><div class="font-mono-score mt-1" style="font-size:10px; color:var(--text-muted);">${s.No_KP}</div></div>${isD?'<i class="fas fa-check-circle text-green-600"></i>':''}</div></div>`;
             }).join('') || `<div class="text-center p-6 text-slate-400 text-sm border-dashed border-2 rounded-lg">Tiada rakan dikesan dalam pangkalan data.</div>`;
             document.getElementById('evalProgress').textContent = `${dc}/${o.data.length}`;
-            if (dc === o.data.length && dc>0) {
-                const ep = document.getElementById('evalProgress');
-                ep.style.color = '#15803d'; ep.style.background = '#dcfce7'; ep.style.borderColor = '#86efac';
-                ep.innerHTML = `<i class="fas fa-check me-1"></i> Selesai`;
-            }
+            if (dc === o.data.length && dc>0) { const ep = document.getElementById('evalProgress'); ep.style.color = '#15803d'; ep.style.background = '#dcfce7'; ep.style.borderColor = '#86efac'; ep.innerHTML = `<i class="fas fa-check me-1"></i> Selesai`; }
         }
     } catch(e) {}
 }
@@ -898,33 +752,20 @@ function showPeerPanel(peer) {
     PEER_Q.forEach(q => document.querySelectorAll(`#${q.id} .likert-btn`).forEach(b=>b.className='likert-btn'));
     peerScores[peer.No_KP] = null; document.getElementById('peerNote').value = '';
     document.getElementById('peerDoneTag').style.display='none'; document.getElementById('submitPeerBtn').style.display='block';
-    document.getElementById('submitPeerBtn').disabled=false;
-    document.getElementById('submitPeerBtn').innerHTML='<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian';
+    document.getElementById('submitPeerBtn').disabled=false; document.getElementById('submitPeerBtn').innerHTML='<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian';
     
     fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(curUser.No_KP)}&targetKP=${encodeURIComponent(peer.No_KP)}`).then(r=>r.json()).then(o=>{
         if(o.done) {
-            document.getElementById('peerDoneTag').style.display='block'; 
-            document.getElementById('submitPeerBtn').style.display='none';
-            if(o.data) { 
-                PEER_Q.forEach((q) => { 
-                    const v = o.data[q.id]; 
-                    if(v) document.querySelectorAll(`#${q.id} .likert-btn`)[v-1].className=`likert-btn sel-${v} ring-2 ring-offset-1 ring-${DIM_COLORS[PEER_Q.indexOf(q)]}`; 
-                }); 
-                document.getElementById('peerNote').value=o.data.note||''; 
-                document.getElementById('peerNote').disabled = true;
-            }
-        } else {
-             document.getElementById('peerNote').disabled = false;
-        }
+            document.getElementById('peerDoneTag').style.display='block'; document.getElementById('submitPeerBtn').style.display='none';
+            if(o.data) { PEER_Q.forEach((q) => { const v = o.data[q.id]; if(v) document.querySelectorAll(`#${q.id} .likert-btn`)[v-1].className=`likert-btn sel-${v} ring-2 ring-offset-1 ring-${DIM_COLORS[PEER_Q.indexOf(q)]}`; }); document.getElementById('peerNote').value=o.data.note||''; document.getElementById('peerNote').disabled = true; }
+        } else { document.getElementById('peerNote').disabled = false; }
     });
 }
 
 function setLikert(qid, v, btn) { 
     if(document.getElementById('submitPeerBtn').style.display === 'none') return;
-    document.querySelectorAll(`#${qid} .likert-btn`).forEach(b=>b.className='likert-btn'); 
-    btn.className=`likert-btn sel-${v}`; 
-    if(!peerScores[peerTarget?.No_KP]) peerScores[peerTarget.No_KP]={}; 
-    peerScores[peerTarget.No_KP][qid]=v; 
+    document.querySelectorAll(`#${qid} .likert-btn`).forEach(b=>b.className='likert-btn'); btn.className=`likert-btn sel-${v}`; 
+    if(!peerScores[peerTarget?.No_KP]) peerScores[peerTarget.No_KP]={}; peerScores[peerTarget.No_KP][qid]=v; 
 }
 
 async function submitPeerEval() {
@@ -934,22 +775,14 @@ async function submitPeerEval() {
     try {
         await fetch(API, { method:'POST', mode:'no-cors', body:JSON.stringify({ action:"submitPeerEval", evaluatorKP:evKP, evaluatorName:curUser.Nama_Pelajar, evaluatorKelas:curUser.Kelas, targetKP:tgKP, targetName:peerTarget.Nama_Pelajar, targetKelas:peerTarget.Kelas, q1:sc.q1, q2:sc.q2, q3:sc.q3, q4:sc.q4, q5:sc.q5, note:document.getElementById('peerNote').value }) });
         await new Promise(r=>setTimeout(r,1500)); showToast('Penilaian direkodkan ke sistem.', 'success'); loadPeerList();
-        btn.style.display='none'; document.getElementById('peerDoneTag').style.display='block';
-        document.getElementById('peerNote').disabled = true;
+        btn.style.display='none'; document.getElementById('peerDoneTag').style.display='block'; document.getElementById('peerNote').disabled = true;
     } catch(e) { showToast('Ralat pelayan. Cuba sebentar lagi.', 'warn'); btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian'; }
 }
 
-// ---------------------------------------------------------------------------------------------------
-// LECTURER FUNCTIONS
-// ---------------------------------------------------------------------------------------------------
 async function initLecturer(email, name) {
     document.getElementById('loginScreen').style.display='none'; document.getElementById('lecturerDash').style.display='flex'; 
     document.getElementById('lecName').textContent=name||email; curLecEmail=email;
-    try { 
-        const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(email)}`); 
-        const o = await r.json(); 
-        sData=o.data||[]; renderLecStudentList(); renderSummaryTable(); 
-    } catch(e) { showToast('Gagal memuat turun data pelajar.', 'warn'); }
+    try { const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(email)}`); const o = await r.json(); sData=o.data||[]; renderLecStudentList(); renderSummaryTable(); } catch(e) { showToast('Gagal memuat turun data pelajar.', 'warn'); }
 }
 
 function renderLecStudentList() {
@@ -958,36 +791,37 @@ function renderLecStudentList() {
 }
 
 function filterStudents(query) {
-    const q = query.toLowerCase();
-    const filtered = sData.filter(s => s.Nama_Pelajar.toLowerCase().includes(q) || s.No_KP.includes(q));
-    
+    const q = query.toLowerCase(); const filtered = sData.filter(s => s.Nama_Pelajar.toLowerCase().includes(q) || s.No_KP.includes(q));
     document.getElementById('sList').innerHTML = filtered.map(s => {
         const hM = s.markahSediaAda, hP = s.peerSummary && s.peerSummary.count>0;
-        return `<div class="s-card ${hM?'done':''}" data-kp="${s.No_KP}" onclick="selectStudent('${s.No_KP}')">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="eval-dot ${hM?'done':'pending'}"></div>
-                <div style="flex:1; min-width:0;">
-                    <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.Nama_Pelajar}</div>
-                    <div class="font-mono-score" style="font-size:10px; color:var(--text-muted); margin-top:2px;">${s.Kelas} · ${s.No_KP}</div>
-                </div>
-                ${hP?`<span class="bg-blue-50 text-blue-700 border border-blue-200" style="font-size:10px; padding:2px 6px; border-radius:4px; font-weight:700;"><i class="fas fa-users mr-1"></i>${s.peerSummary.count}</span>`:''}
-            </div>
-        </div>`;
+        return `<div class="s-card ${hM?'done':''}" data-kp="${s.No_KP}" onclick="selectStudent('${s.No_KP}')"><div style="display:flex; align-items:center; gap:12px;"><div class="eval-dot ${hM?'done':'pending'}"></div><div style="flex:1; min-width:0;"><div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.Nama_Pelajar}</div><div class="font-mono-score" style="font-size:10px; color:var(--text-muted); margin-top:2px;">${s.Kelas} · ${s.No_KP}</div></div>${hP?`<span class="bg-blue-50 text-blue-700 border border-blue-200" style="font-size:10px; padding:2px 6px; border-radius:4px; font-weight:700;"><i class="fas fa-users mr-1"></i>${s.peerSummary.count}</span>`:''}</div></div>`;
     }).join('') || `<div class="text-center p-4 text-xs text-slate-400">Tiada padanan carian.</div>`;
-    
-    if(curS) {
-        const sel = document.querySelector(`#sList .s-card[data-kp="${curS.No_KP}"]`);
-        if(sel) sel.classList.add('selected');
-    }
+    if(curS) { const sel = document.querySelector(`#sList .s-card[data-kp="${curS.No_KP}"]`); if(sel) sel.classList.add('selected'); }
 }
 
 function showLecTab(t) {
     ['marking','peer','rubrik','summary'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
     const tgt = document.getElementById('ltab-'+t); if(tgt) tgt.style.display='block';
     document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => btn.classList.toggle('active', ['marking','rubrik','peer','summary'][i] === t));
+    
     if(t==='marking' && curS) { document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none'; }
     if(t==='rubrik') { if(curS) showRubrikLecPanel(curS); else { document.getElementById('rubrikLecPanel').style.display='none'; document.getElementById('rubrikLecEmpty').style.display='flex'; } }
-    if(t==='peer') { if(radarChart) radarChart.update(); }
+    
+    // PEMBETULAN CARA CARTA RADAR DILUKIS PADA TAB YANG BARU DIBUKA
+    if(t==='peer') { 
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                if (window._cachedRadarDims) {
+                    const c = document.getElementById('radarChart');
+                    if (c) {
+                        if (radarChart) { radarChart.destroy(); radarChart = null; }
+                        radarChart = new Chart(c.getContext('2d'), buildRC(window._cachedRadarDims));
+                    }
+                }
+            }, 100); 
+        });
+    }
+    
     if(t==='summary') renderSummaryTable();
 }
 
@@ -1006,13 +840,8 @@ async function selectStudent(kp) {
     calc();
 
     const badgeRubrik = document.getElementById('badge-rubrik');
-    if(curS.markahSediaAda) {
-        badgeRubrik.innerHTML = `<i class="fas fa-check-circle me-1"></i> Disahkan`;
-        badgeRubrik.style.background = "#f0fdf4"; badgeRubrik.style.color = "#15803d"; badgeRubrik.style.borderColor = "#bbf7d0";
-    } else {
-        badgeRubrik.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> Data Tiada`;
-        badgeRubrik.style.background = "#fef2f2"; badgeRubrik.style.color = "#b91c1c"; badgeRubrik.style.borderColor = "#fecaca";
-    }
+    if(curS.markahSediaAda) { badgeRubrik.innerHTML = `<i class="fas fa-check-circle me-1"></i> Disahkan`; badgeRubrik.style.background = "#f0fdf4"; badgeRubrik.style.color = "#15803d"; badgeRubrik.style.borderColor = "#bbf7d0"; } 
+    else { badgeRubrik.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> Data Tiada`; badgeRubrik.style.background = "#fef2f2"; badgeRubrik.style.color = "#b91c1c"; badgeRubrik.style.borderColor = "#fecaca"; }
 
     const act = ['marking','rubrik','peer','summary'].find(id => document.getElementById('ltab-'+id)?.style.display !== 'none');
     if(act==='rubrik') showRubrikLecPanel(curS);
@@ -1040,16 +869,11 @@ function renderLecRubrikInputs(dataObj) {
                 </div>
             </div>`;
         }).join('');
-        
         return `<div class="academic-card mb-8 overflow-hidden shadow-md">
             <div class="p-4 border-b flex justify-between items-center" style="background:${cat.bg};">
-                <div class="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style="color:${cat.color};">
-                    <i class="fas ${cat.icon}"></i> ${cat.title}
-                </div>
+                <div class="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style="color:${cat.color};"><i class="fas ${cat.icon}"></i> ${cat.title}</div>
             </div>
-            <div class="p-5 bg-slate-50 border-b">
-                ${inputs}
-            </div>
+            <div class="p-5 bg-slate-50 border-b">${inputs}</div>
             <div class="p-5 flex justify-between items-center bg-white">
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jumlah Sub-Markah Kategori Ini</span>
                 <div class="flex items-end gap-2 bg-slate-100 px-4 py-2 rounded-lg border">
@@ -1063,26 +887,16 @@ function renderLecRubrikInputs(dataObj) {
 }
 
 function clampRubrik(k, max) { 
-    const el=document.getElementById('rub_'+k); 
-    let v=parseFloat(el.value)||0; 
-    if(v>max) el.value=max; 
-    if(v<0) el.value=0; 
-    
+    const el=document.getElementById('rub_'+k); let v=parseFloat(el.value)||0; if(v>max) el.value=max; if(v<0) el.value=0; 
     const parent = el.closest('.flex.items-center');
-    if(v === max && parent) {
-        parent.style.borderLeftColor = el.style.color;
-        parent.style.background = '#f8fafc';
-    } else if (parent) {
-        parent.style.borderLeftColor = '#e2e8f0';
-        parent.style.background = 'white';
-    }
+    if(v === max && parent) { parent.style.borderLeftColor = el.style.color; parent.style.background = '#f8fafc'; } 
+    else if (parent) { parent.style.borderLeftColor = '#e2e8f0'; parent.style.background = 'white'; }
 }
 
 function calcLecRubrikTotal() {
     RUBRIK_CONFIG.forEach(cat => {
         let sum = 0; cat.items.forEach((item, idx) => { sum += parseFloat(document.getElementById('rub_'+cat.prefix+(idx+1))?.value) || 0; });
-        const el = document.getElementById('tot_'+cat.id);
-        if(el) el.textContent = sum;
+        const el = document.getElementById('tot_'+cat.id); if(el) el.textContent = sum;
     });
 }
 
@@ -1102,7 +916,6 @@ async function saveRubrik() {
     RUBRIK_CONFIG.forEach(cat => cat.items.forEach((it,idx) => pl.data[cat.prefix+(idx+1)] = parseFloat(document.getElementById('rub_'+cat.prefix+(idx+1))?.value)||0 ));
     try {
         await fetch(API, { method:'POST', mode:'no-cors', body:JSON.stringify(pl) });
-        
         let vD=null; for(let i=1; i<=5; i++) {
             await new Promise(r=>setTimeout(r,1500));
             try { const vR = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(curS.No_KP)}`); const vO = await vR.json(); if(vO.ada) { vD=vO.data; break; } } catch(e){}
@@ -1166,14 +979,20 @@ async function loadPeerData(kp) {
                 </div>`;
             }).join('');
             
-            if(radarChart) radarChart.destroy(); 
+            // SIMPAN DATA KE DALAM MEMORI UNTUK LUKIS SEMULA
+            window._cachedRadarDims = o.avgDims;
+            
+            if(radarChart) { radarChart.destroy(); radarChart = null; }
             requestAnimationFrame(()=>{ 
                 const c=document.getElementById('radarChart'); 
-                if(c&&c.offsetParent!==null) radarChart=new Chart(c.getContext('2d'), buildRC(o.avgDims)); 
+                if(c && c.offsetParent !== null) {
+                    radarChart=new Chart(c.getContext('2d'), buildRC(o.avgDims)); 
+                }
             });
         } else {
             document.getElementById('peerScoreBadge').style.display='none'; 
             document.getElementById('radarEmpty').style.display='flex'; document.getElementById('radarContent').style.display='none';
+            window._cachedRadarDims = null;
         }
     } catch(e) {}
 }
@@ -1260,13 +1079,8 @@ window.onload = () => {
 };
 </script>
 
-<!-- ==========================================
-     FOOTER RASMI
-     ========================================== -->
 <div class="disclaimer-footer">
-    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;">
-        <i class="fas fa-university text-slate-300 text-lg"></i>
-    </div>
+    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;"><i class="fas fa-university text-slate-300 text-lg"></i></div>
     <div class="font-bold text-slate-600 uppercase tracking-wider mb-2">Aplikasi Maklumat Penilaian Akademik Tertutup</div>
     <div>Sistem ini dikhususkan untuk rekod rasmi pensyarah dan pelajar <strong class="text-slate-700">Unit Kokurikulum, Institut Pendidikan Guru Kampus Darulaman</strong>.</div>
     <div class="mt-2 text-[10px]">Penyelaras Kursus MPU3221 &copy; 2026 Hak Cipta Terpelihara.</div>
