@@ -842,10 +842,17 @@ async function selectStudent(kp) {
     loadImage(document.getElementById('li'), document.getElementById('liPh'), curS.Link_Gambar);
     
     document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none';
+    
+    // PEMBETULAN RUJUKAN ID/KUNCI: Memadankan terus markah kepada DOM ID yang betul
     if(curS.markahSediaAda) {
-        ['h1','h5','h8','h10'].forEach(id=>document.getElementById(id).value = curS.markahSediaAda[id]||0);
-        document.getElementById('justTxt').value = curS.markahSediaAda.just==="-"?"":curS.markahSediaAda.just;
-    } else { ['h1','h5','h8','h10','justTxt'].forEach(id=>document.getElementById(id).value=''); }
+        document.getElementById('h1').value = curS.markahSediaAda.hp1 || 0;
+        document.getElementById('h5').value = curS.markahSediaAda.hp5 || 0;
+        document.getElementById('h8').value = curS.markahSediaAda.hp8 || 0;
+        document.getElementById('h10').value = curS.markahSediaAda.hp10 || 0;
+        document.getElementById('justTxt').value = curS.markahSediaAda.just === "-" ? "" : curS.markahSediaAda.just;
+    } else { 
+        ['h1','h5','h8','h10','justTxt'].forEach(id=>document.getElementById(id).value=''); 
+    }
     calc();
 
     const badgeRubrik = document.getElementById('badge-rubrik');
@@ -967,8 +974,7 @@ async function saveRubrik() {
     btn.disabled=false; btn.innerHTML='<i class="fas fa-save me-2 text-lg"></i> SIMPAN SEMUA KEPUTUSAN RUBRIK';
 }
 
-// FUNGSI DIPERBAIKI: kini sentiasa kemas kini paparan Pemarkahan Induk
-// tanpa kira tab mana yang sedang aktif ketika data disegarkan semula.
+// FUNGSI DIPERBAIKI: kini sentiasa kemas kini paparan Pemarkahan Induk tanpa ralat
 async function _refreshLecData() {
     const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(curLecEmail)}`); const o = await r.json();
     if(o.data) { 
@@ -977,9 +983,12 @@ async function _refreshLecData() {
         renderLecStudentList(); 
         renderSummaryTable();
 
-        // FIX: sentiasa refresh input h1/h5/h8/h10 + badge + peer data, tanpa syarat tab aktif
+        // PEMBETULAN RUJUKAN ID/KUNCI: Memadankan terus markah kepada DOM ID yang betul
         if(curS.markahSediaAda) {
-            ['h1','h5','h8','h10'].forEach(id => document.getElementById(id).value = curS.markahSediaAda[id] || 0);
+            document.getElementById('h1').value = curS.markahSediaAda.hp1 || 0;
+            document.getElementById('h5').value = curS.markahSediaAda.hp5 || 0;
+            document.getElementById('h8').value = curS.markahSediaAda.hp8 || 0;
+            document.getElementById('h10').value = curS.markahSediaAda.hp10 || 0;
             document.getElementById('justTxt').value = curS.markahSediaAda.just === "-" ? "" : curS.markahSediaAda.just;
         } else {
             ['h1','h5','h8','h10','justTxt'].forEach(id => document.getElementById(id).value = '');
