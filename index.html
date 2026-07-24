@@ -136,6 +136,30 @@
             .academic-table { font-size: 11px; }
             .academic-table th, .academic-table td { padding: 8px; }
         }
+
+        /* ================= CETAKAN (PRINT) ================= */
+        #printArea { display: none; }
+        .print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .print-table th, .print-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: left; }
+        .print-table th { background: #e2e8f0; font-weight: 800; text-transform: uppercase; font-size: 9px; letter-spacing: 0.04em; }
+        .print-table td.center, .print-table th.center { text-align: center; }
+        .print-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 14px; margin-bottom: 18px; }
+        .print-header h1 { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; margin: 6px 0 2px; }
+        .print-header h2 { font-size: 12px; font-weight: 600; color: #334155; margin: 0; }
+        .print-meta { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 14px; padding: 8px 0; border-bottom: 1px solid #cbd5e1; }
+        .print-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 8px; border-left: 4px solid #1e3a8a; padding-left: 8px; }
+        .print-stat-row { display: flex; gap: 24px; margin-top: 10px; font-size: 12px; font-weight: 700; }
+        .print-signoff { display: flex; justify-content: space-between; margin-top: 60px; font-size: 11px; }
+        .print-signoff div { width: 45%; }
+        .print-signoff .line { border-top: 1px solid #0f172a; margin-top: 50px; padding-top: 4px; }
+        .print-footer-note { margin-top: 24px; font-size: 9px; color: #64748b; text-align: center; }
+
+        @media print {
+            @page { size: A4 portrait; margin: 14mm; }
+            body.printing-mode > *:not(#printArea) { display: none !important; }
+            body.printing-mode #printArea { display: block !important; }
+            body.printing-mode { background: white !important; }
+        }
     </style>
 </head>
 <body>
@@ -381,7 +405,10 @@
                     <option value="">Semua Kelas</option>
                 </select>
             </div>
-            <div class="mb-3 px-1">
+            <div class="mb-3 px-1 flex flex-col gap-2">
+                <select id="classFilter" onchange="onClassFilterChange()" class="w-full text-xs py-2 px-3 bg-slate-50 font-bold">
+                    <option value="">Semua Kelas</option>
+                </select>
                 <input type="text" id="searchStudent" placeholder="Cari nama atau KP..." class="w-full text-xs py-2 px-3 bg-slate-50" onkeyup="filterStudents(this.value)">
             </div>
             <div id="sList" class="scroll-thin flex-1" style="overflow-y:auto; padding-right:4px;"></div>
@@ -602,7 +629,13 @@
                             <h3 class="font-serif-title text-xl font-bold text-slate-800">Buku Rekod Pemarkahan</h3>
                             <p class="text-[13px] text-slate-500 mt-1">Paparan komprehensif pencapaian keseluruhan kelas.</p>
                         </div>
+                        <div class="flex items-center gap-2">
+                        <select id="printClassFilter" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:160px;">
+                            <option value="">Semua Kelas</option>
+                        </select>
                         <button onclick="renderSummaryTable()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
+                        <button onclick="printReport()" class="btn-primary px-4 py-2 rounded-lg text-[11px]"><i class="fas fa-print me-2"></i> Cetak Laporan</button>
+                    </div>
                     </div>
                     
                     <div class="overflow-x-auto border border-slate-200 rounded-lg">
@@ -632,7 +665,13 @@
                         <h3 class="font-serif-title text-xl font-bold text-slate-800">Laporan Rumusan & Analisis Taburan Gred</h3>
                         <p id="laporanSubtitle" class="text-[13px] text-slate-500 mt-1">Analisis Pentaksiran Berterusan berdasarkan markah 100%.</p>
                     </div>
-                    <button onclick="loadGradeSummary()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
+                    <div class="flex items-center gap-2">
+                        <select id="laporanClassFilter" onchange="loadGradeSummary()" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:160px;">
+                            <option value="">Semua Kelas</option>
+                        </select>
+                        <button onclick="loadGradeSummary()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
+                        <button onclick="printReport(true)" class="btn-primary px-4 py-2 rounded-lg text-[11px]"><i class="fas fa-print me-2"></i> Cetak Laporan</button>
+                    </div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start;">
@@ -869,13 +908,31 @@ async function initLecturer(email, name, isAdminFlag) {
 }
 
 function renderLecStudentList() {
-    const classes = [...new Set(sData.map(s=>s.Kelas))];
+    const classes = [...new Set(sData.map(s=>s.Kelas))].filter(Boolean).sort();
     document.getElementById('classInfo').textContent = isAdminUser ? `SEMUA KELAS (${classes.length})` : (classes.length>0 ? classes.join(', ') : '');
-    filterStudents("");
+
+    ['classFilter','laporanClassFilter','printClassFilter'].forEach(id => {
+        const sel = document.getElementById(id); const prev = sel.value;
+        sel.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(k => `<option value="${k}">${k}</option>`).join('');
+        if (classes.includes(prev)) sel.value = prev;
+    });
+
+    filterStudents(document.getElementById('searchStudent') ? document.getElementById('searchStudent').value : "");
+}
+
+function onClassFilterChange() {
+    filterStudents(document.getElementById('searchStudent').value);
 }
 
 function filterStudents(query) {
-    const q = query.toLowerCase(); const filtered = sData.filter(s => s.Nama_Pelajar.toLowerCase().includes(q) || s.No_KP.includes(q));
+    const q = query.toLowerCase();
+    const classSel = document.getElementById('classFilter');
+    const selectedClass = classSel ? classSel.value : "";
+    const filtered = sData.filter(s => {
+        const matchQ = s.Nama_Pelajar.toLowerCase().includes(q) || s.No_KP.includes(q);
+        const matchClass = !selectedClass || (s.Kelas && s.Kelas.toString() === selectedClass);
+        return matchQ && matchClass;
+    });
     document.getElementById('sList').innerHTML = filtered.map(s => {
         const hM = s.markahSediaAda, hP = s.peerSummary && s.peerSummary.count>0;
         return `<div class="s-card ${hM?'done':''}" data-kp="${s.No_KP}" onclick="selectStudent('${s.No_KP}')"><div style="display:flex; align-items:center; gap:12px;"><div class="eval-dot ${hM?'done':'pending'}"></div><div style="flex:1; min-width:0;"><div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.Nama_Pelajar}</div><div class="font-mono-score" style="font-size:10px; color:var(--text-muted); margin-top:2px;">${s.Kelas} · ${s.No_KP}</div></div>${hP?`<span class="bg-blue-50 text-blue-700 border border-blue-200" style="font-size:10px; padding:2px 6px; border-radius:4px; font-weight:700;"><i class="fas fa-users mr-1"></i>${s.peerSummary.count}</span>`:''}</div></div>`;
@@ -1192,17 +1249,66 @@ function calc() {
     document.getElementById('gd').style.color = g.includes('A') ? '#16a34a' : g.includes('B') ? '#2563eb' : g.includes('C') ? '#d97706' : '#dc2626';
 }
 
+async function printReport(fromLaporanTab) {
+    const selId = fromLaporanTab ? 'laporanClassFilter' : 'printClassFilter';
+    const selEl = document.getElementById(selId);
+    const kelas = selEl ? selEl.value : "";
+
+    const filtered = kelas ? sData.filter(s => (s.Kelas||"").toString() === kelas) : sData;
+    if (!filtered.length) return showToast('Tiada pelajar untuk dicetak dalam skop ini.', 'warn');
+
+    document.getElementById('pStudentBody').innerHTML = filtered.map((s, i) => {
+        const m = s.markahSediaAda || {}, t = (m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0), g = t>0 ? calculateGred(t) : '--';
+        return `<tr>
+            <td class="center">${i+1}</td>
+            <td>${s.Nama_Pelajar}</td>
+            <td>${s.No_KP}</td>
+            <td>${s.Kelas}</td>
+            <td class="center">${m.hp1 ?? '-'}</td>
+            <td class="center">${m.hp5 ?? '-'}</td>
+            <td class="center">${m.hp8 ?? '-'}</td>
+            <td class="center">${m.hp10 ?? '-'}</td>
+            <td class="center"><strong>${t||'-'}</strong></td>
+            <td class="center"><strong>${g}</strong></td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('pLecName').textContent = document.getElementById('lecName').textContent || curLecEmail;
+    document.getElementById('pScope').textContent = kelas ? `Kelas: ${kelas}` : (isAdminUser ? 'SEMUA KELAS (Admin)' : 'Semua Kelas Ditugaskan');
+    document.getElementById('pDate').textContent = new Date().toLocaleString('ms-MY', { dateStyle:'long', timeStyle:'short' });
+
+    try {
+        const r = await fetch(`${API}?action=getGradeSummary&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}`); const o = await r.json();
+        if (o.status === 'success') {
+            document.getElementById('pGradeBody').innerHTML = o.bands.map(b => `<tr><td>${b.skala}</td><td class="center">${b.gred}</td><td class="center">${b.jumlah}</td><td class="center">${b.peratus.toFixed(2)}</td></tr>`).join('');
+            document.getElementById('pJumlah').textContent = o.jumlah;
+            document.getElementById('pMin').textContent = o.jumlah > 0 ? o.min.toFixed(2) : '--';
+            document.getElementById('pSD').textContent = o.jumlah > 0 ? o.sisihanPiawai.toFixed(2) : '--';
+        }
+    } catch(e) {
+        document.getElementById('pGradeBody').innerHTML = '';
+        document.getElementById('pJumlah').textContent = '0'; document.getElementById('pMin').textContent = '--'; document.getElementById('pSD').textContent = '--';
+    }
+
+    document.body.classList.add('printing-mode');
+    setTimeout(() => window.print(), 150);
+}
+
+window.addEventListener('afterprint', () => document.body.classList.remove('printing-mode'));
+
 async function loadGradeSummary() {
     try {
-        const r = await fetch(`${API}?action=getGradeSummary&email=${encodeURIComponent(curLecEmail)}`); const o = await r.json();
-        if (o.status === 'success') renderGradeSummary(o);
+        const selEl = document.getElementById('laporanClassFilter');
+        const kelas = selEl ? selEl.value : "";
+        const r = await fetch(`${API}?action=getGradeSummary&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}`); const o = await r.json();
+        if (o.status === 'success') renderGradeSummary(o, kelas);
     } catch(e) { showToast('Gagal memuat laporan rumusan.', 'warn'); }
 }
 
-function renderGradeSummary(o) {
-    document.getElementById('laporanSubtitle').textContent = o.isAdmin
-        ? `Analisis Pentaksiran Berterusan — SEMUA KELAS (berdasarkan markah 100%)`
-        : `Analisis Pentaksiran Berterusan bagi kelas anda (berdasarkan markah 100%)`;
+function renderGradeSummary(o, kelasFilter) {
+    document.getElementById('laporanSubtitle').textContent = (o.isAdmin
+        ? `Analisis Pentaksiran Berterusan — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'SEMUA KELAS'} (berdasarkan markah 100%)`
+        : `Analisis Pentaksiran Berterusan — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'semua kelas anda'} (berdasarkan markah 100%)`);
 
     document.getElementById('gradeSummaryBody').innerHTML = o.bands.map(b => `
         <tr>
@@ -1307,6 +1413,47 @@ window.onload = () => {
     <div class="font-bold text-slate-600 uppercase tracking-wider mb-2">Aplikasi Maklumat Penilaian Akademik Tertutup</div>
     <div>Sistem ini dikhususkan untuk rekod rasmi pensyarah dan pelajar <strong class="text-slate-700">Unit Kokurikulum, Institut Pendidikan Guru Kampus Darulaman</strong>.</div>
     <div class="mt-2 text-[10px]">Penyelaras Kursus MPU3221 &copy; 2026 Hak Cipta Terpelihara.</div>
+</div>
+
+<div id="printArea">
+    <div class="print-header">
+        <h1>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h1>
+        <h2>Laporan Pemarkahan Rasmi — MPU3221 (Pengurusan Persatuan)</h2>
+    </div>
+    <div class="print-meta">
+        <span><strong>Disediakan Oleh:</strong> <span id="pLecName">--</span></span>
+        <span><strong>Skop:</strong> <span id="pScope">--</span></span>
+        <span><strong>Tarikh Cetakan:</strong> <span id="pDate">--</span></span>
+    </div>
+
+    <div class="print-section-title">Senarai & Pemarkahan Pelajar</div>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th>Bil</th><th>Nama Pelajar</th><th>No. KP</th><th>Kelas</th>
+                <th class="center">HP1<br>(30)</th><th class="center">HP5<br>(10)</th><th class="center">HP8<br>(30)</th><th class="center">HP10<br>(30)</th>
+                <th class="center">Jumlah</th><th class="center">Gred</th>
+            </tr>
+        </thead>
+        <tbody id="pStudentBody"></tbody>
+    </table>
+
+    <div class="print-section-title">Analisis Taburan Gred</div>
+    <table class="print-table" style="max-width:420px;">
+        <thead><tr><th>Skala</th><th class="center">Gred</th><th class="center">Jumlah</th><th class="center">%</th></tr></thead>
+        <tbody id="pGradeBody"></tbody>
+    </table>
+    <div class="print-stat-row">
+        <span>Jumlah Pelajar Dinilai: <span id="pJumlah">0</span></span>
+        <span>MIN: <span id="pMin">--</span></span>
+        <span>Sisihan Piawai: <span id="pSD">--</span></span>
+    </div>
+
+    <div class="print-signoff">
+        <div><div class="line">Disediakan Oleh (Pensyarah)</div></div>
+        <div><div class="line">Disahkan Oleh (Ketua Unit Kokurikulum)</div></div>
+    </div>
+    <div class="print-footer-note">Dokumen ini dijana secara automatik oleh Sistem Portal Pemarkahan MPU3221, Unit Kokurikulum IPGKDA. Sulit &amp; Terhad.</div>
 </div>
 
 </body>
