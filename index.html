@@ -376,6 +376,11 @@
                 <span>Senarai Calon</span>
                 <span id="classInfo" class="font-mono-score" style="color:var(--primary); font-size:11px; background:var(--bg-alt); padding:2px 8px; border-radius:12px;"></span>
             </div>
+            <div class="mb-3 px-1" id="classFilterWrap" style="display:none;">
+                <select id="classFilterSelect" onchange="setClassFilter(this.value)" class="w-full text-xs py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold" style="color:var(--primary);">
+                    <option value="">Semua Kelas</option>
+                </select>
+            </div>
             <div class="mb-3 px-1">
                 <input type="text" id="searchStudent" placeholder="Cari nama atau KP..." class="w-full text-xs py-2 px-3 bg-slate-50" onkeyup="filterStudents(this.value)">
             </div>
