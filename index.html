@@ -385,6 +385,7 @@
             <button class="tab" onclick="showLecTab('peer')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-radar me-2"></i> Analisis Rakan (Radar)</button>
             <button class="tab" onclick="showLecTab('summary')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-table me-2"></i> Buku Rekod Markah</button>
             <button class="tab" onclick="showLecTab('laporan')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-chart-column me-2"></i> Laporan Rumusan</button>
+            <button class="tab" onclick="showLecTab('peerstatus')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-user-check me-2"></i> Status Penilaian Rakan</button>
         </div>
         <style>
             #lecturerDash .tab-bar .tab.active { background:transparent; color:var(--primary); border-bottom-color:var(--primary); box-shadow:none; }
@@ -719,6 +720,58 @@
                     </div>
                 </div>
             </div>
+
+            <!-- TAB: STATUS PENILAIAN RAKAN (HP8) -->
+            <div id="ltab-peerstatus" style="display:none;">
+                <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--hp8-color);">
+                    <div>
+                        <h3 class="font-serif-title text-xl font-bold text-slate-800">Status Penilaian Rakan Sebaya (HP8)</h3>
+                        <p id="peerStatusSubtitle" class="text-[13px] text-slate-500 mt-1">Rumusan pelajar yang telah dan belum membuat penilaian rakan sekelas.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="peerStatusClassFilter" onchange="loadPeerCompletionStatus()" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:160px;">
+                            <option value="">Semua Kelas</option>
+                        </select>
+                        <button onclick="loadPeerCompletionStatus()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;">
+                    <div class="academic-card p-5 text-center" style="border-top:4px solid var(--primary);">
+                        <div class="dim-label mb-2">Jumlah Pelajar</div>
+                        <div id="psTotal" class="font-mono-score" style="font-size:30px; font-weight:800; color:var(--primary);">0</div>
+                    </div>
+                    <div class="academic-card p-5 text-center" style="border-top:4px solid var(--hp8-color);">
+                        <div class="dim-label mb-2">Selesai Sepenuhnya</div>
+                        <div id="psDone" class="font-mono-score" style="font-size:30px; font-weight:800; color:var(--hp8-color);">0</div>
+                    </div>
+                    <div class="academic-card p-5 text-center" style="border-top:4px solid var(--hp10-color);">
+                        <div class="dim-label mb-2">Sebahagian</div>
+                        <div id="psPartial" class="font-mono-score" style="font-size:30px; font-weight:800; color:var(--hp10-color);">0</div>
+                    </div>
+                    <div class="academic-card p-5 text-center" style="border-top:4px solid #b91c1c;">
+                        <div class="dim-label mb-2">Belum Membuat</div>
+                        <div id="psNone" class="font-mono-score" style="font-size:30px; font-weight:800; color:#b91c1c;">0</div>
+                    </div>
+                </div>
+
+                <div class="academic-card p-4 overflow-x-auto">
+                    <table class="academic-table" id="peerStatusTable">
+                        <thead>
+                            <tr>
+                                <th style="min-width:180px;">Nama Pelajar</th>
+                                <th>No. KP</th>
+                                <th>Kelas</th>
+                                <th style="text-align:center;">Wajib Nilai</th>
+                                <th style="text-align:center;">Telah Selesai</th>
+                                <th style="text-align:center;">Baki</th>
+                                <th style="text-align:center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="peerStatusBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -911,7 +964,7 @@ function renderLecStudentList() {
     const classes = [...new Set(sData.map(s=>s.Kelas))].filter(Boolean).sort();
     document.getElementById('classInfo').textContent = isAdminUser ? `SEMUA KELAS (${classes.length})` : (classes.length>0 ? classes.join(', ') : '');
 
-    ['classFilter','laporanClassFilter','printClassFilter'].forEach(id => {
+    ['classFilter','laporanClassFilter','printClassFilter','peerStatusClassFilter'].forEach(id => {
         const sel = document.getElementById(id); const prev = sel.value;
         sel.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(k => `<option value="${k}">${k}</option>`).join('');
         if (classes.includes(prev)) sel.value = prev;
@@ -941,9 +994,9 @@ function filterStudents(query) {
 }
 
 function showLecTab(t) {
-    ['marking','peer','rubrik','summary','laporan'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
+    ['marking','peer','rubrik','summary','laporan','peerstatus'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
     const tgt = document.getElementById('ltab-'+t); if(tgt) tgt.style.display='block';
-    document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => btn.classList.toggle('active', ['marking','rubrik','peer','summary','laporan'][i] === t));
+    document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => btn.classList.toggle('active', ['marking','rubrik','peer','summary','laporan','peerstatus'][i] === t));
     
     if(t==='marking' && curS) { document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none'; }
     if(t==='rubrik') { if(curS) showRubrikLecPanel(curS); else { document.getElementById('rubrikLecPanel').style.display='none'; document.getElementById('rubrikLecEmpty').style.display='flex'; } }
@@ -965,6 +1018,7 @@ function showLecTab(t) {
     
     if(t==='summary') renderSummaryTable();
     if(t==='laporan') loadGradeSummary();
+    if(t==='peerstatus') loadPeerCompletionStatus();
 }
 
 async function selectStudent(kp) {
@@ -1295,6 +1349,44 @@ async function printReport(fromLaporanTab) {
 }
 
 window.addEventListener('afterprint', () => document.body.classList.remove('printing-mode'));
+
+async function loadPeerCompletionStatus() {
+    try {
+        const selEl = document.getElementById('peerStatusClassFilter');
+        const kelas = selEl ? selEl.value : "";
+        const r = await fetch(`${API}?action=getPeerCompletionStatus&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}`); const o = await r.json();
+        if (o.status === 'success') renderPeerCompletionStatus(o, kelas);
+    } catch(e) { showToast('Gagal memuat status penilaian rakan.', 'warn'); }
+}
+
+function renderPeerCompletionStatus(o, kelasFilter) {
+    document.getElementById('peerStatusSubtitle').textContent = (o.isAdmin
+        ? `Rumusan penilaian rakan sebaya — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'SEMUA KELAS'}`
+        : `Rumusan penilaian rakan sebaya — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'semua kelas anda'}`);
+
+    document.getElementById('psTotal').textContent = o.ringkasan.jumlahPelajar;
+    document.getElementById('psDone').textContent = o.ringkasan.selesai;
+    document.getElementById('psPartial').textContent = o.ringkasan.sebahagian;
+    document.getElementById('psNone').textContent = o.ringkasan.belumMula + (o.ringkasan.tiadaRakan||0);
+
+    const statusBadge = (status) => {
+        if (status === 'Selesai') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-green-100 text-green-800"><i class="fas fa-check-circle me-1"></i>Selesai</span>';
+        if (status === 'Sebahagian') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-amber-100 text-amber-800"><i class="fas fa-hourglass-half me-1"></i>Sebahagian</span>';
+        if (status === 'Tiada Rakan Sekelas') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-slate-100 text-slate-500"><i class="fas fa-minus-circle me-1"></i>Tiada Rakan</span>';
+        return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-red-100 text-red-800"><i class="fas fa-times-circle me-1"></i>Belum Membuat</span>';
+    };
+
+    document.getElementById('peerStatusBody').innerHTML = o.data.map(s => `
+        <tr>
+            <td class="p-3 font-bold text-[13px]">${s.nama}</td>
+            <td class="p-3 font-mono-score text-[12px] text-slate-500">${s.noKP}</td>
+            <td class="p-3 text-[12px]">${s.kelas}</td>
+            <td class="p-3 text-center font-mono-score font-bold">${s.wajib}</td>
+            <td class="p-3 text-center font-mono-score font-bold" style="color:var(--hp8-color);">${s.selesai}</td>
+            <td class="p-3 text-center font-mono-score font-bold" style="color:${s.baki>0?'#b91c1c':'#94a3b8'};">${s.baki}</td>
+            <td class="p-3 text-center">${statusBadge(s.status)}</td>
+        </tr>`).join('') || `<tr><td colspan="7" class="text-center p-8 text-slate-400">Tiada rekod pelajar dalam skop ini.</td></tr>`;
+}
 
 async function loadGradeSummary() {
     try {
