@@ -343,7 +343,10 @@
                 <i class="fas fa-chalkboard-teacher"></i>
             </div>
             <div>
-                <div style="font-size:10px; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.7); text-transform:uppercase;">Ruang Kerja Pensyarah (Admin)</div>
+                <div style="font-size:10px; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.7); text-transform:uppercase; display:flex; align-items:center; gap:8px;">
+                    <span>Ruang Kerja Pensyarah</span>
+                    <span id="adminBadge" style="display:none; background:#facc15; color:#78350f; padding:2px 8px; border-radius:10px; font-size:9px; font-weight:800; letter-spacing:0.05em;"><i class="fas fa-crown me-1"></i>SUPER ADMIN — SEMUA KELAS</span>
+                </div>
                 <div id="lecName" class="font-serif-title" style="font-size:16px; font-weight:700;">--</div>
             </div>
         </div>
@@ -357,6 +360,7 @@
             <button class="tab" onclick="showLecTab('rubrik')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-clipboard-list me-2"></i> Panel Rubrik (Borang)</button>
             <button class="tab" onclick="showLecTab('peer')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-radar me-2"></i> Analisis Rakan (Radar)</button>
             <button class="tab" onclick="showLecTab('summary')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-table me-2"></i> Buku Rekod Markah</button>
+            <button class="tab" onclick="showLecTab('laporan')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 16px; font-size:12px;"><i class="fas fa-chart-column me-2"></i> Laporan Rumusan</button>
         </div>
         <style>
             #lecturerDash .tab-bar .tab.active { background:transparent; color:var(--primary); border-bottom-color:var(--primary); box-shadow:none; }
@@ -615,6 +619,62 @@
                     </div>
                 </div>
             </div>
+
+            <!-- TAB: LAPORAN RUMUSAN MARKAH (TABURAN GRED) -->
+            <div id="ltab-laporan" style="display:none;">
+                <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--secondary);">
+                    <div>
+                        <h3 class="font-serif-title text-xl font-bold text-slate-800">Laporan Rumusan & Analisis Taburan Gred</h3>
+                        <p id="laporanSubtitle" class="text-[13px] text-slate-500 mt-1">Analisis Pentaksiran Berterusan berdasarkan markah 100%.</p>
+                    </div>
+                    <button onclick="loadGradeSummary()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
+                </div>
+
+                <div style="display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start;">
+                    <div class="academic-card p-4 overflow-hidden">
+                        <table class="academic-table" id="gradeSummaryTable">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;">Skala</th>
+                                    <th style="text-align:center;">Gred</th>
+                                    <th style="text-align:center;">Jumlah</th>
+                                    <th style="text-align:center;">%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gradeSummaryBody"></tbody>
+                            <tfoot>
+                                <tr style="background:var(--bg-alt); font-weight:800;">
+                                    <td colspan="2" class="p-3 text-center text-[11px] uppercase tracking-wider">Jumlah</td>
+                                    <td class="p-3 text-center font-mono-score" id="gradeSummaryTotal">0</td>
+                                    <td class="p-3 text-center font-mono-score">100</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="flex flex-col gap-6">
+                        <div class="academic-card p-6">
+                            <div style="position:relative; width:100%; height:340px;">
+                                <canvas id="gradeBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                            <div class="academic-card p-6 text-center" style="border-top:4px solid var(--primary);">
+                                <div class="dim-label mb-2">MIN</div>
+                                <div id="gradeMinVal" class="font-mono-score" style="font-size:32px; font-weight:800; color:var(--primary);">--</div>
+                            </div>
+                            <div class="academic-card p-6 text-center" style="border-top:4px solid var(--secondary);">
+                                <div class="dim-label mb-2">Sisihan Piawai</div>
+                                <div id="gradeSDVal" class="font-mono-score" style="font-size:32px; font-weight:800; color:var(--secondary);">--</div>
+                            </div>
+                        </div>
+                        <div id="gradeSummaryEmptyNote" style="display:none;" class="alert-warn">
+                            <i class="fas fa-info-circle mt-1"></i>
+                            <div>Tiada rekod markah lengkap dijumpai buat masa ini untuk skop capaian anda.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -625,6 +685,8 @@ const API = "https://script.google.com/macros/s/AKfycbxufZgAB9OWBbVzGzBascudDu49
 
 let mode = 'student', sData = [], curS = null, curUser = null, curLecEmail = null;
 let peerScores = {}, peerTarget = null, radarChart = null;
+let isAdminUser = false, gradeBarChart = null;
+const GRADE_CHART_COLORS = { 'A+':'#16a34a','A':'#22c55e','A-':'#4ade80','B+':'#2563eb','B':'#3b82f6','B-':'#60a5fa','C+':'#d97706','C':'#f59e0b','C-':'#fbbf24','D+':'#dc2626','D':'#ef4444','E':'#f87171','F':'#7f1d1d' };
 const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
 const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
 
@@ -695,7 +757,7 @@ async function handleAuth() {
             if (o.status === "success") { curUser = o.data; localStorage.setItem('userMPU', JSON.stringify(o.data)); renderStudent(o.data); } else showToast(o.message, 'warn');
         } else {
             const r = await fetch(`${API}?action=lecturerLogin&email=${encodeURIComponent(id)}&pass=${encodeURIComponent(pw)}`); const o = await r.json();
-            if (o.status === "success") { curLecEmail = id; localStorage.setItem('le', id); localStorage.setItem('leName', o.name || id); initLecturer(id, o.name); } else showToast(o.message, 'warn');
+            if (o.status === "success") { curLecEmail = id; localStorage.setItem('le', id); localStorage.setItem('leName', o.name || id); localStorage.setItem('leAdmin', o.isAdmin ? '1' : '0'); initLecturer(id, o.name, o.isAdmin); } else showToast(o.message, 'warn');
         }
     } catch (e) { showToast('Ralat rangkaian', 'warn'); }
     btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> Akses Sistem';
@@ -788,14 +850,22 @@ async function submitPeerEval() {
     } catch(e) { showToast('Ralat pelayan. Cuba sebentar lagi.', 'warn'); btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian'; }
 }
 
-async function initLecturer(email, name) {
+async function initLecturer(email, name, isAdminFlag) {
     document.getElementById('loginScreen').style.display='none'; document.getElementById('lecturerDash').style.display='flex'; 
     document.getElementById('lecName').textContent=name||email; curLecEmail=email;
-    try { const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(email)}`); const o = await r.json(); sData=o.data||[]; renderLecStudentList(); renderSummaryTable(); } catch(e) { showToast('Gagal memuat turun data pelajar.', 'warn'); }
+    isAdminUser = isAdminFlag !== undefined ? !!isAdminFlag : (localStorage.getItem('leAdmin') === '1');
+    document.getElementById('adminBadge').style.display = isAdminUser ? 'inline-block' : 'none';
+    try {
+        const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(email)}`); const o = await r.json();
+        sData=o.data||[]; if(typeof o.isAdmin === 'boolean') isAdminUser = o.isAdmin;
+        document.getElementById('adminBadge').style.display = isAdminUser ? 'inline-block' : 'none';
+        renderLecStudentList(); renderSummaryTable(); loadGradeSummary();
+    } catch(e) { showToast('Gagal memuat turun data pelajar.', 'warn'); }
 }
 
 function renderLecStudentList() {
-    document.getElementById('classInfo').textContent = sData.length>0 ? [...new Set(sData.map(s=>s.Kelas))].join(', ') : '';
+    const classes = [...new Set(sData.map(s=>s.Kelas))];
+    document.getElementById('classInfo').textContent = isAdminUser ? `SEMUA KELAS (${classes.length})` : (classes.length>0 ? classes.join(', ') : '');
     filterStudents("");
 }
 
@@ -809,9 +879,9 @@ function filterStudents(query) {
 }
 
 function showLecTab(t) {
-    ['marking','peer','rubrik','summary'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
+    ['marking','peer','rubrik','summary','laporan'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
     const tgt = document.getElementById('ltab-'+t); if(tgt) tgt.style.display='block';
-    document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => btn.classList.toggle('active', ['marking','rubrik','peer','summary'][i] === t));
+    document.querySelectorAll('#lecturerDash .tab').forEach((btn,i) => btn.classList.toggle('active', ['marking','rubrik','peer','summary','laporan'][i] === t));
     
     if(t==='marking' && curS) { document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none'; }
     if(t==='rubrik') { if(curS) showRubrikLecPanel(curS); else { document.getElementById('rubrikLecPanel').style.display='none'; document.getElementById('rubrikLecEmpty').style.display='flex'; } }
@@ -832,6 +902,7 @@ function showLecTab(t) {
     }
     
     if(t==='summary') renderSummaryTable();
+    if(t==='laporan') loadGradeSummary();
 }
 
 async function selectStudent(kp) {
@@ -1116,6 +1187,76 @@ function calc() {
     document.getElementById('gd').style.color = g.includes('A') ? '#16a34a' : g.includes('B') ? '#2563eb' : g.includes('C') ? '#d97706' : '#dc2626';
 }
 
+async function loadGradeSummary() {
+    try {
+        const r = await fetch(`${API}?action=getGradeSummary&email=${encodeURIComponent(curLecEmail)}`); const o = await r.json();
+        if (o.status === 'success') renderGradeSummary(o);
+    } catch(e) { showToast('Gagal memuat laporan rumusan.', 'warn'); }
+}
+
+function renderGradeSummary(o) {
+    document.getElementById('laporanSubtitle').textContent = o.isAdmin
+        ? `Analisis Pentaksiran Berterusan — SEMUA KELAS (berdasarkan markah 100%)`
+        : `Analisis Pentaksiran Berterusan bagi kelas anda (berdasarkan markah 100%)`;
+
+    document.getElementById('gradeSummaryBody').innerHTML = o.bands.map(b => `
+        <tr>
+            <td class="p-3 text-center font-mono-score">${b.skala}</td>
+            <td class="p-3 text-center font-bold">${b.gred}</td>
+            <td class="p-3 text-center font-mono-score font-bold">${b.jumlah}</td>
+            <td class="p-3 text-center font-mono-score">${b.peratus.toFixed(2)}</td>
+        </tr>`).join('');
+    document.getElementById('gradeSummaryTotal').textContent = o.jumlah;
+    document.getElementById('gradeMinVal').textContent = o.jumlah > 0 ? o.min.toFixed(2) : '--';
+    document.getElementById('gradeSDVal').textContent = o.jumlah > 0 ? o.sisihanPiawai.toFixed(2) : '--';
+    document.getElementById('gradeSummaryEmptyNote').style.display = o.jumlah > 0 ? 'none' : 'flex';
+
+    if (gradeBarChart) { gradeBarChart.destroy(); gradeBarChart = null; }
+    const c = document.getElementById('gradeBarChart');
+    if (c) {
+        gradeBarChart = new Chart(c.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: o.bands.map(b => b.gred),
+                datasets: [{
+                    data: o.bands.map(b => b.jumlah),
+                    backgroundColor: o.bands.map(b => GRADE_CHART_COLORS[b.gred] || '#94a3b8'),
+                    borderRadius: 4,
+                    maxBarThickness: 46
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (ctx) => `Jumlah: ${ctx.raw} pelajar` } },
+                    datalabels: undefined
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { precision: 0, color: '#94a3b8' }, grid: { color: '#e2e8f0' } },
+                    x: { ticks: { color: '#475569', font: { weight: 'bold' } }, grid: { display: false } }
+                }
+            },
+            plugins: [{
+                id: 'barValueLabels',
+                afterDatasetsDraw(chart) {
+                    const { ctx } = chart;
+                    chart.data.datasets[0].data.forEach((val, i) => {
+                        if (!val) return;
+                        const meta = chart.getDatasetMeta(0).data[i];
+                        ctx.save();
+                        ctx.fillStyle = '#334155';
+                        ctx.font = 'bold 12px "Plus Jakarta Sans"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(val, meta.x, meta.y - 6);
+                        ctx.restore();
+                    });
+                }
+            }]
+        });
+    }
+}
+
 function renderSummaryTable() {
     const tbody = document.getElementById('summaryBody');
     if(!sData.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-8 text-slate-400">Tiada rekod pelajar.</td></tr>'; return; }
@@ -1152,7 +1293,7 @@ window.onload = () => {
     const u=localStorage.getItem('userMPU'); 
     if(u){try{renderStudent(JSON.parse(u));}catch(e){localStorage.clear();}} 
     const le=localStorage.getItem('le'); 
-    if(le) initLecturer(le,localStorage.getItem('leName')); 
+    if(le) initLecturer(le,localStorage.getItem('leName'), localStorage.getItem('leAdmin')==='1'); 
 };
 </script>
 
