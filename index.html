@@ -29,7 +29,7 @@
             --hp10-color: #b45309; /* Academic Gold */
             
             --bg-body: #f8fafc;    /* Slate 50 */
-            --bg-surface: #ffffff; /* White */
+            --bg-surface: #ffffff; /* Putih */
             --bg-alt: #f1f5f9;     /* Slate 100 */
             
             --text-main: #0f172a;  /* Slate 900 */
@@ -115,20 +115,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.3s ease forwards; }
 
-        @media (max-width: 768px) {
-            .tab { padding: 10px 4px !important; font-size: 10px !important; }
-            .likert-group { flex-wrap: wrap !important; gap: 6px !important; }
-            .likert-btn { min-width: calc(33% - 6px) !important; padding: 10px 4px !important; font-size: 11px !important; }
-            #sList, #peerList { display: flex !important; flex-direction: row !important; overflow-x: auto !important; max-height: none !important; padding-bottom: 10px; }
-            #sList .s-card, #peerList .s-card { min-width: 200px !important; flex-shrink: 0 !important; margin-bottom: 0; }
-            #lecturerDash > div:last-child, #stab-peer > div:last-child { grid-template-columns: 1fr !important; }
-            #toast { left: 16px; right: 16px; top: 16px; transform: translateY(-120%) !important; }
-            #toast.show { transform: translateY(0) !important; }
-            .academic-table { font-size: 11px; }
-            .academic-table th, .academic-table td { padding: 8px; }
-        }
-
-        /* ================= CETAKAN (PRINT) ================= */
         #printArea, #printModerationArea { display: none; }
         .print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .print-table th, .print-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: left; }
@@ -234,7 +220,6 @@
         </div>
     </div>
 
-    <!-- Tab: Profil Pelajar -->
     <div id="stab-profile" style="padding:24px 32px; flex:1; display:flex; flex-wrap:wrap; gap:24px;">
         <div class="academic-card p-8 flex-1 min-w-[300px]">
             <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:var(--primary); text-transform:uppercase; margin-bottom:24px; border-bottom:2px solid var(--bg-alt); padding-bottom:12px;">Maklumat Pendaftaran Rasmi</div>
@@ -377,7 +362,6 @@
 
     <div style="padding:24px 32px; display:grid; grid-template-columns:320px 1fr; gap:24px; flex:1;">
         
-        <!-- Sidebar Senarai Pelajar -->
         <div class="academic-card p-4" style="align-self: start; position: sticky; top: 110px; max-height: calc(100vh - 130px); display: flex; flex-direction: column;">
             <div style="font-size:11px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; padding:0 4px; display:flex; justify-content:space-between; align-items:center;">
                 <span>Senarai Calon</span>
@@ -748,13 +732,12 @@
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Garis Panduan LAM-PT-04-02</span>
-                            <span class="text-xs text-slate-400 font-mono-score">Kohort 321 Pelajar / 13 Pemeriksa</span>
+                            <span class="text-xs text-slate-400 font-mono-score">Sampling Nisbah Nisbi Kohort</span>
                         </div>
                         <h3 class="font-serif-title text-xl font-bold text-slate-800">Modul Sampling Moderasi Pemarkahan</h3>
-                        <p class="text-[13px] text-slate-500 mt-1">Pemilihan sistematik 13 sampel tugasan mewakili kesemua 13 orang pemeriksa (pensyarah) merentasi 3 kelompok markah.</p>
+                        <p class="text-[13px] text-slate-500 mt-1">Pemilihan sistematik 13 sampel tugasan mewakili kesemua 13 orang pemeriksa merentasi 3 kelompok markah seimbang.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                        <!-- DROPDOWN PEMILIHAN TUGASAN 1 / TUGASAN 2 / KESELURUHAN -->
                         <select id="moderationTaskFilter" onchange="loadModerationSampling()" class="text-xs py-2 px-3 bg-amber-50 text-amber-900 font-bold border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500" style="min-width:180px;">
                             <option value="all">📊 Keseluruhan (100%)</option>
                             <option value="t1">📝 Tugasan 1 (HP1 + HP5 - 40%)</option>
@@ -769,7 +752,7 @@
                     </div>
                 </div>
 
-                <!-- Kad Statistik Profil Moderasi -->
+                <!-- Kad Statistik Profil Moderasi dengan Julat Dinamik -->
                 <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; margin-bottom:24px;">
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--primary);">
                         <div class="dim-label mb-1">Jumlah Dinilai</div>
@@ -784,21 +767,20 @@
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--hp1-color);">
                         <div class="dim-label mb-1">Kelompok Tinggi</div>
                         <div id="modGroupTinggi" class="font-mono-score text-2xl font-black" style="color:var(--hp1-color);">0</div>
-                        <div class="text-[10px] text-slate-400 mt-1">75% - 89.9%</div>
+                        <div id="modGroupTinggiRange" class="text-[10px] text-slate-500 font-mono-score font-bold mt-1">-</div>
                     </div>
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--hp5-color);">
                         <div class="dim-label mb-1">Kelompok Sederhana</div>
                         <div id="modGroupSederhana" class="font-mono-score text-2xl font-black" style="color:var(--hp5-color);">0</div>
-                        <div class="text-[10px] text-slate-400 mt-1">60% - 74.9%</div>
+                        <div id="modGroupSederhanaRange" class="text-[10px] text-slate-500 font-mono-score font-bold mt-1">-</div>
                     </div>
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--hp10-color);">
                         <div class="dim-label mb-1">Kelompok Rendah</div>
                         <div id="modGroupRendah" class="font-mono-score text-2xl font-black" style="color:var(--hp10-color);">0</div>
-                        <div class="text-[10px] text-slate-400 mt-1">50% - 59.9%</div>
+                        <div id="modGroupRendahRange" class="text-[10px] text-slate-500 font-mono-score font-bold mt-1">-</div>
                     </div>
                 </div>
 
-                <!-- Panduan Prosedur Moderasi 5 Langkah -->
                 <div class="academic-card p-5 mb-6 bg-amber-50/50 border-amber-200">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900 mb-3 flex items-center gap-2">
                         <i class="fas fa-list-check text-amber-700"></i> Panduan Langkah Operasi Moderasi Ketua Pemeriksa
@@ -814,7 +796,7 @@
                         </div>
                         <div class="p-3 bg-white rounded border border-amber-200">
                             <strong class="text-amber-900 block mb-1">Langkah 3: Kelompok</strong>
-                            Bahagikan baki lulus (50%-89%) kepada 3 Kelompok: Tinggi, Sederhana, dan Rendah.
+                            Bahagikan baki lulus secara nisbah nisbi seimbang kepada 3 Kelompok: Tinggi, Sederhana, dan Rendah.
                         </div>
                         <div class="p-3 bg-white rounded border border-amber-200">
                             <strong class="text-amber-900 block mb-1">Langkah 4: 13 Sampel</strong>
@@ -953,7 +935,6 @@ const PEER_Q = [
     {id:'q5', title:"Kerjasama", label:"Rakan bekerjasama baik dan menyumbang aktif kepada kumpulan."}
 ];
 
-// UTILITIES
 function fixDriveUrl(url) { if (!url) return ""; let id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1]; return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w800` : url; }
 function loadImage(iEl, pEl, url) { if (!url) { iEl.style.display='none'; pEl.style.display='flex'; return; } iEl.onload = () => { iEl.style.display='block'; pEl.style.display='none'; }; iEl.onerror = () => { iEl.style.display='none'; pEl.style.display='flex'; }; iEl.src = fixDriveUrl(url); }
 function showToast(msg, type='success') { const t = document.getElementById('toast'), m = document.getElementById('toastMsg'); const icon = type === 'success' ? 'fa-check-circle text-green-600' : 'fa-exclamation-triangle text-amber-600'; const bColor = type === 'success' ? 'var(--hp8-color)' : 'var(--hp10-color)'; t.style.borderLeftColor = bColor; m.innerHTML = `<i class="fas ${icon} text-lg"></i><span class="text-slate-700">${msg}</span>`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
@@ -1445,6 +1426,11 @@ function renderModerationUI(data) {
     document.getElementById('modGroupTinggi').textContent = data.stats ? data.stats.tinggiCount : 0;
     document.getElementById('modGroupSederhana').textContent = data.stats ? data.stats.sederhanaCount : 0;
     document.getElementById('modGroupRendah').textContent = data.stats ? data.stats.rendahCount : 0;
+
+    // Paparan julat dinamik kohort bagi setiap kelompok
+    document.getElementById('modGroupTinggiRange').textContent = data.stats ? data.stats.tinggiRange : '-';
+    document.getElementById('modGroupSederhanaRange').textContent = data.stats ? data.stats.sederhanaRange : '-';
+    document.getElementById('modGroupRendahRange').textContent = data.stats ? data.stats.rendahRange : '-';
 
     // Render Kes Ekstrem Table
     const allExtremes = [...(data.extremesHigh || []), ...(data.extremesLow || [])];
