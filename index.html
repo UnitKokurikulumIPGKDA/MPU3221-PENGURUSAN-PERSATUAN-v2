@@ -598,7 +598,7 @@
                             <p class="text-[13px] text-slate-500 mt-1">Paparan komprehensif pencapaian keseluruhan kelas.</p>
                         </div>
                         <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                            <select id="printClassFilter" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:150px;">
+                            <select id="printClassFilter" onchange="renderSummaryTable()" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:150px;">
                                 <option value="">Semua Kelas</option>
                             </select>
                             <button onclick="renderSummaryTable()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar</button>
@@ -1381,7 +1381,15 @@ function renderSummaryTable() {
     const tbody = document.getElementById('summaryBody');
     if(!sData.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center p-8 text-slate-400">Tiada rekod pelajar.</td></tr>'; return; }
     
-    tbody.innerHTML = sData.map((s, index)=>{
+    const classFilter = document.getElementById('printClassFilter') ? document.getElementById('printClassFilter').value : "";
+    const filteredData = classFilter ? sData.filter(s => (s.Kelas || "").toString() === classFilter) : sData;
+
+    if(!filteredData.length) { 
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center p-8 text-slate-400">Tiada rekod pelajar bagi kelas ini.</td></tr>'; 
+        return; 
+    }
+
+    tbody.innerHTML = filteredData.map((s, index)=>{
         const m=s.markahSediaAda||{}, t=(m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0), g=t>0?calculateGred(t):'--';
         const isOdd = index % 2 !== 0;
         const bg = isOdd ? 'bg-slate-50' : 'bg-white';
