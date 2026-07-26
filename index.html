@@ -867,13 +867,7 @@ const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama']
 const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
 
 const RUBRIK_CONFIG = [
-function fixDriveUrl(url) { 
-    if (!url) return ""; 
-    let id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1]; 
-    return id ? `https://lh3.googleusercontent.com/d/${id}` : url; 
-}
-function loadImage(iEl, pEl, url) { if (!url) { iEl.style.display='none'; pEl.style.display='flex'; return; } iEl.onload = () => { iEl.style.display='block'; pEl.style.display='none'; }; iEl.onerror = () => { iEl.style.display='none'; pEl.style.display='flex'; }; iEl.src = fixDriveUrl(url); }
-
+    {
         id: 'hp1', title: 'TUGASAN 1: Asas & Identiti, Operasi, Artifak (HP1)', max: 30, color: 'var(--hp1-color)', bg:'rgba(67,56,202,0.05)', icon: 'fa-file-alt', prefix: 'r',
         items: [
             {no:1, nama:"Pengenalan, Konsep & Rasional", penerangan:"Pengenalan dan konsep, Tujuan, Objektif, dan Rasional penubuhan.", max:5},
@@ -1673,8 +1667,6 @@ function renderSingleDossierHTML(d) {
     const m = d.markah || {};
     const r = d.rubrik || {};
     const peer = d.peer || null;
-    const rawImg = p.linkGambar || p.Link_Gambar || "";
-    const imgUrl = fixDriveUrl(rawImg);
 
     return `
     <div style="font-family:'Plus Jakarta Sans', sans-serif; color:#0f172a; padding:10px;">
@@ -1686,8 +1678,8 @@ function renderSingleDossierHTML(d) {
 
         <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #cbd5e1; border-radius:6px; padding:8px 12px; margin-bottom:12px; background:#f8fafc;">
             <div style="display:flex; align-items:center; gap:12px;">
-                <div style="width:55px; height:70px; border:1px solid #94a3b8; border-radius:4px; overflow:hidden; background:#e2e8f0; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
-                    ${imgUrl ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'font-size:8px; font-weight:800; color:#64748b; text-align:center; text-transform:uppercase;\\'>TIADA GAMBAR</div>';" style="width:100%; height:100%; object-fit:cover;">` : '<div style="font-size:8px; font-weight:800; color:#64748b; text-align:center; text-transform:uppercase;">TIADA GAMBAR</div>'}
+                <div style="width:50px; height:65px; border:1px solid #94a3b8; border-radius:4px; overflow:hidden; background:#e2e8f0; flex-shrink:0;">
+                    ${p.linkGambar ? `<img src="${p.linkGambar}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; font-size:10px; color:#94a3b8;">TIADA</div>'}
                 </div>
                 <div>
                     <div style="font-size:13px; font-weight:800; color:#1e3a8a;">${p.nama || '--'}</div>
