@@ -58,9 +58,6 @@
         .tab { flex: 1; padding: 10px; border-radius: 0.5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; background: transparent; border: none; color: var(--text-muted); }
         .tab.active { background: var(--bg-surface); color: var(--primary); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
 
-        .screen { display: none; }
-        .screen.active { display: flex; }
-
         .likert-group { display: flex; gap: 6px; }
         .likert-btn { flex: 1; padding: 12px 4px; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--bg-surface); cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-muted); transition: all 0.2s; text-align: center; }
         .likert-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0fdfa; }
@@ -115,27 +112,33 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.3s ease forwards; }
 
-        #printArea, #printModerationArea { display: none; }
-        .print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        .print-table th, .print-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: left; }
-        .print-table th { background: #e2e8f0; font-weight: 800; text-transform: uppercase; font-size: 9px; letter-spacing: 0.04em; }
+        #printArea, #printModerationArea, #printIndividualArea { display: none; }
+        .print-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .print-table th, .print-table td { border: 1px solid #94a3b8; padding: 5px 6px; text-align: left; }
+        .print-table th { background: #f1f5f9; font-weight: 800; text-transform: uppercase; font-size: 8.5px; letter-spacing: 0.03em; color: #1e293b; }
         .print-table td.center, .print-table th.center { text-align: center; }
-        .print-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 14px; margin-bottom: 18px; }
-        .print-header h1 { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; margin: 6px 0 2px; }
-        .print-header h2 { font-size: 12px; font-weight: 600; color: #334155; margin: 0; }
-        .print-meta { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 14px; padding: 8px 0; border-bottom: 1px solid #cbd5e1; }
-        .print-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 8px; border-left: 4px solid #1e3a8a; padding-left: 8px; }
-        .print-stat-row { display: flex; gap: 24px; margin-top: 10px; font-size: 12px; font-weight: 700; }
-        .print-signoff { display: flex; justify-content: space-between; margin-top: 50px; font-size: 11px; }
-        .print-signoff div { width: 45%; }
-        .print-signoff .line { border-top: 1px solid #0f172a; margin-top: 45px; padding-top: 4px; }
-        .print-footer-note { margin-top: 24px; font-size: 9px; color: #64748b; text-align: center; }
+        .print-header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 8px; margin-bottom: 12px; }
+        .print-header h1 { font-family: 'Lora', serif; font-size: 17px; font-weight: 700; margin: 2px 0; color: #0f172a; }
+        .print-header h2 { font-size: 10.5px; font-weight: 600; color: #334155; margin: 0; }
+        .print-meta { display: flex; justify-content: space-between; font-size: 9.5px; margin-bottom: 10px; padding: 4px 0; border-bottom: 1px solid #cbd5e1; }
+        .print-section-title { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin: 12px 0 6px; border-left: 4px solid #1e3a8a; padding-left: 6px; color: #1e3a8a; }
+        
+        .dossier-page {
+            page-break-after: always;
+            break-after: page;
+            padding: 4px;
+        }
+        .dossier-page:last-child {
+            page-break-after: avoid;
+            break-after: avoid;
+        }
 
         @media print {
-            @page { size: A4 portrait; margin: 12mm; }
-            body.printing-mode > *:not(#printArea):not(#printModerationArea) { display: none !important; }
+            @page { size: A4 portrait; margin: 8mm; }
+            body.printing-mode > *:not(#printArea):not(#printModerationArea):not(#printIndividualArea) { display: none !important; }
             body.printing-mode #printArea.active-print { display: block !important; }
             body.printing-mode #printModerationArea.active-print { display: block !important; }
+            body.printing-mode #printIndividualArea.active-print { display: block !important; }
             body.printing-mode { background: white !important; }
         }
     </style>
@@ -212,7 +215,6 @@
         <button onclick="logout()" class="btn-outline px-4 py-2 rounded-lg"><i class="fas fa-sign-out-alt me-1"></i> Log Keluar</button>
     </div>
 
-    <!-- Navigasi Pelajar -->
     <div style="padding:24px 32px 0;">
         <div class="tab-bar" style="max-width:400px;">
             <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-id-badge me-1"></i> Profil Pengguna</button>
@@ -343,9 +345,9 @@
         <button onclick="logout()" class="btn-outline px-4 py-2 rounded-lg" style="border-color:rgba(255,255,255,0.3); color:white;"><i class="fas fa-sign-out-alt me-1"></i> Log Keluar</button>
     </div>
 
-    <!-- Navigasi Pensyarah dengan Tab Moderasi -->
+    <!-- Navigasi Pensyarah -->
     <div style="padding:24px 32px 0; background:white; border-bottom:1px solid var(--border);">
-        <div class="tab-bar" style="max-width:1050px; background:transparent; border:none; padding:0; gap:10px; margin-bottom:-1px; overflow-x:auto;">
+        <div class="tab-bar" style="max-width:1100px; background:transparent; border:none; padding:0; gap:10px; margin-bottom:-1px; overflow-x:auto;">
             <button class="tab active" onclick="showLecTab('marking')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-calculator me-1"></i> Pemarkahan Induk</button>
             <button class="tab" onclick="showLecTab('rubrik')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-clipboard-list me-1"></i> Panel Rubrik</button>
             <button class="tab" onclick="showLecTab('peer')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-radar me-1"></i> Analisis Rakan</button>
@@ -362,6 +364,7 @@
 
     <div style="padding:24px 32px; display:grid; grid-template-columns:320px 1fr; gap:24px; flex:1;">
         
+        <!-- Sidebar Senarai Pelajar -->
         <div class="academic-card p-4" style="align-self: start; position: sticky; top: 110px; max-height: calc(100vh - 130px); display: flex; flex-direction: column;">
             <div style="font-size:11px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; padding:0 4px; display:flex; justify-content:space-between; align-items:center;">
                 <span>Senarai Calon</span>
@@ -401,6 +404,9 @@
                         </div>
                         
                         <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+                            <button onclick="printIndividualReport()" class="btn-primary text-xs px-3 py-2 rounded-lg bg-indigo-900 border-indigo-900 hover:bg-indigo-800 shadow-sm flex items-center gap-2">
+                                <i class="fas fa-file-pdf"></i> Cetak Laporan Individu
+                            </button>
                             <div id="badge-rubrik" style="font-size:10px; font-weight:700; padding:4px 10px; border-radius:12px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-muted);"><i class="fas fa-times-circle me-1"></i> Rubrik Belum Diisi</div>
                             <div id="peerScoreBadge" style="display:none; font-size:10px; font-weight:700; padding:4px 10px; border-radius:12px; border:1px solid #bbf7d0; background:#f0fdf4; color:#15803d;">
                                 <i class="fas fa-users me-1"></i> Skor Rakan: <span id="peerAvgDisp" class="font-mono-score ms-1">--</span>
@@ -512,8 +518,13 @@
                             <div id="rubrikLecStudentName" class="font-serif-title text-2xl font-bold text-slate-800">--</div>
                             <div id="rubrikLecStudentKP" class="font-mono-score text-sm text-slate-500 mt-1">--</div>
                         </div>
-                        <div id="rubrikLecExistBadge" style="display:none; background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; padding:8px 16px; border-radius:8px; font-weight:700; font-size:12px; box-shadow:var(--shadow-sm);">
-                            <i class="fas fa-lock me-2"></i> Rekod Tersimpan
+                        <div class="flex items-center gap-3">
+                            <button onclick="printIndividualReport()" class="btn-primary text-xs px-3 py-2 rounded-lg bg-indigo-900 border-indigo-900 hover:bg-indigo-800 shadow-sm flex items-center gap-2">
+                                <i class="fas fa-file-pdf"></i> Cetak Laporan Individu
+                            </button>
+                            <div id="rubrikLecExistBadge" style="display:none; background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; padding:8px 16px; border-radius:8px; font-weight:700; font-size:12px; box-shadow:var(--shadow-sm);">
+                                <i class="fas fa-lock me-2"></i> Rekod Tersimpan
+                            </div>
                         </div>
                     </div>
 
@@ -581,18 +592,19 @@
 
             <div id="ltab-summary" style="display:none;">
                 <div class="academic-card p-6">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
                         <div>
                             <h3 class="font-serif-title text-xl font-bold text-slate-800">Buku Rekod Pemarkahan</h3>
                             <p class="text-[13px] text-slate-500 mt-1">Paparan komprehensif pencapaian keseluruhan kelas.</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                        <select id="printClassFilter" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:160px;">
-                            <option value="">Semua Kelas</option>
-                        </select>
-                        <button onclick="renderSummaryTable()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
-                        <button onclick="printReport()" class="btn-primary px-4 py-2 rounded-lg text-[11px]"><i class="fas fa-print me-2"></i> Cetak Laporan</button>
-                    </div>
+                        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                            <select id="printClassFilter" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:150px;">
+                                <option value="">Semua Kelas</option>
+                            </select>
+                            <button onclick="renderSummaryTable()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar</button>
+                            <button onclick="printReport()" class="btn-primary px-3 py-2 rounded-lg text-[10px]" style="background:#334155; border-color:#334155;"><i class="fas fa-list me-1"></i> Ringkasan Kelas</button>
+                            <button onclick="printBatchClassIndividualReports()" class="btn-primary px-3 py-2 rounded-lg text-[10px]" style="background:#1e3a8a; border-color:#1e3a8a;"><i class="fas fa-copy me-1"></i> Cetak Pukal Dossier Kelas</button>
+                        </div>
                     </div>
                     
                     <div class="overflow-x-auto border border-slate-200 rounded-lg">
@@ -607,6 +619,7 @@
                                     <th style="text-align:center; background:#f1f5f9; color:var(--text-main);">Jumlah</th>
                                     <th style="text-align:center; background:#f1f5f9; color:var(--text-main);">Gred</th>
                                     <th style="text-align:center;">Skor Rakan</th>
+                                    <th style="text-align:center;">Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody id="summaryBody"></tbody>
@@ -752,7 +765,6 @@
                     </div>
                 </div>
 
-                <!-- Kad Statistik Profil Moderasi dengan Julat Dinamik -->
                 <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; margin-bottom:24px;">
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--primary);">
                         <div class="dim-label mb-1">Jumlah Dinilai</div>
@@ -781,35 +793,6 @@
                     </div>
                 </div>
 
-                <div class="academic-card p-5 mb-6 bg-amber-50/50 border-amber-200">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900 mb-3 flex items-center gap-2">
-                        <i class="fas fa-list-check text-amber-700"></i> Panduan Langkah Operasi Moderasi Ketua Pemeriksa
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-[11px] leading-relaxed text-slate-700">
-                        <div class="p-3 bg-white rounded border border-amber-200">
-                            <strong class="text-amber-900 block mb-1">Langkah 1: Susunan</strong>
-                            Susun semua markah secara menurun (Desc) dari tertinggi ke terendah.
-                        </div>
-                        <div class="p-3 bg-white rounded border border-amber-200">
-                            <strong class="text-amber-900 block mb-1">Langkah 2: Ekstrem</strong>
-                            Asingkan skrip Amat Cemerlang (≥90%) & Gagal (&lt;50%) untuk semakan pen hijau khas.
-                        </div>
-                        <div class="p-3 bg-white rounded border border-amber-200">
-                            <strong class="text-amber-900 block mb-1">Langkah 3: Kelompok</strong>
-                            Bahagikan baki lulus secara nisbah nisbi seimbang kepada 3 Kelompok: Tinggi, Sederhana, dan Rendah.
-                        </div>
-                        <div class="p-3 bg-white rounded border border-amber-200">
-                            <strong class="text-amber-900 block mb-1">Langkah 4: 13 Sampel</strong>
-                            Pilih tepat 13 sampel di mana setiap 13 orang pemeriksa diwakili oleh 1 skrip.
-                        </div>
-                        <div class="p-3 bg-white rounded border border-amber-200">
-                            <strong class="text-amber-900 block mb-1">Langkah 5: Semakan Pen Hijau</strong>
-                            Moderasi guna Pen Hijau. Jika beza markah ≥ 5%, teruskan ke moderasi Pen Ungu.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BAHAGIAN KES EKSTREM -->
                 <div class="academic-card p-6 mb-6">
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-red-700 flex items-center gap-2">
@@ -836,7 +819,6 @@
                     </div>
                 </div>
 
-                <!-- BAHAGIAN JADUAL 13 SAMPEL MODERASI -->
                 <div class="academic-card p-6">
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <div>
@@ -857,12 +839,12 @@
                                     <th>No. KP</th>
                                     <th>Kelas</th>
                                     <th style="text-align:center;">Markah Asal</th>
-                                    <th style="text-align:center;">Gred Asal</th>
-                                    <th>Pemeriksa / Pensyarah</th>
+                                    <th style="text-align:center;">Gred</th>
+                                    <th>Pemeriksa Asal</th>
                                     <th style="text-align:center;">Kelompok</th>
-                                    <th style="text-align:center; background:#f0fdf4; color:#15803d;">Markah Moderasi (Pen Hijau)</th>
-                                    <th style="text-align:center; background:#f0fdf4; color:#15803d;">Beza %</th>
-                                    <th style="text-align:center;">Status Moderasi</th>
+                                    <th style="text-align:center; width:110px;">Markah Moderasi<br>(Pen Hijau)</th>
+                                    <th style="text-align:center; width:100px;">Beza (%)</th>
+                                    <th style="text-align:center;">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="modSamplesBody"></tbody>
@@ -875,19 +857,15 @@
 </div>
 
 <script>
-// CONFIGURATIONS API
 const API = "https://script.google.com/macros/s/AKfycbxufZgAB9OWBbVzGzBascudDu498uJB80q9PtWDAFWLzDCZD5MxYqGKvIRyC38JgkId1Q/exec";
 
 let mode = 'student', sData = [], curS = null, curUser = null, curLecEmail = null;
 let peerScores = {}, peerTarget = null, radarChart = null;
 let isAdminUser = false, gradeBarChart = null;
-let cachedModerationData = null;
-
 const GRADE_CHART_COLORS = { 'A+':'#16a34a','A':'#22c55e','A-':'#4ade80','B+':'#2563eb','B':'#3b82f6','B-':'#60a5fa','C+':'#d97706','C':'#f59e0b','C-':'#fbbf24','D+':'#dc2626','D':'#ef4444','E':'#f87171','F':'#7f1d1d' };
 const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
 const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
 
-// KONFIGURASI RUBRIK 
 const RUBRIK_CONFIG = [
     {
         id: 'hp1', title: 'TUGASAN 1: Asas & Identiti, Operasi, Artifak (HP1)', max: 30, color: 'var(--hp1-color)', bg:'rgba(67,56,202,0.05)', icon: 'fa-file-alt', prefix: 'r',
@@ -931,7 +909,7 @@ const PEER_Q = [
     {id:'q1', title:"Kepimpinan", label:"Rakan ini menunjukkan kepimpinan jelas menyelaras tugasan."},
     {id:'q2', title:"Autonomi", label:"Rakan proaktif dan berinisiatif tanpa perlu diarahkan."},
     {id:'q3', title:"Tanggungjawab", label:"Rakan penuh akauntabiliti terhadap tugas yang diamanahkan."},
-    {id:'q4', title:"Penganjuran", label:"Rakan merancang dan menganjur secara tersusun & sistematik."},
+    {id:'q4', title:"Penganjuran", label:"Rakan merancang dan menganjur secara tersusun & xsistematik."},
     {id:'q5', title:"Kerjasama", label:"Rakan bekerjasama baik dan menyumbang aktif kepada kumpulan."}
 ];
 
@@ -1064,9 +1042,8 @@ function renderLecStudentList() {
     document.getElementById('classInfo').textContent = isAdminUser ? `SEMUA KELAS (${classes.length})` : (classes.length>0 ? classes.join(', ') : '');
 
     ['classFilter','laporanClassFilter','printClassFilter','peerStatusClassFilter','moderationClassFilter'].forEach(id => {
-        const sel = document.getElementById(id);
+        const sel = document.getElementById(id); const prev = sel ? sel.value : "";
         if (sel) {
-            const prev = sel.value;
             sel.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(k => `<option value="${k}">${k}</option>`).join('');
             if (classes.includes(prev)) sel.value = prev;
         }
@@ -1400,217 +1377,39 @@ function calc() {
     document.getElementById('gd').style.color = g.includes('A') ? '#16a34a' : g.includes('B') ? '#2563eb' : g.includes('C') ? '#d97706' : '#dc2626';
 }
 
-async function loadModerationSampling() {
-    try {
-        const selEl = document.getElementById('moderationClassFilter');
-        const taskEl = document.getElementById('moderationTaskFilter');
-        const kelas = selEl ? selEl.value : "";
-        const task = taskEl ? taskEl.value : "all";
-
-        const r = await fetch(`${API}?action=getModerationSampling&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}&task=${encodeURIComponent(task)}`);
-        const o = await r.json();
-        if (o.status === 'success') {
-            cachedModerationData = o;
-            cachedModerationData.currentTask = task;
-            renderModerationUI(o);
-        }
-    } catch(e) { showToast('Gagal memuatkan data modul moderasi.', 'warn'); }
-}
-
-function renderModerationUI(data) {
-    document.getElementById('modTotalGraded').textContent = data.totalMarked || 0;
-    const extremeTotal = (data.extremesHigh ? data.extremesHigh.length : 0) + (data.extremesLow ? data.extremesLow.length : 0);
-    document.getElementById('modExtremesCount').textContent = extremeTotal;
-    document.getElementById('extremeTotalBadge').textContent = `${extremeTotal} Kes Dikesan`;
+function renderSummaryTable() {
+    const tbody = document.getElementById('summaryBody');
+    if(!sData.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center p-8 text-slate-400">Tiada rekod pelajar.</td></tr>'; return; }
     
-    document.getElementById('modGroupTinggi').textContent = data.stats ? data.stats.tinggiCount : 0;
-    document.getElementById('modGroupSederhana').textContent = data.stats ? data.stats.sederhanaCount : 0;
-    document.getElementById('modGroupRendah').textContent = data.stats ? data.stats.rendahCount : 0;
-
-    // Paparan julat dinamik kohort bagi setiap kelompok
-    document.getElementById('modGroupTinggiRange').textContent = data.stats ? data.stats.tinggiRange : '-';
-    document.getElementById('modGroupSederhanaRange').textContent = data.stats ? data.stats.sederhanaRange : '-';
-    document.getElementById('modGroupRendahRange').textContent = data.stats ? data.stats.rendahRange : '-';
-
-    // Render Kes Ekstrem Table
-    const allExtremes = [...(data.extremesHigh || []), ...(data.extremesLow || [])];
-    const extremesBody = document.getElementById('modExtremesBody');
-    if (!allExtremes.length) {
-        extremesBody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan dalam skop tugasan ini.</td></tr>`;
-    } else {
-        extremesBody.innerHTML = allExtremes.map(s => {
-            const isHigh = s.markahPct >= 90;
-            const badgeCat = isHigh 
-                ? `<span class="px-2 py-1 rounded font-bold text-[10px] bg-green-100 text-green-800 border border-green-200">Amat Cemerlang (≥90%)</span>`
-                : `<span class="px-2 py-1 rounded font-bold text-[10px] bg-red-100 text-red-800 border border-red-200">Gagal (&lt;50%)</span>`;
-            return `
-                <tr class="hover:bg-amber-50/40">
-                    <td class="p-3">${badgeCat}</td>
-                    <td class="p-3 font-bold text-slate-800">${s.nama}</td>
-                    <td class="p-3 font-mono-score text-slate-500">${s.kp}</td>
-                    <td class="p-3 text-slate-600">${s.kelas}</td>
-                    <td class="p-3 text-center font-mono-score font-bold">${s.markah} <span class="text-[10px] text-slate-400">(${s.markahPct.toFixed(1)}%)</span></td>
-                    <td class="p-3 text-center font-serif-title font-bold">${s.gred}</td>
-                    <td class="p-3 text-slate-600 text-xs">${s.penilai}</td>
-                    <td class="p-3 text-center">
-                        <span class="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-1 rounded">Semakan Pen Hijau Wajib</span>
-                    </td>
-                </tr>`;
-        }).join('');
-    }
-
-    const samples = data.samples || [];
-    document.getElementById('modSamplesCountBadge').textContent = `${samples.length}/13 Sampel Terpilih`;
-    const samplesBody = document.getElementById('modSamplesBody');
-
-    if (!samples.length) {
-        samplesBody.innerHTML = `<tr><td colspan="11" class="text-center p-8 text-slate-400">Tiada sampel moderasi dipilih. Pastikan tugasan telah dimarkahkan.</td></tr>`;
-    } else {
-        samplesBody.innerHTML = samples.map((s, idx) => {
-            const groupBadge = s.kelompok === 'Kelompok Tinggi' 
-                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">Tinggi</span>`
-                : s.kelompok === 'Kelompok Rendah'
-                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Rendah</span>`
-                : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">Sederhana</span>`;
-
-            const maxMark = s.maxPossible || 100;
-
-            return `
-                <tr class="hover:bg-blue-50/50">
-                    <td class="p-3 text-center font-mono-score font-bold text-slate-400">${idx+1}</td>
-                    <td class="p-3 font-bold text-slate-800 text-[13px]">${s.nama}</td>
-                    <td class="p-3 font-mono-score text-slate-500 text-[12px]">${s.kp}</td>
-                    <td class="p-3 text-slate-600 text-[12px]">${s.kelas}</td>
-                    <td class="p-3 text-center font-mono-score font-bold text-slate-800">${s.markah} / ${maxMark} <span class="text-[10px] text-slate-400 block">(${s.markahPct.toFixed(1)}%)</span></td>
-                    <td class="p-3 text-center font-serif-title font-bold text-amber-700">${s.gred}</td>
-                    <td class="p-3 text-xs text-slate-700 font-medium">${s.penilai}</td>
-                    <td class="p-3 text-center">${groupBadge}</td>
-                    <td class="p-3 text-center bg-green-50/50">
-                        <input type="number" min="0" max="${maxMark}" placeholder="${s.markah}" oninput="calcModDiff(this, ${s.markahPct}, 'diff_${idx}', 'stat_${idx}')" class="w-20 py-1 px-2 text-center font-mono-score font-bold text-green-800 border-green-300 rounded text-xs bg-white">
-                    </td>
-                    <td class="p-3 text-center bg-green-50/50 font-mono-score text-xs font-bold" id="diff_${idx}">0.0%</td>
-                    <td class="p-3 text-center text-xs" id="stat_${idx}">
-                        <span class="px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-[10px]">Belum Disemak</span>
-                    </td>
-                </tr>`;
-        }).join('');
-    }
-}
-
-function calcModDiff(input, origPct, diffId, statId) {
-    const modVal = parseFloat(input.value);
-    const diffEl = document.getElementById(diffId);
-    const statEl = document.getElementById(statId);
-
-    if (isNaN(modVal)) {
-        if (diffEl) diffEl.textContent = '0.0%';
-        if (statEl) statEl.innerHTML = '<span class="px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-[10px]">Belum Disemak</span>';
-        return;
-    }
-
-    const taskEl = document.getElementById('moderationTaskFilter');
-    const task = taskEl ? taskEl.value : "all";
-    const maxPossible = task === 't1' ? 40 : task === 't2' ? 60 : 100;
-    const modPct = (modVal / maxPossible) * 100;
-    const diff = Math.abs(modPct - origPct);
-
-    if (diffEl) diffEl.textContent = (modPct - origPct > 0 ? '+' : '') + (modPct - origPct).toFixed(1) + '%';
-
-    if (statEl) {
-        if (diff >= 5) {
-            statEl.innerHTML = '<span class="px-2 py-1 rounded bg-purple-100 text-purple-900 border border-purple-300 font-bold text-[10px]"><i class="fas fa-exclamation-circle me-1"></i>Beza ≥5% (Pen Ungu)</span>';
-        } else {
-            statEl.innerHTML = '<span class="px-2 py-1 rounded bg-green-100 text-green-800 border border-green-300 font-bold text-[10px]"><i class="fas fa-check-circle me-1"></i>Diterima (&lt;5%)</span>';
-        }
-    }
-}
-
-function printModerationReport() {
-    if (!cachedModerationData || !cachedModerationData.samples || !cachedModerationData.samples.length) {
-        return showToast('Tiada sampel moderasi sedia ada untuk dicetak.', 'warn');
-    }
-
-    const selEl = document.getElementById('moderationClassFilter');
-    const taskEl = document.getElementById('moderationTaskFilter');
-    const kelas = selEl ? selEl.value : "";
-    const task = taskEl ? taskEl.value : "all";
-    
-    const taskLabelMap = {
-        't1': 'TUGASAN 1 (HP1: 30% + HP5: 10% = 40%)',
-        't2': 'TUGASAN 2 (HP8: 30% + HP10: 30% = 60%)',
-        'all': 'KESELURAHAN PENTAKSIRAN (100%)'
-    };
-
-    const samples = cachedModerationData.samples;
-
-    document.getElementById('pModLecName').textContent = document.getElementById('lecName').textContent || curLecEmail;
-    document.getElementById('pModScope').textContent = (kelas ? `Kelas: ${kelas}` : 'SEMUA KELAS') + ` | ${taskLabelMap[task] || taskLabelMap['all']}`;
-    document.getElementById('pModTaskTitle').textContent = taskLabelMap[task] || taskLabelMap['all'];
-    document.getElementById('pModDate').textContent = new Date().toLocaleString('ms-MY', { dateStyle:'long', timeStyle:'short' });
-
-    document.getElementById('pModSamplesBody').innerHTML = samples.map((s, i) => `
-        <tr>
-            <td class="center">${i+1}</td>
-            <td>${s.nama}</td>
-            <td>${s.kp}</td>
-            <td>${s.kelas}</td>
-            <td class="center"><strong>${s.markah}</strong> (${s.markahPct.toFixed(1)}%)</td>
-            <td class="center"><strong>${s.gred}</strong></td>
-            <td>${s.penilai}</td>
-            <td class="center">${s.kelompok}</td>
-            <td class="center">______</td>
-            <td class="center">____%</td>
-        </tr>
-    `).join('');
-
-    document.getElementById('printModerationArea').classList.add('active-print');
-    document.getElementById('printArea').classList.remove('active-print');
-    document.body.classList.add('printing-mode');
-    setTimeout(() => window.print(), 150);
-}
-
-window.addEventListener('afterprint', () => {
-    document.body.classList.remove('printing-mode');
-    document.getElementById('printArea').classList.remove('active-print');
-    document.getElementById('printModerationArea').classList.remove('active-print');
-});
-
-async function loadPeerCompletionStatus() {
-    try {
-        const selEl = document.getElementById('peerStatusClassFilter');
-        const kelas = selEl ? selEl.value : "";
-        const r = await fetch(`${API}?action=getPeerCompletionStatus&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}`); const o = await r.json();
-        if (o.status === 'success') renderPeerCompletionStatus(o, kelas);
-    } catch(e) { showToast('Gagal memuat status penilaian rakan.', 'warn'); }
-}
-
-function renderPeerCompletionStatus(o, kelasFilter) {
-    document.getElementById('peerStatusSubtitle').textContent = (o.isAdmin
-        ? `Rumusan penilaian rakan sebaya — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'SEMUA KELAS'}`
-        : `Rumusan penilaian rakan sebaya — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'semua kelas anda'}`);
-
-    document.getElementById('psTotal').textContent = o.ringkasan.jumlahPelajar;
-    document.getElementById('psDone').textContent = o.ringkasan.selesai;
-    document.getElementById('psPartial').textContent = o.ringkasan.sebahagian;
-    document.getElementById('psNone').textContent = o.ringkasan.belumMula + (o.ringkasan.tiadaRakan||0);
-
-    const statusBadge = (status) => {
-        if (status === 'Selesai') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-green-100 text-green-800"><i class="fas fa-check-circle me-1"></i>Selesai</span>';
-        if (status === 'Sebahagian') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-amber-100 text-amber-800"><i class="fas fa-hourglass-half me-1"></i>Sebahagian</span>';
-        if (status === 'Tiada Rakan Sekelas') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-slate-100 text-slate-500"><i class="fas fa-minus-circle me-1"></i>Tiada Rakan</span>';
-        return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-red-100 text-red-800"><i class="fas fa-times-circle me-1"></i>Belum Membuat</span>';
-    };
-
-    document.getElementById('peerStatusBody').innerHTML = o.data.map(s => `
-        <tr>
-            <td class="p-3 font-bold text-[13px]">${s.nama}</td>
-            <td class="p-3 font-mono-score text-[12px] text-slate-500">${s.noKP}</td>
-            <td class="p-3 text-[12px]">${s.kelas}</td>
-            <td class="p-3 text-center font-mono-score font-bold">${s.wajib}</td>
-            <td class="p-3 text-center font-mono-score font-bold" style="color:var(--hp8-color);">${s.selesai}</td>
-            <td class="p-3 text-center font-mono-score font-bold" style="color:${s.baki>0?'#b91c1c':'#94a3b8'};">${s.baki}</td>
-            <td class="p-3 text-center">${statusBadge(s.status)}</td>
-        </tr>`).join('') || `<tr><td colspan="7" class="text-center p-8 text-slate-400">Tiada rekod pelajar dalam skop ini.</td></tr>`;
+    tbody.innerHTML = sData.map((s, index)=>{
+        const m=s.markahSediaAda||{}, t=(m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0), g=t>0?calculateGred(t):'--';
+        const isOdd = index % 2 !== 0;
+        const bg = isOdd ? 'bg-slate-50' : 'bg-white';
+        const gBadge = g.includes('A') ? 'bg-green-100 text-green-800' : g.includes('B') ? 'bg-blue-100 text-blue-800' : g.includes('C') ? 'bg-amber-100 text-amber-800' : g==='--' ? 'bg-slate-100 text-slate-500' : 'bg-red-100 text-red-800';
+        
+        return `<tr class="${bg} border-b border-slate-200 hover:bg-blue-50 transition-colors">
+            <td class="p-3">
+                <div class="font-bold text-[13px] text-slate-800">${s.Nama_Pelajar}</div>
+                <div class="font-mono-score text-[10px] text-slate-500 mt-1">${s.No_KP} <span class="mx-1">•</span> ${s.Kelas}</div>
+            </td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp1-color);">${m.hp1||'-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp5-color);">${m.hp5||'-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp8-color);">${m.hp8||'-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp10-color);">${m.hp10||'-'}</td>
+            <td class="p-3 text-center font-mono-score text-[15px] font-black text-slate-800 bg-slate-100 border-l border-r">${t||'-'}</td>
+            <td class="p-3 text-center">
+                <span class="inline-block px-2 py-1 rounded font-serif-title font-bold text-sm ${gBadge}">${g}</span>
+            </td>
+            <td class="p-3 text-center">
+                ${s.peerSummary ? `<span class="bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded font-mono-score text-[11px] font-bold">${s.peerSummary.avg.toFixed(1)}/5</span>` : '<span class="text-slate-300 text-xs">-</span>'}
+            </td>
+            <td class="p-3 text-center">
+                <button onclick="printIndividualReport('${s.No_KP}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-bold border transition" title="Cetak Laporan Individu">
+                    <i class="fas fa-file-pdf text-indigo-700 mr-1"></i> Dossier
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
 }
 
 async function loadGradeSummary() {
@@ -1655,10 +1454,7 @@ function renderGradeSummary(o, kelasFilter) {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => `Jumlah: ${ctx.raw} pelajar` } }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     y: { beginAtZero: true, ticks: { precision: 0, color: '#94a3b8' }, grid: { color: '#e2e8f0' } },
                     x: { ticks: { color: '#475569', font: { weight: 'bold' } }, grid: { display: false } }
@@ -1668,34 +1464,301 @@ function renderGradeSummary(o, kelasFilter) {
     }
 }
 
-function renderSummaryTable() {
-    const tbody = document.getElementById('summaryBody');
-    if(!sData.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-8 text-slate-400">Tiada rekod pelajar.</td></tr>'; return; }
-    
-    tbody.innerHTML = sData.map((s, index)=>{
-        const m=s.markahSediaAda||{}, t=(m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0), g=t>0?calculateGred(t):'--';
-        const isOdd = index % 2 !== 0;
-        const bg = isOdd ? 'bg-slate-50' : 'bg-white';
-        const gBadge = g.includes('A') ? 'bg-green-100 text-green-800' : g.includes('B') ? 'bg-blue-100 text-blue-800' : g.includes('C') ? 'bg-amber-100 text-amber-800' : g==='--' ? 'bg-slate-100 text-slate-500' : 'bg-red-100 text-red-800';
-        
-        return `<tr class="${bg} border-b border-slate-200 hover:bg-blue-50 transition-colors">
-            <td class="p-3">
-                <div class="font-bold text-[13px] text-slate-800">${s.Nama_Pelajar}</div>
-                <div class="font-mono-score text-[10px] text-slate-500 mt-1">${s.No_KP} <span class="mx-1">•</span> ${s.Kelas}</div>
+async function loadPeerCompletionStatus() {
+    try {
+        const selEl = document.getElementById('peerStatusClassFilter');
+        const kelas = selEl ? selEl.value : "";
+        const r = await fetch(`${API}?action=getPeerCompletionStatus&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}`); const o = await r.json();
+        if (o.status === 'success') renderPeerCompletionStatus(o, kelas);
+    } catch(e) { showToast('Gagal memuat status penilaian rakan.', 'warn'); }
+}
+
+function renderPeerCompletionStatus(o, kelasFilter) {
+    document.getElementById('peerStatusSubtitle').textContent = (o.isAdmin
+        ? `Rumusan penilaian rakan sebaya — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'SEMUA KELAS'}`
+        : `Rumusan penilaian rakan sebaya — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'semua kelas anda'}`);
+
+    document.getElementById('psTotal').textContent = o.ringkasan.jumlahPelajar;
+    document.getElementById('psDone').textContent = o.ringkasan.selesai;
+    document.getElementById('psPartial').textContent = o.ringkasan.sebahagian;
+    document.getElementById('psNone').textContent = o.ringkasan.belumMula + (o.ringkasan.tiadaRakan||0);
+
+    const statusBadge = (status) => {
+        if (status === 'Selesai') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-green-100 text-green-800"><i class="fas fa-check-circle me-1"></i>Selesai</span>';
+        if (status === 'Sebahagian') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-amber-100 text-amber-800"><i class="fas fa-hourglass-half me-1"></i>Sebahagian</span>';
+        if (status === 'Tiada Rakan Sekelas') return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-slate-100 text-slate-500"><i class="fas fa-minus-circle me-1"></i>Tiada Rakan</span>';
+        return '<span class="inline-block px-2 py-1 rounded font-bold text-[11px] bg-red-100 text-red-800"><i class="fas fa-times-circle me-1"></i>Belum Membuat</span>';
+    };
+
+    document.getElementById('peerStatusBody').innerHTML = o.data.map(s => `
+        <tr>
+            <td class="p-3 font-bold text-[13px]">${s.nama}</td>
+            <td class="p-3 font-mono-score text-[12px] text-slate-500">${s.noKP}</td>
+            <td class="p-3 text-[12px]">${s.kelas}</td>
+            <td class="p-3 text-center font-mono-score font-bold">${s.wajib}</td>
+            <td class="p-3 text-center font-mono-score font-bold" style="color:var(--hp8-color);">${s.selesai}</td>
+            <td class="p-3 text-center font-mono-score font-bold" style="color:${s.baki>0?'#b91c1c':'#94a3b8'};">${s.baki}</td>
+            <td class="p-3 text-center">${statusBadge(s.status)}</td>
+        </tr>`).join('') || `<tr><td colspan="7" class="text-center p-8 text-slate-400">Tiada rekod pelajar dalam skop ini.</td></tr>`;
+}
+
+async function loadModerationSampling() {
+    try {
+        const selEl = document.getElementById('moderationClassFilter');
+        const taskEl = document.getElementById('moderationTaskFilter');
+        const kelas = selEl ? selEl.value : "";
+        const task = taskEl ? taskEl.value : "all";
+
+        const r = await fetch(`${API}?action=getModerationSampling&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}&task=${encodeURIComponent(task)}`);
+        const o = await r.json();
+        if (o.status === 'success') renderModerationSampling(o);
+    } catch(e) { showToast('Gagal memuat modul moderasi.', 'warn'); }
+}
+
+function renderModerationSampling(o) {
+    document.getElementById('modTotalGraded').textContent = o.totalMarked;
+    const extremes = (o.extremesHigh || []).concat(o.extremesLow || []);
+    document.getElementById('modExtremesCount').textContent = extremes.length;
+
+    document.getElementById('modGroupTinggi').textContent = o.stats.tinggiCount || 0;
+    document.getElementById('modGroupSederhana').textContent = o.stats.sederhanaCount || 0;
+    document.getElementById('modGroupRendah').textContent = o.stats.rendahCount || 0;
+
+    document.getElementById('modGroupTinggiRange').textContent = o.stats.tinggiRange || '-';
+    document.getElementById('modGroupSederhanaRange').textContent = o.stats.sederhanaRange || '-';
+    document.getElementById('modGroupRendahRange').textContent = o.stats.rendahRange || '-';
+
+    document.getElementById('extremeTotalBadge').textContent = `${extremes.length} Kes Dikesan`;
+    document.getElementById('modExtremesBody').innerHTML = extremes.map(s => {
+        const isHigh = s.markahPct >= 90;
+        const catText = isHigh ? 'Amat Cemerlang (≥90%)' : 'Gagal (<50%)';
+        const catBadge = isHigh ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-red-100 text-red-900 border-red-300';
+        return `<tr>
+            <td><span class="px-2 py-1 rounded text-[10px] font-extrabold border ${catBadge}">${catText}</span></td>
+            <td class="font-bold">${s.nama}</td>
+            <td class="font-mono-score text-slate-500">${s.kp}</td>
+            <td>${s.kelas}</td>
+            <td class="text-center font-mono-score font-bold">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+            <td class="text-center font-bold">${s.gred}</td>
+            <td>${s.penilai}</td>
+            <td class="text-center text-red-700 font-bold text-[11px]"><i class="fas fa-pen-alt me-1 text-green-600"></i> Semakan Pen Hijau Khas</td>
+        </tr>`;
+    }).join('') || `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan dalam skop ini.</td></tr>`;
+
+    document.getElementById('modSamplesCountBadge').textContent = `${(o.samples || []).length}/13 Sampel Terpilih`;
+    document.getElementById('modSamplesBody').innerHTML = (o.samples || []).map((s, i) => {
+        const kelBg = s.kelompok.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : s.kelompok.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        return `<tr>
+            <td class="text-center font-bold">${s.bil}</td>
+            <td class="font-bold">${s.nama}</td>
+            <td class="font-mono-score text-slate-500">${s.kp}</td>
+            <td>${s.kelas}</td>
+            <td class="text-center font-mono-score font-bold" id="orig_score_${s.kp}" data-raw="${s.markah}" data-max="${s.maxPossible}">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+            <td class="text-center font-bold">${s.gred}</td>
+            <td class="text-xs font-semibold text-slate-700">${s.penilai}</td>
+            <td class="text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${kelBg}">${s.kelompok}</span></td>
+            <td class="text-center">
+                <input type="number" id="mod_input_${s.kp}" step="0.5" placeholder="0" class="w-16 text-center font-mono-score font-bold text-xs py-1 px-1 border-amber-400 bg-amber-50 rounded" oninput="calcModDiff('${s.kp}')">
             </td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp1-color);">${m.hp1||'-'}</td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp5-color);">${m.hp5||'-'}</td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp8-color);">${m.hp8||'-'}</td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp10-color);">${m.hp10||'-'}</td>
-            <td class="p-3 text-center font-mono-score text-[15px] font-black text-slate-800 bg-slate-100 border-l border-r">${t||'-'}</td>
-            <td class="p-3 text-center">
-                <span class="inline-block px-2 py-1 rounded font-serif-title font-bold text-sm ${gBadge}">${g}</span>
-            </td>
-            <td class="p-3 text-center">
-                ${s.peerSummary ? `<span class="bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded font-mono-score text-[11px] font-bold">${s.peerSummary.avg.toFixed(1)}/5</span>` : '<span class="text-slate-300 text-xs">-</span>'}
+            <td class="text-center font-mono-score font-bold text-xs" id="mod_diff_${s.kp}">0.0%</td>
+            <td class="text-center" id="mod_status_${s.kp}">
+                <span class="text-[10px] text-slate-400 font-bold"><i class="fas fa-clock me-1"></i>Menunggu</span>
             </td>
         </tr>`;
-    }).join('');
+    }).join('') || `<tr><td colspan="11" class="text-center p-8 text-slate-400">Tiada sampel moderasi dapat dijana lagi.</td></tr>`;
+}
+
+function calcModDiff(kp) {
+    const origEl = document.getElementById(`orig_score_${kp}`);
+    const inputEl = document.getElementById(`mod_input_${kp}`);
+    const diffEl = document.getElementById(`mod_diff_${kp}`);
+    const statusEl = document.getElementById(`mod_status_${kp}`);
+
+    if (!origEl || !inputEl) return;
+
+    const rawOrig = parseFloat(origEl.getAttribute('data-raw')) || 0;
+    const maxPossible = parseFloat(origEl.getAttribute('data-max')) || 100;
+    const modVal = parseFloat(inputEl.value);
+
+    if (isNaN(modVal)) {
+        diffEl.textContent = "0.0%";
+        diffEl.className = "text-center font-mono-score font-bold text-xs text-slate-400";
+        statusEl.innerHTML = '<span class="text-[10px] text-slate-400 font-bold"><i class="fas fa-clock me-1"></i>Menunggu</span>';
+        return;
+    }
+
+    const origPct = (rawOrig / maxPossible) * 100;
+    const modPct = (modVal / maxPossible) * 100;
+    const diffPct = Math.abs(modPct - origPct);
+
+    diffEl.textContent = `${diffPct.toFixed(1)}%`;
+
+    if (diffPct >= 5.0) {
+        diffEl.className = "text-center font-mono-score font-black text-xs text-red-600 bg-red-50 p-1 rounded border border-red-200";
+        statusEl.innerHTML = '<span class="px-2 py-1 rounded text-[10px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300"><i class="fas fa-exclamation-circle me-1"></i>Semak Pen Ungu (≥5%)</span>';
+    } else {
+        diffEl.className = "text-center font-mono-score font-bold text-xs text-green-700 bg-green-50 p-1 rounded border border-green-200";
+        statusEl.innerHTML = '<span class="px-2 py-1 rounded text-[10px] font-bold bg-green-100 text-green-800 border border-green-300"><i class="fas fa-check-circle me-1"></i>Diterima (<5%)</span>';
+    }
+}
+
+async function printIndividualReport(targetKP) {
+    const kp = targetKP || (curS ? curS.No_KP : null);
+    if (!kp) return showToast('Sila pilih pelajar dahulu.', 'warn');
+
+    showToast('Menjana Laporan Dossier Individu...', 'success');
+
+    try {
+        const r = await fetch(`${API}?action=getIndividualReportData&noKP=${encodeURIComponent(kp)}`);
+        const o = await r.json();
+
+        if (o.status !== 'success' || !o.data) return showToast('Gagal menarik data individu.', 'warn');
+
+        document.getElementById('printIndividualArea').innerHTML = renderSingleDossierHTML(o.data);
+
+        document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
+        const pArea = document.getElementById('printIndividualArea');
+        pArea.classList.add('active-print');
+
+        document.body.classList.add('printing-mode');
+        setTimeout(() => window.print(), 200);
+    } catch (e) { showToast('Ralat mencetak laporan individu.', 'warn'); }
+}
+
+async function printBatchClassIndividualReports() {
+    const selEl = document.getElementById('printClassFilter');
+    const kelas = selEl ? selEl.value : "";
+
+    showToast('Menjana Dossier Pukal Seluruh Kelas...', 'success');
+
+    try {
+        const r = await fetch(`${API}?action=getBatchIndividualReportData&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}`);
+        const o = await r.json();
+
+        if (o.status !== 'success' || !o.data || !o.data.length) return showToast('Tiada rekod pelajar untuk kelas ini.', 'warn');
+
+        const dossiersHTML = o.data.map((item, idx) => `
+            <div class="dossier-page">
+                ${renderSingleDossierHTML(item)}
+            </div>
+        `).join('');
+
+        document.getElementById('printIndividualArea').innerHTML = dossiersHTML;
+
+        document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
+        const pArea = document.getElementById('printIndividualArea');
+        pArea.classList.add('active-print');
+
+        document.body.classList.add('printing-mode');
+        setTimeout(() => window.print(), 300);
+    } catch(e) { showToast('Ralat mencetak pukal dossier.', 'warn'); }
+}
+
+function renderSingleDossierHTML(d) {
+    const p = d.profile || {};
+    const m = d.markah || {};
+    const r = d.rubrik || {};
+    const peer = d.peer || null;
+
+    return `
+    <div style="font-family:'Plus Jakarta Sans', sans-serif; color:#0f172a; padding:10px;">
+        <div class="print-header">
+            <h1>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h1>
+            <h2>DOSSIER PELAPORAN PEMARKAHAN INDIVIDU — MPU3221</h2>
+            <div style="font-size:9px; font-weight:700; color:#475569; margin-top:2px;">KURSUS PENGURUSAN PERSATUAN (PENTAKSIRAN BERTERUSAN 100%)</div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #cbd5e1; border-radius:6px; padding:8px 12px; margin-bottom:12px; background:#f8fafc;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:50px; height:65px; border:1px solid #94a3b8; border-radius:4px; overflow:hidden; background:#e2e8f0; flex-shrink:0;">
+                    ${p.linkGambar ? `<img src="${p.linkGambar}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; font-size:10px; color:#94a3b8;">TIADA</div>'}
+                </div>
+                <div>
+                    <div style="font-size:13px; font-weight:800; color:#1e3a8a;">${p.nama || '--'}</div>
+                    <div style="font-size:10px; font-family:'Space Mono', monospace; color:#475569; margin-top:2px;">NO. KP: ${p.noKP || '--'} &nbsp;|&nbsp; KELAS: ${p.kelas || '--'}</div>
+                    <div style="font-size:9.5px; color:#64748b; margin-top:2px;">PENSYARAH PENILAI: <strong>${m.penilai || p.penilai || '--'}</strong></div>
+                </div>
+            </div>
+            <div style="text-align:right; border-left:2px solid #cbd5e1; padding-left:14px;">
+                <div style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b;">JUMLAH MARKAH</div>
+                <div style="font-size:22px; font-weight:800; font-family:'Space Mono', monospace; color:#1e3a8a;">${m.total || 0}<span style="font-size:11px; color:#94a3b8;">/100</span></div>
+                <div style="font-size:11px; font-weight:800; color:#b45309;">GRED: ${m.gred || '--'}</div>
+            </div>
+        </div>
+
+        ${m.justifikasi && m.justifikasi !== '-' ? `
+        <div style="font-size:9.5px; background:#fefce8; border:1px solid #fde047; padding:6px 10px; border-radius:4px; margin-bottom:10px; color:#713f12;">
+            <strong>JUSTIFIKASI CEMERLANG (A+):</strong> ${m.justifikasi}
+        </div>` : ''}
+
+        <div class="print-section-title">PECAHAN SKOR SUB-RUBRIK MENTAH</div>
+        <table class="print-table" style="margin-bottom:10px;">
+            <thead>
+                <tr>
+                    <th style="width:220px;">Komponen Rubrik (HPK)</th>
+                    <th class="center">1</th><th class="center">2</th><th class="center">3</th>
+                    <th class="center">4</th><th class="center">5</th><th class="center">6</th>
+                    <th class="center" style="background:#e2e8f0;">JUMLAH</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Tugasan 1: HP1 — Pengetahuan & Artifak</strong> (Maks 30)</td>
+                    <td class="center">${r.r1??0}</td><td class="center">${r.r2??0}</td><td class="center">${r.r3??0}</td>
+                    <td class="center">${r.r4??0}</td><td class="center">${r.r5??0}</td><td class="center">${r.r6??0}</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp1||0}/30</td>
+                </tr>
+                <tr>
+                    <td><strong>Tugasan 1: HP5 — Komunikasi Penulisan</strong> (Maks 10)</td>
+                    <td class="center">${r.g1??0}</td><td class="center">${r.g2??0}</td><td class="center">${r.g3??0}</td>
+                    <td class="center">${r.g4??0}</td><td class="center">-</td><td class="center">-</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp5||0}/10</td>
+                </tr>
+                <tr>
+                    <td><strong>Tugasan 2: HP8 — Kapasiti Kepimpinan</strong> (Maks 30)</td>
+                    <td class="center">${r.p1??0}</td><td class="center">${r.p2??0}</td><td class="center">${r.p3??0}</td>
+                    <td class="center">-</td><td class="center">-</td><td class="center">-</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp8||0}/30</td>
+                </tr>
+                <tr>
+                    <td><strong>Tugasan 2: HP10 — Minda Keusahawanan</strong> (Maks 30)</td>
+                    <td class="center">${r.k1??0}</td><td class="center">${r.k2??0}</td><td class="center">${r.k3??0}</td>
+                    <td class="center">-</td><td class="center">-</td><td class="center">-</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp10||0}/30</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="print-section-title">RINGKASAN PENILAIAN RAKAN SEBAYA 360° (HP8)</div>
+        ${peer ? `
+        <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #e2e8f0; padding:6px 10px; font-size:9.5px; margin-bottom:10px; border-radius:4px; background:#fafafa;">
+            <div>Purata Keseluruhan Rakan: <strong style="font-size:12px; color:#1e3a8a;">${peer.avg.toFixed(2)} / 5.00</strong> (${peer.count} Penilai)</div>
+            <div style="display:flex; gap:10px; font-size:8.5px; font-weight:700;">
+                <span>Q1 Kepimpinan: ${peer.avgDims[0]}</span>
+                <span>Q2 Autonomi: ${peer.avgDims[1]}</span>
+                <span>Q3 Tanggungjawab: ${peer.avgDims[2]}</span>
+                <span>Q4 Penganjuran: ${peer.avgDims[3]}</span>
+                <span>Q5 Kerjasama: ${peer.avgDims[4]}</span>
+            </div>
+        </div>` : '<div style="font-size:9px; color:#94a3b8; italic; margin-bottom:10px;">*Tiada rekod penilaian rakan sebaya diterima buat masa ini.</div>'}
+
+        <div class="print-signoff" style="margin-top:30px;">
+            <div>
+                <div style="font-size:9px; font-weight:700;">Disediakan Oleh (Pensyarah Penilai):</div>
+                <div class="line" style="margin-top:35px;">Tandatangan &amp; Cop Rasmi</div>
+                <div style="font-size:8.5px; color:#64748b; margin-top:2px;">Tarikh: ________________________</div>
+            </div>
+            <div>
+                <div style="font-size:9px; font-weight:700;">Disahkan Oleh (Ketua Unit Kokurikulum):</div>
+                <div class="line" style="margin-top:35px;">Tandatangan &amp; Cop Rasmi</div>
+                <div style="font-size:8.5px; color:#64748b; margin-top:2px;">Tarikh: ________________________</div>
+            </div>
+        </div>
+
+        <div class="print-footer-note" style="margin-top:14px;">
+            Dokumen ini dijana secara automatik oleh Portal Pemarkahan MPU3221, IPGKDA pada ${new Date().toLocaleDateString('ms-MY')}.
+        </div>
+    </div>`;
 }
 
 async function printReport(fromLaporanTab) {
@@ -1739,11 +1802,40 @@ async function printReport(fromLaporanTab) {
         document.getElementById('pJumlah').textContent = '0'; document.getElementById('pMin').textContent = '--'; document.getElementById('pSD').textContent = '--';
     }
 
+    document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
     document.getElementById('printArea').classList.add('active-print');
-    document.getElementById('printModerationArea').classList.remove('active-print');
+
     document.body.classList.add('printing-mode');
     setTimeout(() => window.print(), 150);
 }
+
+async function printModerationReport() {
+    const taskEl = document.getElementById('moderationTaskFilter');
+    const classEl = document.getElementById('moderationClassFilter');
+    const task = taskEl ? taskEl.value : "all";
+    const kelas = classEl ? classEl.value : "";
+
+    const taskLabel = task === 't1' ? 'Tugasan 1 (HP1 + HP5 - 40%)' : task === 't2' ? 'Tugasan 2 (HP8 + HP10 - 60%)' : 'Keseluruhan (100%)';
+
+    document.getElementById('modPTask').textContent = taskLabel;
+    document.getElementById('modPDate').textContent = new Date().toLocaleDateString('ms-MY');
+
+    const sampleTable = document.getElementById('moderationSampleTable');
+    if (sampleTable) {
+        document.getElementById('modPSampleBody').innerHTML = sampleTable.querySelector('tbody').innerHTML;
+    }
+
+    document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
+    document.getElementById('printModerationArea').classList.add('active-print');
+
+    document.body.classList.add('printing-mode');
+    setTimeout(() => window.print(), 150);
+}
+
+window.addEventListener('afterprint', () => {
+    document.body.classList.remove('printing-mode');
+    document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
+});
 
 // System Boot
 function logout() { localStorage.clear(); location.reload(); }
@@ -1762,7 +1854,7 @@ window.onload = () => {
     <div class="mt-2 text-[10px]">Penyelaras Kursus MPU3221 &copy; 2026 Hak Cipta Terpelihara.</div>
 </div>
 
-<!-- TEMPLATE CETAKAN BUKU REKOD / LAPORAN RUMUSAN -->
+<!-- ================= CETAKAN BUKU REKOD ================= -->
 <div id="printArea">
     <div class="print-header">
         <h1>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h1>
@@ -1804,53 +1896,53 @@ window.onload = () => {
     <div class="print-footer-note">Dokumen ini dijana secara automatik oleh Sistem Portal Pemarkahan MPU3221, Unit Kokurikulum IPGKDA. Sulit &amp; Terhad.</div>
 </div>
 
-<!-- TEMPLATE CETAKAN RASMI BORANG MODERASI LAM-PT-04-02 -->
+<!-- ================= CETAKAN BORANG MODERASI LAM-PT-04-02 ================= -->
 <div id="printModerationArea">
     <div class="print-header">
-        <h1>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h1>
-        <h2>BORANG MODERASI PEMARKAHAN TUGASAN (LAM-PT-04-02)</h2>
-        <p style="font-size:11px; margin-top:4px; font-weight:bold; color:#1e3a8a;">KURSUS: MPU3221 PENGURUSAN PERSATUAN — <span id="pModTaskTitle">KESELURAHAN (100%)</span></p>
+        <h1>BORANG MODERASI PEMARKAHAN (LAM-PT-04-02)</h1>
+        <h2>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h2>
+        <div style="font-size:10px; font-weight:700; margin-top:4px;">KOD KURSUS: MPU3221 (PENGURUSAN PERSATUAN)</div>
     </div>
     <div class="print-meta">
-        <span><strong>Ketua Pemeriksa:</strong> <span id="pModLecName">--</span></span>
-        <span><strong>Skop & Komponen:</strong> <span id="pModScope">--</span></span>
-        <span><strong>Tarikh Moderasi:</strong> <span id="pModDate">--</span></span>
+        <span><strong>Komponen Moderasi:</strong> <span id="modPTask">--</span></span>
+        <span><strong>Tarikh Semakan:</strong> <span id="modPDate">--</span></span>
     </div>
 
-    <div class="print-section-title">SENARAI 13 SAMPEL MODERASI (MEWAKILI SEMUA PEMERIKSA)</div>
+    <div class="print-section-title">Senarai 13 Sampel Moderasi (Mewakili Semua Pemeriksa)</div>
     <table class="print-table">
         <thead>
             <tr>
-                <th>Bil</th>
+                <th class="center">Bil</th>
                 <th>Nama Pelajar</th>
                 <th>No. KP</th>
                 <th>Kelas</th>
                 <th class="center">Markah Asal</th>
-                <th class="center">Gred Asal</th>
-                <th>Pemeriksa / Pensyarah</th>
+                <th class="center">Gred</th>
+                <th>Pemeriksa Asal</th>
                 <th class="center">Kelompok</th>
-                <th class="center">Markah Moderasi (Pen Hijau)</th>
-                <th class="center">Beza %</th>
+                <th class="center">Markah Pen Hijau</th>
+                <th class="center">Beza (%)</th>
+                <th class="center">Status Moderasi</th>
             </tr>
         </thead>
-        <tbody id="pModSamplesBody"></tbody>
+        <tbody id="modPSampleBody"></tbody>
     </table>
 
-    <div style="margin-top:20px; padding:10px; border:1px solid #94a3b8; font-size:10px; line-height:1.6; background:#f8fafc;">
-        <strong>Nota Prosedur Moderasi:</strong>
-        <ol style="margin-left:16px;">
-            <li>Satu sampel mewakili setiap seorang daripada 13 pemeriksa telah dipilih secara rawak berstrata merentasi Kelompok Tinggi, Sederhana, dan Rendah.</li>
-            <li>Ketua Pemeriksa menyemak semula 13 sampel tugasan menggunakan <strong>Pen Berdakwat Hijau</strong>.</li>
-            <li>Sekiranya perbezaan markah asal dan markah moderasi &ge; 5%, sampel spesifik dikehendaki melalui Moderasi Pusingan Kedua menggunakan <strong>Pen Berdakwat Ungu</strong>.</li>
-        </ol>
+    <div class="print-signoff" style="margin-top:40px;">
+        <div>
+            <div class="line">Disediakan Oleh (Ketua Pemeriksa)</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Tarikh: ____________________</div>
+        </div>
+        <div>
+            <div class="line">Disahkan Oleh (Ketua Jabatan / Unit)</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Tarikh: ____________________</div>
+        </div>
     </div>
-
-    <div class="print-signoff">
-        <div><div class="line">Tandatangan Ketua Pemeriksa</div></div>
-        <div><div class="line">Disahkan Oleh (Ketua Jabatan / Unit)</div></div>
-    </div>
-    <div class="print-footer-note">Dokumen Rasmi LAM-PT-04-02. Dijana oleh Portal Pemarkahan & Moderasi MPU3221 IPGKDA. Sulit &amp; Terhad.</div>
+    <div class="print-footer-note">Borang ini dijana secara rasmi di bawah Tatacara Pengurusan Pentaksiran IPGKDA (LAM-PT-04-02). Sulit &amp; Terhad.</div>
 </div>
+
+<!-- ================= CETAKAN INDIVIDU / PUKAL (DOSSIER) ================= -->
+<div id="printIndividualArea"></div>
 
 </body>
 </html>
