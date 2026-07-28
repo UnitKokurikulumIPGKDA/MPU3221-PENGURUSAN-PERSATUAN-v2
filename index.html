@@ -163,8 +163,8 @@
     <div class="academic-card w-full shadow-2xl p-8 sm:p-10 border-t-4" style="max-width:440px; border-top-color: var(--primary);">
         
         <div class="text-center mb-8">
-            <div style="display:inline-flex; align-items:center; justify-content:center; width:70px; height:70px; border-radius:50%; background:var(--bg-alt); border: 1px solid var(--border); margin-bottom:16px;">
-                <i class="fas fa-university" style="font-size:2rem; color:var(--primary);"></i>
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:90px; height:90px; margin-bottom:12px;">
+                <img src="https://lh3.googleusercontent.com/d/10kap54x0sqPu4bFZdju9P2fXKMpyMVi8" referrerpolicy="no-referrer" crossorigin="anonymous" alt="Logo IPGKDA" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fas fa-university\\' style=\\'font-size:2.5rem; color:var(--primary);\\'></i>';">
             </div>
             
             <div style="font-size:10px; font-weight:800; letter-spacing:0.15em; color:var(--secondary); text-transform:uppercase; margin-bottom:8px;">
@@ -938,7 +938,11 @@ function renderModerationSampling(o) {
 
     document.getElementById('modSamplesBody').innerHTML = window_modSamplesData.map((s, idx) => {
         const isLocked = !!s.isLocked;
-        const kelBg = s.kelompok.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : s.kelompok.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        const kelBg = s.kelompok.includes('Tinggi') 
+            ? 'bg-indigo-100 text-indigo-900 border-indigo-300 font-black' 
+            : s.kelompok.includes('Sederhana') 
+            ? 'bg-amber-100 text-amber-900 border-amber-300 font-black' 
+            : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-black';
 
         let nameDisplayHTML = '';
         if (isLocked) {
@@ -1004,8 +1008,12 @@ function onSelectSampleCandidate(idx) {
         document.getElementById(`mod_score_${idx}`).textContent = `${chosen.markah} / ${chosen.maxPossible} (${chosen.markahPct.toFixed(1)}%)`;
         document.getElementById(`mod_gred_${idx}`).textContent = chosen.gred;
         
-        const kelBg = bandCat.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : bandCat.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
-        document.getElementById(`mod_kelompok_${idx}`).innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold border ${kelBg}">${bandCat}</span>`;
+        const kelBg = bandCat.includes('Tinggi') 
+            ? 'bg-indigo-100 text-indigo-900 border-indigo-300 font-black' 
+            : bandCat.includes('Sederhana') 
+            ? 'bg-amber-100 text-amber-900 border-amber-300 font-black' 
+            : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-black';
+        document.getElementById(`mod_kelompok_${idx}`).innerHTML = `<span class="px-2.5 py-1 rounded text-[10px] uppercase border ${kelBg}">${bandCat}</span>`;
     }
 }
 
@@ -1819,176 +1827,6 @@ async function loadModerationSampling() {
         const o = await r.json();
         if (o.status === 'success') renderModerationSampling(o);
     } catch(e) { showToast('Gagal memuat modul moderasi.', 'warn'); }
-}
-
-function renderModerationSampling(o) {
-    currentModSamples = o.samples || [];
-
-    const isLocked = !!o.isLocked;
-    const lockBadge = document.getElementById('modLockStatusBadge');
-    const lockBtn = document.getElementById('lockSamplesBtn');
-    const unlockBtn = document.getElementById('unlockSamplesBtn');
-
-    if (isLocked) {
-        if (lockBadge) lockBadge.classList.remove('hidden');
-        if (lockBtn) lockBtn.classList.add('hidden');
-        if (unlockBtn) unlockBtn.classList.remove('hidden');
-    } else {
-        if (lockBadge) lockBadge.classList.add('hidden');
-        if (lockBtn) lockBtn.classList.remove('hidden');
-        if (unlockBtn) unlockBtn.classList.add('hidden');
-    }
-
-    if (o.examinerStats) {
-        const statsEl = document.getElementById('modExaminerStats');
-        if (statsEl) statsEl.textContent = `${o.examinerStats.completed} / ${o.examinerStats.total}`;
-    }
-
-    const extremes = (o.extremesHigh || []).concat(o.extremesLow || []);
-    document.getElementById('modExtremesCount').textContent = extremes.length;
-
-    document.getElementById('modGroupTinggi').textContent = o.stats.tinggiCount || 0;
-    document.getElementById('modGroupSederhana').textContent = o.stats.sederhanaCount || 0;
-    document.getElementById('modGroupRendah').textContent = o.stats.rendahCount || 0;
-
-    document.getElementById('modGroupTinggiRange').textContent = o.stats.tinggiRange || '-';
-    document.getElementById('modGroupSederhanaRange').textContent = o.stats.sederhanaRange || '-';
-    document.getElementById('modGroupRendahRange').textContent = o.stats.rendahRange || '-';
-
-    document.getElementById('extremeTotalBadge').textContent = `${extremes.length} Kes Dikesan`;
-    document.getElementById('modExtremesBody').innerHTML = extremes.map(s => {
-        const isHigh = s.markahPct >= 90;
-        const catText = isHigh ? 'Amat Cemerlang (≥90%)' : 'Gagal (<50%)';
-        const catBadge = isHigh ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-red-100 text-red-900 border-red-300';
-        return `<tr>
-            <td><span class="px-2 py-1 rounded text-[10px] font-extrabold border ${catBadge}">${catText}</span></td>
-            <td class="font-bold">${s.nama}</td>
-            <td class="font-mono-score text-slate-500">${s.kp}</td>
-            <td>${s.kelas}</td>
-            <td class="text-center font-mono-score font-bold">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
-            <td class="text-center font-bold">${s.gred}</td>
-            <td>${s.penilai}</td>
-            <td class="text-center text-red-700 font-bold text-[11px]"><i class="fas fa-pen-alt me-1 text-green-600"></i> Semakan Pen Hijau Khas</td>
-        </tr>`;
-    }).join('') || `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan dalam skop ini.</td></tr>`;
-
-    document.getElementById('modSamplesCountBadge').textContent = `${currentModSamples.length}/13 Sampel Terpilih`;
-    document.getElementById('modSamplesBody').innerHTML = currentModSamples.map((s, i) => {
-        const kelBg = s.kelompok.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : s.kelompok.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
-        return `<tr>
-            <td class="text-center font-bold">${s.bil}</td>
-            <td class="font-bold">${s.nama}</td>
-            <td class="font-mono-score text-slate-500">${s.kp}</td>
-            <td>${s.kelas}</td>
-            <td class="text-center font-mono-score font-bold" id="orig_score_${s.kp}" data-raw="${s.markah}" data-max="${s.maxPossible}">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
-            <td class="text-center font-bold">${s.gred}</td>
-            <td class="text-xs font-semibold text-slate-700">${s.penilai}</td>
-            <td class="text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${kelBg}">${s.kelompok}</span></td>
-            <td class="text-center">
-                <input type="number" id="mod_input_${s.kp}" step="0.5" placeholder="0" class="w-16 text-center font-mono-score font-bold text-xs py-1 px-1 border-amber-400 bg-amber-50 rounded" oninput="calcModDiff('${s.kp}')">
-            </td>
-            <td class="text-center font-mono-score font-bold text-xs" id="mod_diff_${s.kp}">0.0%</td>
-            <td class="text-center" id="mod_status_${s.kp}">
-                <span class="text-[10px] text-slate-400 font-bold"><i class="fas fa-clock me-1"></i>Menunggu</span>
-            </td>
-        </tr>`;
-    }).join('') || `<tr><td colspan="11" class="text-center p-8 text-slate-400">Tiada sampel moderasi dapat dijana lagi.</td></tr>`;
-}
-
-async function handleLockSamples() {
-    if (!currentModSamples.length) return showToast('Tiada sampel untuk dikunci!', 'warn');
-
-    const selEl = document.getElementById('moderationClassFilter');
-    const taskEl = document.getElementById('moderationTaskFilter');
-    const kelas = selEl ? selEl.value : "";
-    const task = taskEl ? taskEl.value : "all";
-
-    const btn = document.getElementById('lockSamplesBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Mengunci...';
-
-    try {
-        await fetch(API, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "lockModerationSamples",
-                task: task,
-                kelas: kelas,
-                samples: currentModSamples,
-                by: curLecEmail
-            })
-        });
-        await new Promise(res => setTimeout(res, 1500));
-        showToast('13 Sampel Moderasi Rasmi Berjaya Dikunci KEKAL!', 'success');
-        loadModerationSampling();
-    } catch (e) { showToast('Ralat mengunci sampel.', 'warn'); }
-
-    btn.disabled = false;
-    btn.innerHTML = '🔒 Kunci Sampel Rasmi';
-}
-
-async function handleUnlockSamples() {
-    const selEl = document.getElementById('moderationClassFilter');
-    const taskEl = document.getElementById('moderationTaskFilter');
-    const kelas = selEl ? selEl.value : "";
-    const task = taskEl ? taskEl.value : "all";
-
-    const btn = document.getElementById('unlockSamplesBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Membuka...';
-
-    try {
-        await fetch(API, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "unlockModerationSamples",
-                task: task,
-                kelas: kelas
-            })
-        });
-        await new Promise(res => setTimeout(res, 1500));
-        showToast('Sampel Moderasi dibuka kunci semula.', 'success');
-        loadModerationSampling();
-    } catch (e) { showToast('Ralat membuka kunci.', 'warn'); }
-
-    btn.disabled = false;
-    btn.innerHTML = '🔓 Buka Kunci';
-}
-
-function calcModDiff(kp) {
-    const origEl = document.getElementById(`orig_score_${kp}`);
-    const inputEl = document.getElementById(`mod_input_${kp}`);
-    const diffEl = document.getElementById(`mod_diff_${kp}`);
-    const statusEl = document.getElementById(`mod_status_${kp}`);
-
-    if (!origEl || !inputEl) return;
-
-    const rawOrig = parseFloat(origEl.getAttribute('data-raw')) || 0;
-    const maxPossible = parseFloat(origEl.getAttribute('data-max')) || 100;
-    const modVal = parseFloat(inputEl.value);
-
-    if (isNaN(modVal)) {
-        diffEl.textContent = "0.0%";
-        diffEl.className = "text-center font-mono-score font-bold text-xs text-slate-400";
-        statusEl.innerHTML = '<span class="text-[10px] text-slate-400 font-bold"><i class="fas fa-clock me-1"></i>Menunggu</span>';
-        return;
-    }
-
-    const origPct = (rawOrig / maxPossible) * 100;
-    const modPct = (modVal / maxPossible) * 100;
-    const diffPct = Math.abs(modPct - origPct);
-
-    diffEl.textContent = `${diffPct.toFixed(1)}%`;
-
-    if (diffPct >= 5.0) {
-        diffEl.className = "text-center font-mono-score font-black text-xs text-red-600 bg-red-50 p-1 rounded border border-red-200";
-        statusEl.innerHTML = '<span class="px-2 py-1 rounded text-[10px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300"><i class="fas fa-exclamation-circle me-1"></i>Semak Pen Ungu (≥5%)</span>';
-    } else {
-        diffEl.className = "text-center font-mono-score font-bold text-xs text-green-700 bg-green-50 p-1 rounded border border-green-200";
-        statusEl.innerHTML = '<span class="px-2 py-1 rounded text-[10px] font-bold bg-green-100 text-green-800 border border-green-300"><i class="fas fa-check-circle me-1"></i>Diterima (<5%)</span>';
-    }
 }
 
 async function printIndividualReport(targetKP) {
