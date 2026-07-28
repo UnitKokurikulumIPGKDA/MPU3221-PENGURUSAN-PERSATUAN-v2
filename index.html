@@ -10,7 +10,7 @@
     
     <!-- Chart.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    
+    a
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
@@ -354,7 +354,6 @@
             <button class="tab" onclick="showLecTab('summary')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-table me-1"></i> Buku Rekod</button>
             <button class="tab" onclick="showLecTab('laporan')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-chart-column me-1"></i> Laporan Rumusan</button>
             <button class="tab" onclick="showLecTab('peerstatus')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-user-check me-1"></i> Status Rakan</button>
-            <!-- Tab Moderasi: Disorokkan secara lalai (display:none) dan HANYA dibuka untuk Super Admin -->
             <button class="tab" id="tabBtnModerasi" onclick="showLecTab('moderasi')" style="display:none; border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px; color:#b45309;"><i class="fas fa-balance-scale me-1"></i> Moderasi LAM-PT-04-02</button>
         </div>
         <style>
@@ -362,6 +361,9 @@
             #lecturerDash .tab-bar .tab:hover:not(.active) { background:var(--bg-body); color:var(--text-main); border-bottom-color:var(--border); }
         </style>
     </div>
+
+    <!-- KAD NOTIS MODERASI INDIVIDU PENSYARAH -->
+    <div id="lecModerationNoticeCard" style="display:none; padding:16px 32px 0;"></div>
 
     <div style="padding:24px 32px; display:grid; grid-template-columns:320px 1fr; gap:24px; flex:1;">
         
@@ -544,6 +546,7 @@
                 </div>
             </div>
 
+            <!-- TAB 3: ANALISIS RAKAN -->
             <div id="ltab-peer" style="display:none;">
                 <div id="radarEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -746,15 +749,16 @@
                 </div>
             </div>
 
+            <!-- TAB 7: MODUL MODERASI LAM-PT-04-02 (SUPER ADMIN ONLY) -->
             <div id="ltab-moderasi" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: #b45309;">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Garis Panduan LAM-PT-04-02</span>
-                            <span class="text-xs text-slate-400 font-mono-score">Sampling Nisbah Nisbi Kohort</span>
+                            <span class="text-xs text-slate-400 font-mono-score">Sampling Manual Individu Pemeriksa</span>
                         </div>
                         <h3 class="font-serif-title text-xl font-bold text-slate-800">Modul Sampling Moderasi Pemarkahan</h3>
-                        <p class="text-[13px] text-slate-500 mt-1">Pemilihan sistematik 13 sampel tugasan mewakili kesemua 13 orang pemeriksa merentasi 3 kelompok markah seimbang.</p>
+                        <p class="text-[13px] text-slate-500 mt-1">Pemilihan dan penguncian manual 13 sampel tugasan mewakili setiap pemeriksa 100% completer.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                         <select id="moderationTaskFilter" onchange="loadModerationSampling()" class="text-xs py-2 px-3 bg-amber-50 text-amber-900 font-bold border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500" style="min-width:180px;">
@@ -766,7 +770,8 @@
                         <select id="moderationClassFilter" onchange="loadModerationSampling()" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg" style="min-width:150px;">
                             <option value="">Semua Kelas</option>
                         </select>
-                        <button onclick="loadModerationSampling()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar Semula</button>
+                        <button onclick="loadModerationSampling()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar</button>
+
                         <button onclick="printModerationReport()" class="btn-primary px-4 py-2 rounded-lg text-[11px]" style="background:#b45309; border-color:#b45309;"><i class="fas fa-print me-2"></i> Cetak Borang LAM-PT-04-02</button>
                     </div>
                 </div>
@@ -774,9 +779,9 @@
                 <!-- Kad Statistik Kelompok -->
                 <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; margin-bottom:24px;">
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--primary);">
-                        <div class="dim-label mb-1">Jumlah Dinilai</div>
-                        <div id="modTotalGraded" class="font-mono-score text-2xl font-black text-blue-900">0</div>
-                        <div class="text-[10px] text-slate-400 mt-1">Calon Lengkap</div>
+                        <div class="dim-label mb-1">Status Menanda</div>
+                        <div id="modExaminerStats" class="font-mono-score text-xl font-black text-blue-900">0 / 0</div>
+                        <div class="text-[10px] text-slate-500 font-bold mt-1">Pemeriksa 100% Selesai</div>
                     </div>
                     <div class="academic-card p-4 text-center" style="border-top:4px solid #dc2626;">
                         <div class="dim-label mb-1">Kes Ekstrem</div>
@@ -800,31 +805,27 @@
                     </div>
                 </div>
 
-                <!-- PANDUAN LANGKAH OPERASI MODERASI (STEPS 1-5 BOX) -->
+                <!-- PANDUAN LANGKAH OPERASI MODERASI -->
                 <div class="academic-card p-5 mb-6 bg-amber-50/50 border-amber-200">
                     <div class="text-xs font-extrabold uppercase text-amber-900 mb-3 flex items-center gap-2">
-                        <i class="fas fa-list-ol text-amber-700"></i> Panduan Langkah Operasi Moderasi Ketua Pemeriksa
+                        <i class="fas fa-list-ol text-amber-700"></i> Panduan Penguncian Manual Sampel Pemeriksa
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
                         <div class="bg-white p-3 rounded border border-amber-200 shadow-sm">
-                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 1: Susunan</span>
-                            <span class="text-slate-600 text-[11px] leading-relaxed">Susun semua markah secara menurun (Desc) daripada markah tertinggi ke terendah.</span>
+                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 1: Pilih Calon</span>
+                            <span class="text-slate-600 text-[11px] leading-relaxed">Bagi baris pemeriksa yang belum dikunci, pilih nama calon daripada dropdown.</span>
                         </div>
                         <div class="bg-white p-3 rounded border border-amber-200 shadow-sm">
-                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 2: Ekstrem</span>
-                            <span class="text-slate-600 text-[11px] leading-relaxed">Asingkan Amat Cemerlang (≥90%) & Gagal (&lt;50%) untuk semakan Pen Hijau khas.</span>
+                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 2: Kunci Baris</span>
+                            <span class="text-slate-600 text-[11px] leading-relaxed">Klik <strong>🔒 Kunci Sampel Ini</strong> untuk mempatri sampel pemeriksa tersebut secara kekal.</span>
                         </div>
                         <div class="bg-white p-3 rounded border border-amber-200 shadow-sm">
-                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 3: Kelompok</span>
-                            <span class="text-slate-600 text-[11px] leading-relaxed">Bahagikan baki markah Lulus kepada 3 Kelompok Seimbang (Tinggi, Sederhana, Rendah).</span>
+                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 3: Perlindungan Data</span>
+                            <span class="text-slate-600 text-[11px] leading-relaxed">Sampel terkunci tidak akan bertukar walaupun ada pensyarah lain memasukkan markah baharu.</span>
                         </div>
                         <div class="bg-white p-3 rounded border border-amber-200 shadow-sm">
-                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 4: 13 Sampel</span>
-                            <span class="text-slate-600 text-[11px] leading-relaxed">Pilih tepat 13 sampel di mana setiap 13 orang pemeriksa diwakili tepat 1 skrip.</span>
-                        </div>
-                        <div class="bg-white p-3 rounded border border-amber-200 shadow-sm">
-                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 5: Semakan Pen Hijau</span>
-                            <span class="text-slate-600 text-[11px] leading-relaxed">Semak pen hijau. Sekiranya beza markah ≥5%, teruskan ke Pen Ungu (Pusingan 2).</span>
+                            <span class="font-extrabold text-amber-900 block mb-1">Langkah 4: Pelepasan Kunci</span>
+                            <span class="text-slate-600 text-[11px] leading-relaxed">Klik <strong>🔓 Buka Kunci</strong> pada baris spesifik sekiranya ingin menukar calon.</span>
                         </div>
                     </div>
                 </div>
@@ -856,33 +857,31 @@
                     </div>
                 </div>
 
-                <!-- Jadual 13 Sampel Moderasi -->
+                <!-- Jadual 13 Sampel Moderasi Manual -->
                 <div class="academic-card p-6">
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <div>
                             <h4 class="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center gap-2">
-                                <i class="fas fa-microscope text-blue-700"></i> Senarai Tepat 13 Sampel Moderasi (Mewakili Semua 13 Pemeriksa)
+                                <i class="fas fa-microscope text-blue-700"></i> Senarai 13 Sampel Moderasi (Penguncian Manual Per Pemeriksa)
                             </h4>
-                            <p class="text-[11px] text-slate-500 mt-1">Diambil secara seimbang daripada Kelompok Tinggi, Sederhana, dan Rendah.</p>
+                            <p class="text-[11px] text-slate-500 mt-1">Satu sampel wajib dikunci bagi setiap daripada 13 orang pemeriksa completer.</p>
                         </div>
-                        <span id="modSamplesCountBadge" class="font-mono-score text-xs font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">0/13 Sampel Terpilih</span>
+                        <span id="modSamplesCountBadge" class="font-mono-score text-xs font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">0 Sampel Terkunci</span>
                     </div>
                     
                     <div class="overflow-x-auto">
                         <table class="academic-table" id="moderationSampleTable">
                             <thead>
                                 <tr>
-                                    <th style="text-align:center; width:40px;">Bil</th>
-                                    <th>Nama Pelajar</th>
+                                    <th style="text-align:center; width:35px;">Bil</th>
+                                    <th>Pemeriksa Asal</th>
+                                    <th style="min-width:200px;">Nama Pelajar (Sampel Terpilih)</th>
                                     <th>No. KP</th>
                                     <th>Kelas</th>
                                     <th style="text-align:center;">Markah Asal</th>
                                     <th style="text-align:center;">Gred</th>
-                                    <th>Pemeriksa Asal</th>
                                     <th style="text-align:center;">Kelompok</th>
-                                    <th style="text-align:center; width:110px;">Markah Moderasi<br>(Pen Hijau)</th>
-                                    <th style="text-align:center; width:100px;">Beza (%)</th>
-                                    <th style="text-align:center;">Status</th>
+                                    <th style="text-align:center; width:120px;">Kawalan Kunci</th>
                                 </tr>
                             </thead>
                             <tbody id="modSamplesBody"></tbody>
@@ -896,18 +895,181 @@
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbxufZgAB9OWBbVzGzBascudDu498uJB80q9PtWDAFWLzDCZD5MxYqGKvIRyC38JgkId1Q/exec";
+let window_modSamplesData = [];
 
-let mode = 'student', sData = [], curS = null, curUser = null, curLecEmail = null;
-let peerScores = {}, peerTarget = null, radarChart = null;
-let isAdminUser = false, gradeBarChart = null;
-const GRADE_CHART_COLORS = { 'A+':'#16a34a','A':'#22c55e','A-':'#4ade80','B+':'#2563eb','B':'#3b82f6','B-':'#60a5fa','C+':'#d97706','C':'#f59e0b','C-':'#fbbf24','D+':'#dc2626','D':'#ef4444','E':'#f87171','F':'#7f1d1d' };
-const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
-const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
+function renderModerationSampling(o) {
+    window_modSamplesData = o.samples || [];
 
-function fixDriveUrl(url) { 
-    if (!url) return ""; 
-    let id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1] || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1]; 
-    return id ? `https://lh3.googleusercontent.com/d/${id}` : url; 
+    if (o.examinerStats) {
+        const statsEl = document.getElementById('modExaminerStats');
+        if (statsEl) statsEl.textContent = `${o.examinerStats.completed} / ${o.examinerStats.total}`;
+    }
+
+    const extremes = (o.extremesHigh || []).concat(o.extremesLow || []);
+    document.getElementById('modExtremesCount').textContent = extremes.length;
+
+    document.getElementById('modGroupTinggi').textContent = o.stats.tinggiCount || 0;
+    document.getElementById('modGroupSederhana').textContent = o.stats.sederhanaCount || 0;
+    document.getElementById('modGroupRendah').textContent = o.stats.rendahCount || 0;
+
+    document.getElementById('modGroupTinggiRange').textContent = o.stats.tinggiRange || '-';
+    document.getElementById('modGroupSederhanaRange').textContent = o.stats.sederhanaRange || '-';
+    document.getElementById('modGroupRendahRange').textContent = o.stats.rendahRange || '-';
+
+    document.getElementById('extremeTotalBadge').textContent = `${extremes.length} Kes Dikesan`;
+    document.getElementById('modExtremesBody').innerHTML = extremes.map(s => {
+        const isHigh = s.markahPct >= 90;
+        const catText = isHigh ? 'Amat Cemerlang (≥90%)' : 'Gagal (<50%)';
+        const catBadge = isHigh ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-red-100 text-red-900 border-red-300';
+        return `<tr>
+            <td><span class="px-2 py-1 rounded text-[10px] font-extrabold border ${catBadge}">${catText}</span></td>
+            <td class="font-bold">${s.nama}</td>
+            <td class="font-mono-score text-slate-500">${s.kp}</td>
+            <td>${s.kelas}</td>
+            <td class="text-center font-mono-score font-bold">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+            <td class="text-center font-bold">${s.gred}</td>
+            <td>${s.penilai}</td>
+            <td class="text-center text-red-700 font-bold text-[11px]"><i class="fas fa-pen-alt me-1 text-green-600"></i> Semakan Pen Hijau Khas</td>
+        </tr>`;
+    }).join('') || `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan dalam skop ini.</td></tr>`;
+
+    const lockedCount = window_modSamplesData.filter(s => s.isLocked).length;
+    document.getElementById('modSamplesCountBadge').textContent = `${lockedCount}/${window_modSamplesData.length} Sampel Terkunci`;
+
+    document.getElementById('modSamplesBody').innerHTML = window_modSamplesData.map((s, idx) => {
+        const isLocked = !!s.isLocked;
+        const kelBg = s.kelompok.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : s.kelompok.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+
+        let nameDisplayHTML = '';
+        if (isLocked) {
+            nameDisplayHTML = `<div class="font-bold text-slate-800 flex items-center gap-2">
+                <span>${s.nama}</span>
+                <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-black px-2 py-0.5 rounded">🔒 TERKUNCI</span>
+            </div>`;
+        } else {
+            const opts = s.allOptions || [s];
+            nameDisplayHTML = `<select id="mod_select_${idx}" onchange="onSelectSampleCandidate(${idx})" class="w-full text-xs font-bold p-1.5 bg-amber-50 border border-amber-300 rounded focus:ring-2 focus:ring-amber-500">
+                ${opts.map(opt => `<option value="${opt.kp}" ${opt.kp === s.kp ? 'selected' : ''}>${opt.nama} (${opt.markah}/${opt.maxPossible})</option>`).join('')}
+            </select>`;
+        }
+
+        return `<tr id="mod_row_${idx}" class="${isLocked ? 'bg-emerald-50/30' : 'bg-white'}">
+            <td class="text-center font-bold">${s.bil}</td>
+            <td class="text-xs font-extrabold text-slate-700">${s.penilai}</td>
+            <td>${nameDisplayHTML}</td>
+            <td class="font-mono-score text-slate-500 text-xs" id="mod_kp_${idx}">${s.kp}</td>
+            <td id="mod_kelas_${idx}">${s.kelas}</td>
+            <td class="text-center font-mono-score font-bold" id="mod_score_${idx}">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+            <td class="text-center font-bold" id="mod_gred_${idx}">${s.gred}</td>
+            <td class="text-center" id="mod_kelompok_${idx}"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${kelBg}">${s.kelompok}</span></td>
+            <td class="text-center">
+                ${isLocked 
+                    ? `<button onclick="handleUnlockSingleSample('${s.penilai}')" class="px-2.5 py-1 text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-300 hover:bg-red-200 rounded shadow-xs">
+                        🔓 Buka Kunci
+                       </button>`
+                    : `<button onclick="handleLockSingleSample(${idx})" class="px-2.5 py-1 text-[10px] font-extrabold bg-emerald-700 text-white hover:bg-emerald-800 rounded shadow-xs">
+                        🔒 Kunci Sampel Ini
+                       </button>`
+                }
+            </td>
+        </tr>`;
+    }).join('') || `<tr><td colspan="9" class="text-center p-8 text-slate-400">Tiada sampel moderasi dapat dijana lagi.</td></tr>`;
+}
+
+function onSelectSampleCandidate(idx) {
+    const sel = document.getElementById(`mod_select_${idx}`);
+    if (!sel || !window_modSamplesData[idx]) return;
+
+    const selectedKP = sel.value;
+    const item = window_modSamplesData[idx];
+    const opts = item.allOptions || [];
+    const chosen = opts.find(o => o.kp === selectedKP);
+
+    if (chosen) {
+        item.kp = chosen.kp;
+        item.nama = chosen.nama;
+        item.kelas = chosen.kelas;
+        item.markah = chosen.markah;
+        item.markahPct = chosen.markahPct;
+        item.maxPossible = chosen.maxPossible;
+        item.gred = chosen.gred;
+
+        let bandCat = "Kelompok Sederhana";
+        if (chosen.markahPct >= 75) bandCat = "Kelompok Tinggi";
+        else if (chosen.markahPct < 60) bandCat = "Kelompok Rendah";
+        item.kelompok = bandCat;
+
+        document.getElementById(`mod_kp_${idx}`).textContent = chosen.kp;
+        document.getElementById(`mod_kelas_${idx}`).textContent = chosen.kelas;
+        document.getElementById(`mod_score_${idx}`).textContent = `${chosen.markah} / ${chosen.maxPossible} (${chosen.markahPct.toFixed(1)}%)`;
+        document.getElementById(`mod_gred_${idx}`).textContent = chosen.gred;
+        
+        const kelBg = bandCat.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : bandCat.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        document.getElementById(`mod_kelompok_${idx}`).innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold border ${kelBg}">${bandCat}</span>`;
+    }
+}
+
+async function handleLockSingleSample(idx) {
+    const s = window_modSamplesData[idx];
+    if (!s) return;
+
+    const taskEl = document.getElementById('moderationTaskFilter');
+    const classEl = document.getElementById('moderationClassFilter');
+    const task = taskEl ? taskEl.value : "all";
+    const kelas = classEl ? classEl.value : "";
+
+    showToast(`Mengunci sampel untuk ${s.penilai}...`, 'success');
+
+    try {
+        await fetch(API, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "lockSingleSample",
+                task: task,
+                kelasFilter: kelas,
+                bil: s.bil,
+                kp: s.kp,
+                nama: s.nama,
+                kelas: s.kelas,
+                markah: s.markah,
+                markahPct: s.markahPct,
+                maxPossible: s.maxPossible,
+                gred: s.gred,
+                penilai: s.penilai,
+                kelompok: s.kelompok,
+                by: curLecEmail
+            })
+        });
+        await new Promise(r => setTimeout(r, 1200));
+        showToast(`Sampel ${s.nama} (${s.penilai}) KINI TERKUNCI!`, 'success');
+        loadModerationSampling();
+    } catch(e) { showToast('Ralat mengunci sampel.', 'warn'); }
+}
+
+async function handleUnlockSingleSample(penilai) {
+    const taskEl = document.getElementById('moderationTaskFilter');
+    const classEl = document.getElementById('moderationClassFilter');
+    const task = taskEl ? taskEl.value : "all";
+    const kelas = classEl ? classEl.value : "";
+
+    showToast(`Membuka kunci sampel ${penilai}...`, 'warn');
+
+    try {
+        await fetch(API, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "unlockSingleSample",
+                task: task,
+                kelasFilter: kelas,
+                penilai: penilai
+            })
+        });
+        await new Promise(r => setTimeout(r, 1200));
+        showToast(`Kunci sampel ${penilai} telah dibuka.`, 'success');
+        loadModerationSampling();
+    } catch(e) { showToast('Ralat membuka kunci.', 'warn'); }
 }
 
 function loadImage(iEl, pEl, url) { 
@@ -982,15 +1144,22 @@ function normalizeKP(kp) { return kp ? kp.toString().trim().replace(/^0+/, '') |
 
 function setType(t) { 
     mode = t; 
-    document.getElementById('ts').classList.toggle('active', t === 'student'); 
-    document.getElementById('tl').classList.toggle('active', t === 'lecturer'); 
-    document.getElementById('pwField').className = t === 'student' ? 'hidden' : 'block mt-4'; 
+    const tsBtn = document.getElementById('ts');
+    const tlBtn = document.getElementById('tl');
+    const pwField = document.getElementById('pwField');
+    if (tsBtn) tsBtn.classList.toggle('active', t === 'student'); 
+    if (tlBtn) tlBtn.classList.toggle('active', t === 'lecturer'); 
+    if (pwField) pwField.className = t === 'student' ? 'hidden' : 'block mt-4'; 
 }
 
 async function handleAuth() {
-    const id = document.getElementById('idIn').value.trim(), pw = document.getElementById('pwIn').value;
+    const idIn = document.getElementById('idIn');
+    const pwIn = document.getElementById('pwIn');
+    const id = idIn ? idIn.value.trim() : '';
+    const pw = pwIn ? pwIn.value : '';
     if (!id) return showToast('Sila masukkan maklumat!', 'err');
-    const btn = document.getElementById('loginBtn'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Mengesahkan...';
+    const btn = document.getElementById('loginBtn'); 
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Mengesahkan...'; }
     try {
         if (mode === 'student') {
             const r = await fetch(`${API}?action=checkLogin&noKP=${encodeURIComponent(id)}`); const o = await r.json();
@@ -1000,7 +1169,7 @@ async function handleAuth() {
             if (o.status === "success") { curLecEmail = id; localStorage.setItem('le', id); localStorage.setItem('leName', o.name || id); localStorage.setItem('leAdmin', o.isAdmin ? '1' : '0'); initLecturer(id, o.name, o.isAdmin); } else showToast(o.message, 'warn');
         }
     } catch (e) { showToast('Ralat rangkaian', 'warn'); }
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> Akses Sistem';
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> Akses Sistem'; }
 }
 
 function renderStudent(d) {
@@ -1095,7 +1264,6 @@ async function initLecturer(email, name, isAdminFlag) {
     document.getElementById('lecName').textContent=name||email; curLecEmail=email;
     isAdminUser = isAdminFlag !== undefined ? !!isAdminFlag : (localStorage.getItem('leAdmin') === '1');
     
-    // Paparkan lencana & tab moderasi HANYA kepada Super Admin
     document.getElementById('adminBadge').style.display = isAdminUser ? 'inline-block' : 'none';
     const modTabBtn = document.getElementById('tabBtnModerasi');
     if (modTabBtn) modTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
@@ -1107,8 +1275,49 @@ async function initLecturer(email, name, isAdminFlag) {
         document.getElementById('adminBadge').style.display = isAdminUser ? 'inline-block' : 'none';
         if (modTabBtn) modTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
         
-        renderLecStudentList(); renderSummaryTable(); loadGradeSummary();
+        renderLecStudentList(); renderSummaryTable(); loadGradeSummary(); renderLecturerNotice(o.moderationNotice);
     } catch(e) { showToast('Gagal memuat turun data pelajar.', 'warn'); }
+}
+
+function renderLecturerNotice(notice) {
+    const card = document.getElementById('lecModerationNoticeCard');
+    if (!card || !notice) return;
+    const samples = notice.modSamples || [];
+    const extremes = notice.extremeCases || [];
+
+    if (!samples.length && !extremes.length) {
+        card.style.display = 'none';
+        return;
+    }
+
+    card.style.display = 'block';
+    card.innerHTML = `
+        <div class="academic-card p-5 bg-amber-50/60 border-amber-300 shadow-sm">
+            <div class="flex items-center justify-between border-b border-amber-200 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="bg-amber-600 text-white p-1.5 rounded-lg text-xs"><i class="fas fa-bell"></i></span>
+                    <h4 class="font-bold text-amber-900 text-sm uppercase tracking-wide">Notis Moderasi & Semakan Khas Ketua Pemeriksa</h4>
+                </div>
+                <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-amber-200 text-amber-900 rounded-full">Tindakan Pensyarah</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="bg-white p-4 rounded-lg border border-amber-200 shadow-xs">
+                    <div class="font-extrabold text-blue-900 mb-2 flex items-center justify-between">
+                        <span><i class="fas fa-folder-open text-blue-700 me-1"></i> Skrip Sampel Moderasi Terpilih (Kumpulan Anda)</span>
+                        <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px]">${samples.length} Skrip</span>
+                    </div>
+                    ${samples.length ? `<ul class="space-y-1.5 text-slate-700">${samples.map(s => `<li class="p-2 bg-slate-50 rounded border border-slate-200 flex justify-between items-center"><div><strong class="text-slate-800 block">${s.nama}</strong><span class="font-mono-score text-[10px] text-slate-500">${s.kp} (${s.kelas})</span></div><span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-1 rounded">${s.kelompok}</span></li>`).join('')}</ul><p class="text-[10px] text-slate-500 mt-2 italic">*Sila sediakan fail/skrip fizikal calon ini untuk diserahkan kepada Ketua Pemeriksa.</p>` : '<div class="text-slate-400 italic">Tiada skrip daripada kumpulan anda terpilih dalam sampel moderasi terkunci.</div>'}
+                </div>
+                <div class="bg-white p-4 rounded-lg border border-red-200 shadow-xs">
+                    <div class="font-extrabold text-red-900 mb-2 flex items-center justify-between">
+                        <span><i class="fas fa-exclamation-triangle text-red-600 me-1"></i> Kes Ekstrem Wajib Semakan Pen Hijau</span>
+                        <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-[10px]">${extremes.length} Kes</span>
+                    </div>
+                    ${extremes.length ? `<ul class="space-y-1.5 text-slate-700">${extremes.map(e => `<li class="p-2 bg-red-50/50 rounded border border-red-200 flex justify-between items-center"><div><strong class="text-slate-800 block">${e.nama}</strong><span class="font-mono-score text-[10px] text-slate-500">${e.kp} (${e.kelas})</span></div><span class="bg-red-100 text-red-800 font-mono-score font-bold text-[10px] px-2 py-1 rounded">${e.markah} [${e.kat}]</span></li>`).join('')}</ul><p class="text-[10px] text-slate-500 mt-2 italic">*Skrip ini wajib disemak dan ditanda semula secara berasingan oleh Ketua Pemeriksa.</p>` : '<div class="text-slate-400 italic">Tiada kes ekstrem (≥90% atau <50%) dikesan bagi pelajar di bawah jagaan anda.</div>'}
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function renderLecStudentList() {
@@ -1147,7 +1356,6 @@ function filterStudents(query) {
 }
 
 function showLecTab(t) {
-    // Sekatan Hak Akses: Moderasi hanya untuk Admin
     if (t === 'moderasi' && !isAdminUser) {
         showToast('Akses Terhad: Modul Moderasi khusus untuk Super Admin sahaja.', 'warn');
         t = 'marking';
@@ -1156,7 +1364,6 @@ function showLecTab(t) {
     ['marking','peer','rubrik','summary','laporan','peerstatus','moderasi'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
     const tgt = document.getElementById('ltab-'+t); if(tgt) tgt.style.display='block';
     
-    // Kemas kini gaya butang tab aktif secara fleksibel
     document.querySelectorAll('#lecturerDash .tab-bar .tab').forEach(btn => {
         const isTarget = btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${t}'`);
         btn.classList.toggle('active', !!isTarget);
@@ -1355,6 +1562,7 @@ async function _refreshLecData() {
         if (modTabBtn) modTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
 
         loadPeerData(curS.No_KP);
+        renderLecturerNotice(o.moderationNotice);
     }
 }
 
@@ -1614,7 +1822,28 @@ async function loadModerationSampling() {
 }
 
 function renderModerationSampling(o) {
-    document.getElementById('modTotalGraded').textContent = o.totalMarked;
+    currentModSamples = o.samples || [];
+
+    const isLocked = !!o.isLocked;
+    const lockBadge = document.getElementById('modLockStatusBadge');
+    const lockBtn = document.getElementById('lockSamplesBtn');
+    const unlockBtn = document.getElementById('unlockSamplesBtn');
+
+    if (isLocked) {
+        if (lockBadge) lockBadge.classList.remove('hidden');
+        if (lockBtn) lockBtn.classList.add('hidden');
+        if (unlockBtn) unlockBtn.classList.remove('hidden');
+    } else {
+        if (lockBadge) lockBadge.classList.add('hidden');
+        if (lockBtn) lockBtn.classList.remove('hidden');
+        if (unlockBtn) unlockBtn.classList.add('hidden');
+    }
+
+    if (o.examinerStats) {
+        const statsEl = document.getElementById('modExaminerStats');
+        if (statsEl) statsEl.textContent = `${o.examinerStats.completed} / ${o.examinerStats.total}`;
+    }
+
     const extremes = (o.extremesHigh || []).concat(o.extremesLow || []);
     document.getElementById('modExtremesCount').textContent = extremes.length;
 
@@ -1643,8 +1872,8 @@ function renderModerationSampling(o) {
         </tr>`;
     }).join('') || `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan dalam skop ini.</td></tr>`;
 
-    document.getElementById('modSamplesCountBadge').textContent = `${(o.samples || []).length}/13 Sampel Terpilih`;
-    document.getElementById('modSamplesBody').innerHTML = (o.samples || []).map((s, i) => {
+    document.getElementById('modSamplesCountBadge').textContent = `${currentModSamples.length}/13 Sampel Terpilih`;
+    document.getElementById('modSamplesBody').innerHTML = currentModSamples.map((s, i) => {
         const kelBg = s.kelompok.includes('Tinggi') ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : s.kelompok.includes('Sederhana') ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
         return `<tr>
             <td class="text-center font-bold">${s.bil}</td>
@@ -1664,6 +1893,68 @@ function renderModerationSampling(o) {
             </td>
         </tr>`;
     }).join('') || `<tr><td colspan="11" class="text-center p-8 text-slate-400">Tiada sampel moderasi dapat dijana lagi.</td></tr>`;
+}
+
+async function handleLockSamples() {
+    if (!currentModSamples.length) return showToast('Tiada sampel untuk dikunci!', 'warn');
+
+    const selEl = document.getElementById('moderationClassFilter');
+    const taskEl = document.getElementById('moderationTaskFilter');
+    const kelas = selEl ? selEl.value : "";
+    const task = taskEl ? taskEl.value : "all";
+
+    const btn = document.getElementById('lockSamplesBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Mengunci...';
+
+    try {
+        await fetch(API, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "lockModerationSamples",
+                task: task,
+                kelas: kelas,
+                samples: currentModSamples,
+                by: curLecEmail
+            })
+        });
+        await new Promise(res => setTimeout(res, 1500));
+        showToast('13 Sampel Moderasi Rasmi Berjaya Dikunci KEKAL!', 'success');
+        loadModerationSampling();
+    } catch (e) { showToast('Ralat mengunci sampel.', 'warn'); }
+
+    btn.disabled = false;
+    btn.innerHTML = '🔒 Kunci Sampel Rasmi';
+}
+
+async function handleUnlockSamples() {
+    const selEl = document.getElementById('moderationClassFilter');
+    const taskEl = document.getElementById('moderationTaskFilter');
+    const kelas = selEl ? selEl.value : "";
+    const task = taskEl ? taskEl.value : "all";
+
+    const btn = document.getElementById('unlockSamplesBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Membuka...';
+
+    try {
+        await fetch(API, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "unlockModerationSamples",
+                task: task,
+                kelas: kelas
+            })
+        });
+        await new Promise(res => setTimeout(res, 1500));
+        showToast('Sampel Moderasi dibuka kunci semula.', 'success');
+        loadModerationSampling();
+    } catch (e) { showToast('Ralat membuka kunci.', 'warn'); }
+
+    btn.disabled = false;
+    btn.innerHTML = '🔓 Buka Kunci';
 }
 
 function calcModDiff(kp) {
@@ -1945,103 +2236,4 @@ window.onload = () => {
     if(le) initLecturer(le,localStorage.getItem('leName'), localStorage.getItem('leAdmin')==='1'); 
 };
 </script>
-
-<div class="disclaimer-footer">
-    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;"><i class="fas fa-university text-slate-300 text-lg"></i></div>
-    <div class="font-bold text-slate-600 uppercase tracking-wider mb-2">Aplikasi Maklumat Penilaian Akademik Tertutup</div>
-    <div>Sistem ini dikhususkan untuk rekod rasmi pensyarah dan pelajar <strong class="text-slate-700">Unit Kokurikulum, Institut Pendidikan Guru Kampus Darulaman</strong>.</div>
-    <div class="mt-2 text-[10px]">Penyelaras Kursus MPU3221 &copy; 2026 Hak Cipta Terpelihara.</div>
-</div>
-
-<!-- ================= CETAKAN BUKU REKOD ================= -->
-<div id="printArea">
-    <div class="print-header">
-        <h1>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h1>
-        <h2>Laporan Pemarkahan Sebelum Moderasi — MPU3221 (Pengurusan Persatuan)</h2>
-    </div>
-    <div class="print-meta">
-        <span><strong>Disediakan Oleh:</strong> <span id="pLecName">--</span></span>
-        <span><strong>Skop:</strong> <span id="pScope">--</span></span>
-        <span><strong>Tarikh Cetakan:</strong> <span id="pDate">--</span></span>
-    </div>
-
-    <div class="print-section-title">Senarai & Pemarkahan Pelajar</div>
-    <table class="print-table">
-        <thead>
-            <tr>
-                <th>Bil</th><th>Nama Pelajar</th><th>No. KP</th><th>Kelas</th>
-                <th class="center">HP1<br>(30)</th><th class="center">HP5<br>(10)</th><th class="center">HP8<br>(30)</th><th class="center">HP10<br>(30)</th>
-                <th class="center">Jumlah</th><th class="center">Gred</th>
-            </tr>
-        </thead>
-        <tbody id="pStudentBody"></tbody>
-    </table>
-
-    <div class="print-section-title">Analisis Taburan Gred</div>
-    <table class="print-table" style="max-width:420px;">
-        <thead><tr><th>Skala</th><th class="center">Gred</th><th class="center">Jumlah</th><th class="center">%</th></tr></thead>
-        <tbody id="pGradeBody"></tbody>
-    </table>
-    <div class="print-stat-row">
-        <span>Jumlah Pelajar Dinilai: <span id="pJumlah">0</span></span>
-        <span>MIN: <span id="pMin">--</span></span>
-        <span>Sisihan Piawai: <span id="pSD">--</span></span>
-    </div>
-
-    <div class="print-signoff">
-        <div><div class="line">Disediakan Oleh (Pensyarah)</div></div>
-        <div><div class="line">Disahkan Oleh (Ketua Unit Kokurikulum)</div></div>
-    </div>
-    <div class="print-footer-note">Dokumen ini dijana secara automatik oleh Sistem Portal Pemarkahan MPU3221, Unit Kokurikulum IPGKDA. Sulit &amp; Terhad.</div>
-</div>
-
-<!-- ================= CETAKAN BORANG MODERASI LAM-PT-04-02 ================= -->
-<div id="printModerationArea">
-    <div class="print-header">
-        <h1>BORANG MODERASI PEMARKAHAN (LAM-PT-04-02)</h1>
-        <h2>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h2>
-        <div style="font-size:10px; font-weight:700; margin-top:4px;">KOD KURSUS: MPU3221 (PENGURUSAN PERSATUAN)</div>
-    </div>
-    <div class="print-meta">
-        <span><strong>Komponen Moderasi:</strong> <span id="modPTask">--</span></span>
-        <span><strong>Tarikh Semakan:</strong> <span id="modPDate">--</span></span>
-    </div>
-
-    <div class="print-section-title">Senarai 13 Sampel Moderasi (Mewakili Semua Pemeriksa)</div>
-    <table class="print-table">
-        <thead>
-            <tr>
-                <th class="center">Bil</th>
-                <th>Nama Pelajar</th>
-                <th>No. KP</th>
-                <th>Kelas</th>
-                <th class="center">Markah Asal</th>
-                <th class="center">Gred</th>
-                <th>Pemeriksa Asal</th>
-                <th class="center">Kelompok</th>
-                <th class="center">Markah Pen Hijau</th>
-                <th class="center">Beza (%)</th>
-                <th class="center">Status Moderasi</th>
-            </tr>
-        </thead>
-        <tbody id="modPSampleBody"></tbody>
-    </table>
-
-    <div class="print-signoff" style="margin-top:40px;">
-        <div>
-            <div class="line">Disediakan Oleh (Ketua Pemeriksa)</div>
-            <div style="font-size:9px; color:#64748b; margin-top:2px;">Tarikh: ____________________</div>
-        </div>
-        <div>
-            <div class="line">Disahkan Oleh (Ketua Jabatan / Unit)</div>
-            <div style="font-size:9px; color:#64748b; margin-top:2px;">Tarikh: ____________________</div>
-        </div>
-    </div>
-    <div class="print-footer-note">Borang ini dijana secara rasmi di bawah Tatacara Pengurusan Pentaksiran IPGKDA (LAM-PT-04-02). Sulit &amp; Terhad.</div>
-</div>
-
-<!-- ================= CETAKAN INDIVIDU / PUKAL (DOSSIER) ================= -->
-<div id="printIndividualArea"></div>
-
-</body>
-</html>
+<!-- ... existing code -->
