@@ -376,6 +376,7 @@
         </div>
 
         <div style="min-width: 0;">
+            <!-- TAB 1: PEMARKAHAN INDUK -->
             <div id="ltab-marking">
                 <div id="gradingEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -496,6 +497,7 @@
                 </div>
             </div>
 
+            <!-- TAB 2: PANEL RUBRIK -->
             <div id="ltab-rubrik" style="display:none;">
                 <div id="rubrikLecEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -537,6 +539,7 @@
                 </div>
             </div>
 
+            <!-- TAB 3: ANALISIS RAKAN -->
             <div id="ltab-peer" style="display:none;">
                 <div id="radarEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -586,6 +589,7 @@
                 </div>
             </div>
 
+            <!-- TAB 4: BUKU REKOD MARKAH -->
             <div id="ltab-summary" style="display:none;">
                 <div class="academic-card p-6">
                     <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
@@ -624,6 +628,7 @@
                 </div>
             </div>
 
+            <!-- TAB 5: LAPORAN RUMUSAN -->
             <div id="ltab-laporan" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--secondary);">
                     <div>
@@ -685,6 +690,7 @@
                 </div>
             </div>
 
+            <!-- TAB 6: STATUS PENILAIAN RAKAN (HP8) -->
             <div id="ltab-peerstatus" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--hp8-color);">
                     <div>
@@ -757,7 +763,6 @@
                             <option value="">Semua Kelas</option>
                         </select>
                         <button onclick="loadModerationSampling()" class="btn-outline px-3 py-2 bg-white"><i class="fas fa-sync-alt me-1"></i> Segar</button>
-
                         <button onclick="printModerationReport()" class="btn-primary px-4 py-2 rounded-lg text-[11px]" style="background:#b45309; border-color:#b45309;"><i class="fas fa-print me-2"></i> Cetak Borang LAM-PT-04-02</button>
                     </div>
                 </div>
@@ -771,7 +776,7 @@
                     </div>
                     <div class="academic-card p-4 text-center" style="border-top:4px solid #dc2626;">
                         <div class="dim-label mb-1">Kes Ekstrem</div>
-                        <div id="modExtremesCount" class="font-mono-score text-2xl font-black text-red-600">0</div>
+                        <div id="modExtremesCount" class="font-mono-score text-2xl font-black text-red-600">-</div>
                         <div class="text-[10px] text-red-500 font-bold mt-1">≥90% ATAU &lt;50%</div>
                     </div>
                     <div class="academic-card p-4 text-center" style="border-top:4px solid #4338ca;">
@@ -1662,8 +1667,34 @@ function renderModerationSampling(o) {
         if (statsEl) statsEl.textContent = `${o.examinerStats.completed} / ${o.examinerStats.total}`;
     }
 
+    const taskMode = o.taskMode || (document.getElementById('moderationTaskFilter') ? document.getElementById('moderationTaskFilter').value : 'all');
     const extremes = (o.extremesHigh || []).concat(o.extremesLow || []);
-    document.getElementById('modExtremesCount').textContent = extremes.length;
+
+    if (taskMode === 'all') {
+        document.getElementById('modExtremesCount').textContent = '-';
+        document.getElementById('extremeTotalBadge').textContent = 'Pilih T1 / T2';
+        document.getElementById('modExtremesBody').innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-600 bg-amber-50/60 font-semibold border border-amber-200 rounded-lg">
+            <i class="fas fa-info-circle text-amber-700 text-lg me-2"></i>Sila pilih <strong>📝 Tugasan 1 (40%)</strong> atau <strong>👥 Tugasan 2 (60%)</strong> pada penapis di atas untuk memaparkan senarai kes ekstrem spesifik.
+        </td></tr>`;
+    } else {
+        document.getElementById('modExtremesCount').textContent = extremes.length;
+        document.getElementById('extremeTotalBadge').textContent = `${extremes.length} Kes Dikesan`;
+        document.getElementById('modExtremesBody').innerHTML = extremes.map(s => {
+            const isHigh = s.markahPct >= 90;
+            const catText = isHigh ? 'Amat Cemerlang (≥90%)' : 'Gagal (<50%)';
+            const catBadge = isHigh ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-red-100 text-red-900 border-red-300';
+            return `<tr>
+                <td><span class="px-2 py-1 rounded text-[10px] font-extrabold border ${catBadge}">${catText}</span></td>
+                <td class="font-bold">${s.nama}</td>
+                <td class="font-mono-score text-slate-500">${s.kp}</td>
+                <td>${s.kelas}</td>
+                <td class="text-center font-mono-score font-bold">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+                <td class="text-center font-bold">${s.gred}</td>
+                <td>${s.penilai}</td>
+                <td class="text-center text-red-700 font-bold text-[11px]"><i class="fas fa-pen-alt me-1 text-green-600"></i> Semakan Pen Hijau Khas</td>
+            </tr>`;
+        }).join('') || `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan bagi tugasan ini.</td></tr>`;
+    }
 
     document.getElementById('modGroupTinggi').textContent = o.stats.tinggiCount || 0;
     document.getElementById('modGroupSederhana').textContent = o.stats.sederhanaCount || 0;
@@ -1672,23 +1703,6 @@ function renderModerationSampling(o) {
     document.getElementById('modGroupTinggiRange').textContent = o.stats.tinggiRange || '-';
     document.getElementById('modGroupSederhanaRange').textContent = o.stats.sederhanaRange || '-';
     document.getElementById('modGroupRendahRange').textContent = o.stats.rendahRange || '-';
-
-    document.getElementById('extremeTotalBadge').textContent = `${extremes.length} Kes Dikesan`;
-    document.getElementById('modExtremesBody').innerHTML = extremes.map(s => {
-        const isHigh = s.markahPct >= 90;
-        const catText = isHigh ? 'Amat Cemerlang (≥90%)' : 'Gagal (<50%)';
-        const catBadge = isHigh ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-red-100 text-red-900 border-red-300';
-        return `<tr>
-            <td><span class="px-2 py-1 rounded text-[10px] font-extrabold border ${catBadge}">${catText}</span></td>
-            <td class="font-bold">${s.nama}</td>
-            <td class="font-mono-score text-slate-500">${s.kp}</td>
-            <td>${s.kelas}</td>
-            <td class="text-center font-mono-score font-bold">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
-            <td class="text-center font-bold">${s.gred}</td>
-            <td>${s.penilai}</td>
-            <td class="text-center text-red-700 font-bold text-[11px]"><i class="fas fa-pen-alt me-1 text-green-600"></i> Semakan Pen Hijau Khas</td>
-        </tr>`;
-    }).join('') || `<tr><td colspan="8" class="text-center p-6 text-slate-400">Tiada kes ekstrem dikesan dalam skop ini.</td></tr>`;
 
     const lockedCount = window_modSamplesData.filter(s => s.isLocked).length;
     document.getElementById('modSamplesCountBadge').textContent = `${lockedCount}/${window_modSamplesData.length} Sampel Terkunci`;
@@ -1754,7 +1768,7 @@ function onSelectSampleCandidate(idx) {
         item.markahPct = chosen.markahPct;
         item.maxPossible = chosen.maxPossible;
         item.gred = chosen.gred;
-        item.kelompok = chosen.kelompok || "Kelompok Sederhana"; // Cohort kelompok calculated strictly from backend!
+        item.kelompok = chosen.kelompok || "Kelompok Sederhana";
 
         document.getElementById(`mod_kp_${idx}`).textContent = chosen.kp;
         document.getElementById(`mod_kelas_${idx}`).textContent = chosen.kelas;
