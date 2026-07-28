@@ -376,7 +376,6 @@
         </div>
 
         <div style="min-width: 0;">
-            <!-- TAB 1: PEMARKAHAN INDUK -->
             <div id="ltab-marking">
                 <div id="gradingEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -497,7 +496,6 @@
                 </div>
             </div>
 
-            <!-- TAB 2: PANEL RUBRIK -->
             <div id="ltab-rubrik" style="display:none;">
                 <div id="rubrikLecEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -539,7 +537,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: ANALISIS RAKAN -->
             <div id="ltab-peer" style="display:none;">
                 <div id="radarEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -589,7 +586,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4: BUKU REKOD MARKAH -->
             <div id="ltab-summary" style="display:none;">
                 <div class="academic-card p-6">
                     <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
@@ -628,7 +624,6 @@
                 </div>
             </div>
 
-            <!-- TAB 5: LAPORAN RUMUSAN -->
             <div id="ltab-laporan" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--secondary);">
                     <div>
@@ -690,7 +685,6 @@
                 </div>
             </div>
 
-            <!-- TAB 6: STATUS PENILAIAN RAKAN (HP8) -->
             <div id="ltab-peerstatus" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--hp8-color);">
                     <div>
@@ -1123,6 +1117,7 @@ function renderLecturerNotice(notice) {
     const samples = notice.modSamples || [];
     const extremes = notice.extremeCases || [];
 
+    // Jika Super Admin atau tiada rekod langsung, sembunyikan kad notis atas
     if (!samples.length && !extremes.length) {
         card.style.display = 'none';
         return;
@@ -1134,7 +1129,7 @@ function renderLecturerNotice(notice) {
             <div class="flex items-center justify-between border-b border-amber-200 pb-3 mb-4">
                 <div class="flex items-center gap-2">
                     <span class="bg-amber-600 text-white p-1.5 rounded-lg text-xs"><i class="fas fa-bell"></i></span>
-                    <h4 class="font-bold text-amber-900 text-sm uppercase tracking-wide">Notis Moderasi & Semakan Khas Ketua Pemeriksa</h4>
+                    <h4 class="font-bold text-amber-900 text-sm uppercase tracking-wide">Notis Moderasi & Semakan Khas Pensyarah</h4>
                 </div>
                 <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-amber-200 text-amber-900 rounded-full">Tindakan Pensyarah</span>
             </div>
@@ -1151,7 +1146,7 @@ function renderLecturerNotice(notice) {
                         <span><i class="fas fa-exclamation-triangle text-red-600 me-1"></i> Kes Ekstrem Wajib Semakan Pen Hijau</span>
                         <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-[10px]">${extremes.length} Kes</span>
                     </div>
-                    ${extremes.length ? `<ul class="space-y-1.5 text-slate-700">${extremes.map(e => `<li class="p-2 bg-red-50/50 rounded border border-red-200 flex justify-between items-center"><div><strong class="text-slate-800 block">${e.nama}</strong><span class="font-mono-score text-[10px] text-slate-500">${e.kp} (${e.kelas})</span></div><span class="bg-red-100 text-red-800 font-mono-score font-bold text-[10px] px-2 py-1 rounded">${e.markah} [${e.kat}]</span></li>`).join('')}</ul><p class="text-[10px] text-slate-500 mt-2 italic">*Skrip ini wajib disemak dan ditanda semula secara berasingan oleh Ketua Pemeriksa.</p>` : '<div class="text-slate-400 italic">Tiada kes ekstrem (≥90% atau <50%) dikesan bagi pelajar di bawah jagaan anda.</div>'}
+                    ${extremes.length ? `<ul class="space-y-1.5 text-slate-700">${extremes.map(e => `<li class="p-2 bg-red-50/50 rounded border border-red-200 flex justify-between items-center"><div><strong class="text-slate-800 block">${e.nama}</strong><span class="font-mono-score text-[10px] text-slate-500">${e.kp} (${e.kelas})</span></div><span class="bg-red-100 text-red-800 font-mono-score font-bold text-[10px] px-2 py-1 rounded">${e.markah} [${e.kat}]</span></li>`).join('')}</ul><p class="text-[10px] text-slate-500 mt-2 italic">*Skrip ini wajib disemak dan ditanda semula secara berasingan oleh Ketua Pemeriksa.</p>` : '<div class="text-slate-400 italic">Tiada kes ekstrem dikesan bagi pelajar di bawah jagaan anda.</div>'}
                 </div>
             </div>
         </div>
