@@ -376,7 +376,6 @@
         </div>
 
         <div style="min-width: 0;">
-            <!-- TAB 1: PEMARKAHAN INDUK -->
             <div id="ltab-marking">
                 <div id="gradingEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -497,7 +496,6 @@
                 </div>
             </div>
 
-            <!-- TAB 2: PANEL RUBRIK -->
             <div id="ltab-rubrik" style="display:none;">
                 <div id="rubrikLecEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -539,7 +537,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: ANALISIS RAKAN -->
             <div id="ltab-peer" style="display:none;">
                 <div id="radarEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[500px]">
                     <div style="text-align:center; color:var(--text-muted);">
@@ -589,7 +586,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4: BUKU REKOD MARKAH -->
             <div id="ltab-summary" style="display:none;">
                 <div class="academic-card p-6">
                     <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
@@ -628,7 +624,6 @@
                 </div>
             </div>
 
-            <!-- TAB 5: LAPORAN RUMUSAN -->
             <div id="ltab-laporan" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--secondary);">
                     <div>
@@ -690,7 +685,6 @@
                 </div>
             </div>
 
-            <!-- TAB 6: STATUS PENILAIAN RAKAN (HP8) -->
             <div id="ltab-peerstatus" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--hp8-color);">
                     <div>
@@ -996,7 +990,7 @@ async function handleAuth() {
     const pwIn = document.getElementById('pwIn');
     const id = idIn ? idIn.value.trim() : '';
     const pw = pwIn ? pwIn.value : '';
-    if (!id) return showToast('Sila masukkan maklumat!', 'err');
+    if (!id) return showToast('Sila masukkan maklumat!', 'warn');
     const btn = document.getElementById('loginBtn'); 
     if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Mengesahkan...'; }
     try {
@@ -1760,23 +1754,20 @@ function onSelectSampleCandidate(idx) {
         item.markahPct = chosen.markahPct;
         item.maxPossible = chosen.maxPossible;
         item.gred = chosen.gred;
-
-        let bandCat = "Kelompok Sederhana";
-        if (chosen.markahPct >= 75) bandCat = "Kelompok Tinggi";
-        else if (chosen.markahPct < 60) bandCat = "Kelompok Rendah";
-        item.kelompok = bandCat;
+        item.kelompok = chosen.kelompok || "Kelompok Sederhana"; // Cohort kelompok calculated strictly from backend!
 
         document.getElementById(`mod_kp_${idx}`).textContent = chosen.kp;
         document.getElementById(`mod_kelas_${idx}`).textContent = chosen.kelas;
         document.getElementById(`mod_score_${idx}`).textContent = `${chosen.markah} / ${chosen.maxPossible} (${chosen.markahPct.toFixed(1)}%)`;
         document.getElementById(`mod_gred_${idx}`).textContent = chosen.gred;
         
+        const bandCat = item.kelompok;
         const kelBg = bandCat.includes('Tinggi') 
             ? 'bg-indigo-100 text-indigo-900 border-indigo-300 font-black' 
             : bandCat.includes('Sederhana') 
             ? 'bg-amber-100 text-amber-900 border-amber-300 font-black' 
             : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-black';
-        document.getElementById(`mod_kelompok_${idx}`).innerHTML = `<span class="px-2.5 py-1 rounded text-[10px] uppercase border ${kelBg}">${bandCat}</span>`;
+        document.getElementById(`mod_kelompok_${idx}`).innerHTML = `<span class="px-2.5 py-1 rounded text-[10px] font-bold border ${kelBg}">${bandCat}</span>`;
     }
 }
 
