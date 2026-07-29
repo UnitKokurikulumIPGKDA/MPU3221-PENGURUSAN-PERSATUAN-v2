@@ -477,7 +477,7 @@
                             <i class="fas fa-exclamation-triangle mt-1"></i>
                             <div><strong>Wajib:</strong> Justifikasi rasmi diperlukan untuk perakuan gred cemerlang tinggi (A+).</div>
                         </div>
-                        <textarea id="justTxt" rows="3" placeholder="Sila taipkan rasional dan justifikasi pencapaian cemerlang calon ini..." class="w-full bg-white"></textarea>
+                        <textarea id="justTxt" rows="3" placeholder="Sila taipkan rasional dan justifikasi pencapaian cemerlang calon ini..." class="w-full bg-white" oninput="this.style.borderColor='var(--border)'; this.style.boxShadow='none';"></textarea>
                     </div>
 
                     <div class="alert-warn mt-4 mb-3">
@@ -973,13 +973,201 @@ function renderStudent(d) {
     document.getElementById('hdrName').textContent = d.Nama_Pelajar || '--'; document.getElementById('sN').textContent = d.Nama_Pelajar || '--';
     document.getElementById('sK').textContent = d.No_KP || '--'; document.getElementById('sC').textContent = d.Kelas || '--';
     if (d.Status_Upload === "Selesai") { const sS = document.getElementById('sS'); sS.innerHTML = "<i class='fas fa-check-circle'></i> Selesai Muat Naik"; sS.style.background = "#f0fdf4"; sS.style.color = "#15803d"; sS.style.borderColor = "#bbf7d0"; }
-    loadImage(document.getElementById('sImg'), document.getElementById('sPl'), d.Link_Gambar); loadPeerList(); renderPeerQuestions();
+    loadImage(document.getElementById('sImg'), document.getElementById('sPl'), d.Link_Gambar); 
+    loadPeerList(); 
+    renderPeerQuestions();
 }
 
 function showStudentTab(t) {
     ['profile','peer'].forEach(id => { const el = document.getElementById('stab-'+id); if (el) el.style.display = 'none'; });
     const target = document.getElementById('stab-'+t); if (target) target.style.display = 'flex';
     document.querySelectorAll('#studentDash .tab').forEach((btn,i) => { btn.classList.toggle('active', ['profile','peer'][i] === t); });
+}
+
+async function loadPeerList() {
+    if (!curUser) return;
+    try {
+        const r = await fetch(`${API}?action=getClassmates&noKP=${encodeURIComponent(curUser.No_KP)}&kelas=${encodeURIComponent(curUser.Kelas)}`);
+        const o = await r.json();
+        if (o.status === "success") {
+            const doneSet = new Set(o.done || []);
+            const list = document.getElementById('peerList');
+            if (o.data.length === 0) {
+                list.innerHTML = `<div class="text-xs text-slate-500 text-center p-4">Tiada rakan sekelas dijumpai.</div>`;
+                document.getElementById('evalProgress').textContent = `0/0`;
+                return;
+            }
+            document.getElementById('evalProgress').textContent = `${doneSet.size}/${o.data.length}`;
+            list.innerHTML = o.data.map(p => {
+                const isDone = doneSet.has(p.No_KP);
+                return `<div class="s-card ${isDone ? 'done' : ''}" id="pcard-${p.No_KP}" onclick="selectPeer('${p.No_KP}', '${p.Nama_Pelajar.replace(/'/g, "\\'")}', '${p.Kelas}', ${isDone}, '${p.Link_Gambar}')">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="eval-dot ${isDone ? 'done' : 'pending'}"></div>
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.Nama_Pelajar}</div>
+                            <div class="font-mono-score" style="font-size:10px; color:var(--text-muted); margin-top:2px;">${p.No_KP}</div>
+                        </div>
+                        ${isDone ? `<i class="fas fa-check text-green-600"></i>` : `<i class="fas fa-chevron-right text-slate-300"></i>`}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    } catch (e) {
+        showToast('Gagal memuat senarai rakan.', 'warn');
+    }
+}
+
+function renderPeerQuestions() {
+    document.getElementById('peerQuestions').innerHTML = PEER_Q.map((q, i) => `
+        <div class="q-block" id="qb-${q.id}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div>
+                    <div class="dim-label"><span style="color:var(--primary); margin-right:4px;">Q${i+1}</span> ${q.title}</div>
+                    <div style="font-size:13px; font-weight:600; color:var(--text-main); line-height:1.4;">${q.label}</div>
+                </div>
+            </div>
+            <div class="likert-group">
+                ${[1, 2, 3, 4, 5].map(v => `<button type="button" class="likert-btn" id="btn-${q.id}-${v}" onclick="setScore('${q.id}', ${v})">${v}</button>`).join('')}
+            </div>
+        </div>
+    `).join('') + `
+    <div class="q-block mt-4" style="background:#f8fafc; border:1px dashed #cbd5e1;">
+        <label class="dim-label mb-2"><i class="fas fa-comment-dots me-1"></i> Ulasan Tambahan (Pilihan)</label>
+        <textarea id="peerNote" rows="2" placeholder="Tuliskan ulasan ringkas mengenai rakan ini (jika ada)..." class="w-full text-xs" style="background:white;"></textarea>
+    </div>`;
+}
+
+function setScore(qId, val) {
+    peerScores[qId] = val;
+    for (let i = 1; i <= 5; i++) {
+        const b = document.getElementById(`btn-${qId}-${i}`);
+        if (b) b.className = `likert-btn ${i === val ? 'sel-' + i : ''}`;
+    }
+}
+
+function selectPeer(kp, name, kelas, isDone, img) {
+    peerTarget = kp;
+    peerScores = {};
+    document.querySelectorAll('#peerList .s-card').forEach(c => c.classList.remove('selected'));
+    const activeCard = document.getElementById(`pcard-${kp}`);
+    if (activeCard) activeCard.classList.add('selected');
+    
+    document.getElementById('peerPanelEmpty').style.display = 'none';
+    document.getElementById('peerPanel').style.display = 'block';
+    
+    document.getElementById('peerName').textContent = name;
+    document.getElementById('peerKlass').textContent = kelas;
+    loadImage(document.getElementById('peerImg'), document.getElementById('peerImgPh'), img);
+
+    const doneTag = document.getElementById('peerDoneTag');
+    if (doneTag) doneTag.style.display = isDone ? 'block' : 'none';
+    
+    const btn = document.getElementById('submitPeerBtn');
+    if (isDone) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-lock me-2"></i> Penilaian Telah Disimpan';
+        btn.style.background = '#94a3b8'; btn.style.borderColor = '#94a3b8';
+        PEER_Q.forEach(q => setScore(q.id, 0));
+        document.getElementById('peerNote').value = "";
+        document.getElementById('peerNote').disabled = true;
+        document.querySelectorAll('.likert-btn').forEach(b => { b.disabled = true; b.className = 'likert-btn'; });
+        checkExistingPeerScore(kp);
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian';
+        btn.style.background = ''; btn.style.borderColor = '';
+        document.getElementById('peerNote').disabled = false;
+        document.getElementById('peerNote').value = "";
+        PEER_Q.forEach(q => {
+            setScore(q.id, 0); peerScores[q.id] = 0;
+            [1,2,3,4,5].forEach(v => { const b = document.getElementById(`btn-${q.id}-${v}`); if(b) { b.disabled = false; b.className = 'likert-btn'; } });
+        });
+    }
+}
+
+async function checkExistingPeerScore(targetKP) {
+    try {
+        const r = await fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(curUser.No_KP)}&targetKP=${encodeURIComponent(targetKP)}`);
+        const o = await r.json();
+        if (o.done && o.data) {
+            setScore('q1', o.data.q1); setScore('q2', o.data.q2); setScore('q3', o.data.q3);
+            setScore('q4', o.data.q4); setScore('q5', o.data.q5);
+            const noteEl = document.getElementById('peerNote');
+            if (noteEl) noteEl.value = o.data.note || "";
+        }
+    } catch(e) {}
+}
+
+async function submitPeerEval() {
+    if (!peerTarget) return;
+    if (Object.keys(peerScores).length < 5 || Object.values(peerScores).some(v => v === 0)) {
+        return showToast('Sila lengkapkan kelima-lima soalan.', 'warn');
+    }
+    const btn = document.getElementById('submitPeerBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Menghantar...';
+    try {
+        const payload = {
+            action: "submitPeerEval",
+            evaluatorKP: curUser.No_KP, evaluatorName: curUser.Nama_Pelajar, evaluatorKelas: curUser.Kelas,
+            targetKP: peerTarget, targetName: document.getElementById('peerName').textContent, targetKelas: document.getElementById('peerKlass').textContent,
+            q1: peerScores.q1, q2: peerScores.q2, q3: peerScores.q3, q4: peerScores.q4, q5: peerScores.q5,
+            note: document.getElementById('peerNote').value.trim()
+        };
+        const r = await fetch(API, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+        await new Promise(res => setTimeout(res, 1000));
+        showToast('Penilaian rakan berjaya direkodkan.', 'success');
+        loadPeerList();
+        document.getElementById('peerPanel').style.display = 'none';
+        document.getElementById('peerPanelEmpty').style.display = 'flex';
+    } catch (e) {
+        showToast('Gagal menghantar penilaian.', 'warn');
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Serahkan Penilaian';
+    }
+}
+
+function pImg(i) {
+    if (i.files && i.files[0]) {
+        const r = new FileReader();
+        r.onload = function(e) {
+            const img = document.getElementById('sImg'); 
+            if (img) { img.src = e.target.result; img.style.display = 'block'; }
+            const sPl = document.getElementById('sPl');
+            if (sPl) sPl.style.display = 'none';
+        }
+        r.readAsDataURL(i.files[0]);
+    }
+}
+
+async function hUp() {
+    const fi = document.getElementById('fIn');
+    if (!fi || !fi.files || !fi.files[0]) return showToast('Sila pilih gambar dahulu.', 'warn');
+    const file = fi.files[0];
+    if (file.size > 2 * 1024 * 1024) return showToast('Saiz gambar terhad kepada 2MB.', 'warn');
+    const btn = document.getElementById('uploadBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Muat Naik...';
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const b64 = e.target.result.split(',')[1];
+        try {
+            await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({
+                action: "uploadImage",
+                noKP: curUser.No_KP.toString(),
+                imageData: b64,
+                mimeType: file.type,
+                fileName: `MPU3221_${curUser.No_KP}_${file.name}`
+            })});
+            await new Promise(r => setTimeout(r, 1500));
+            showToast('Gambar berjaya dikemas kini.', 'success');
+            const sS = document.getElementById('sS');
+            if (sS) {
+                sS.innerHTML = "<i class='fas fa-check-circle'></i> Selesai Muat Naik";
+                sS.style.background = "#f0fdf4"; sS.style.color = "#15803d"; sS.style.borderColor = "#bbf7d0";
+            }
+        } catch (err) { showToast('Gagal muat naik gambar.', 'warn'); }
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload me-2"></i> Muat Naik';
+    };
+    reader.readAsDataURL(file);
 }
 
 async function initLecturer(email, name, isAdminFlag) {
@@ -1006,7 +1194,6 @@ function renderLecturerNotice(notice) {
     const card = document.getElementById('lecModerationNoticeCard');
     if (!card || !notice) return;
     
-    // HIDE NOTICE FOR ADMINS (Admins should use the Moderation Tab to view 100% full lists)
     if (isAdminUser) {
         card.style.display = 'none';
         return;
@@ -1158,10 +1345,19 @@ async function saveManualScores() {
     const h5 = Number(document.getElementById('h5').value)||0;
     const h8 = Number(document.getElementById('h8').value)||0;
     const h10 = Number(document.getElementById('h10').value)||0;
-    const just = document.getElementById('justTxt').value;
+    const just = document.getElementById('justTxt').value.trim();
 
     if (h1>30||h5>10||h8>30||h10>30||h1<0||h5<0||h8<0||h10<0) {
         return showToast('Markah melebihi had maksimum/minimum bagi komponen berkenaan.', 'warn');
+    }
+
+    const total = h1 + h5 + h8 + h10;
+    if (total >= 90 && just === "") {
+        const jt = document.getElementById('justTxt');
+        jt.style.borderColor = '#ef4444';
+        jt.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+        jt.focus();
+        return showToast('AMARAN: Justifikasi rasmi WAJIB diisi untuk perakuan gred cemerlang tinggi (A+)!', 'warn');
     }
 
     const btn = document.getElementById('saveManualBtn');
@@ -1171,7 +1367,7 @@ async function saveManualScores() {
             action: "submitScores",
             noKP: curS.No_KP.toString(),
             hp1: h1, hp5: h5, hp8: h8, hp10: h10,
-            justifikasi: just,
+            justifikasi: just || "-",
             penilai: curLecEmail
         })});
         await new Promise(r => setTimeout(r, 1500));
@@ -1542,7 +1738,6 @@ async function loadModerationSampling() {
     try {
         const selEl = document.getElementById('moderationClassFilter');
         const kelas = selEl ? selEl.value : "";
-        // Backend taskMode 'all' is explicitly handled logic for 100% Extreme/Moderation now.
         const r = await fetch(`${API}?action=getModerationSampling&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}&task=all`);
         const o = await r.json();
         if (o.status === 'success') renderModerationSampling(o);
@@ -1557,7 +1752,6 @@ function renderModerationSampling(o) {
         if (statsEl) statsEl.textContent = `${o.examinerStats.completed} / ${o.examinerStats.total}`;
     }
 
-    // Extremes dipaparkan secara berterusan (100% basis)
     const extremes = (o.extremesHigh || []).concat(o.extremesLow || []);
     
     document.getElementById('modExtremesCount').textContent = extremes.length;
