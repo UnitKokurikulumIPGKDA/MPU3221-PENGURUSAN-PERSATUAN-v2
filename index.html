@@ -735,7 +735,7 @@
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Garis Panduan LAM-PT-04-02</span>
-                            <span class="text-xs text-slate-400 font-mono-score">Sampling Manual Pemeriksa & Kes Ekstrem 100%</span>
+                            <span class="text-xs text-slate-400 font-mono-score">Pemarkahan Akhir 100% Sahaja</span>
                         </div>
                         <h3 class="font-serif-title text-xl font-bold text-slate-800">Modul Moderasi Berasaskan Pemarkahan 100%</h3>
                         <p class="text-[13px] text-slate-500 mt-1">Sistem menjana senarai kes ekstrem secara automatik dan menapis 13 sampel mewakili semua pemeriksa.</p>
@@ -853,6 +853,7 @@ const GRADE_CHART_COLORS = { 'A+':'#16a34a','A':'#22c55e','A-':'#4ade80','B+':'#
 const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
 const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
 
+// Memastikan No KP sentiasa 12 digit (string)
 function normalizeKP(kp) {
     if (!kp) return "";
     let clean = kp.toString().trim().replace(/['"\s]/g, '');
@@ -1005,7 +1006,7 @@ function renderLecturerNotice(notice) {
     const card = document.getElementById('lecModerationNoticeCard');
     if (!card || !notice) return;
     
-    // Khusus: Sembunyikan kad notis atas jika Super Admin (sebab terlalu panjang)
+    // HIDE NOTICE FOR ADMINS (Admins should use the Moderation Tab to view 100% full lists)
     if (isAdminUser) {
         card.style.display = 'none';
         return;
@@ -1073,7 +1074,7 @@ function filterStudents(query) {
     const classSel = document.getElementById('classFilter');
     const selectedClass = classSel ? classSel.value : "";
     const filtered = sData.filter(s => {
-        const matchQ = s.Nama_Pelajar.toLowerCase().includes(q) || s.No_KP.includes(q);
+        const matchQ = s.Nama_Pelajar.toLowerCase().includes(q) || (s.No_KP && s.No_KP.includes(q));
         const matchClass = !selectedClass || (s.Kelas && s.Kelas.toString() === selectedClass);
         return matchQ && matchClass;
     });
@@ -1541,6 +1542,7 @@ async function loadModerationSampling() {
     try {
         const selEl = document.getElementById('moderationClassFilter');
         const kelas = selEl ? selEl.value : "";
+        // Backend taskMode 'all' is explicitly handled logic for 100% Extreme/Moderation now.
         const r = await fetch(`${API}?action=getModerationSampling&email=${encodeURIComponent(curLecEmail)}&kelas=${encodeURIComponent(kelas)}&task=all`);
         const o = await r.json();
         if (o.status === 'success') renderModerationSampling(o);
@@ -1965,6 +1967,7 @@ window.onload = () => {
 };
 </script>
 
+<!-- ================= FOOTER ================= -->
 <div class="disclaimer-footer">
     <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;"><i class="fas fa-university text-slate-300 text-lg"></i></div>
     <div class="font-bold text-slate-600 uppercase tracking-wider mb-2">Aplikasi Maklumat Penilaian Akademik Tertutup</div>
