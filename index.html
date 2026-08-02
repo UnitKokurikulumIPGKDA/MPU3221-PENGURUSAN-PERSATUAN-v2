@@ -423,14 +423,14 @@
                                     <label class="dim-label" style="margin:0; color:var(--hp1-color);">HP1 — Pengetahuan </label>
                                     <span style="font-size:10px; color:var(--text-muted);">Max: 30</span>
                                 </div>
-                                <input type="number" id="h1" oninput="calc()" min="0" max="30" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp1-color); border-color:rgba(67, 56, 202, 0.3);">
+                                <input type="number" id="h1" step="0.1" oninput="calc()" min="0" max="30" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp1-color); border-color:rgba(67, 56, 202, 0.3);">
                             </div>
                             <div>
                                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                                     <label class="dim-label" style="margin:0; color:var(--hp5-color);">HP5 — Komunikasi</label>
                                     <span style="font-size:10px; color:var(--text-muted);">Max: 10</span>
                                 </div>
-                                <input type="number" id="h5" oninput="calc()" min="0" max="10" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp5-color); border-color:rgba(3, 105, 161, 0.3);">
+                                <input type="number" id="h5" step="0.1" oninput="calc()" min="0" max="10" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp5-color); border-color:rgba(3, 105, 161, 0.3);">
                             </div>
                         </div>
 
@@ -445,14 +445,14 @@
                                     <label class="dim-label" style="margin:0; color:var(--hp8-color);">HP8 — Kepimpinan</label>
                                     <span style="font-size:10px; color:var(--text-muted);">Max: 30</span>
                                 </div>
-                                <input type="number" id="h8" oninput="calc()" min="0" max="30" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp8-color); border-color:rgba(21, 128, 61, 0.3);">
+                                <input type="number" id="h8" step="0.1" oninput="calc()" min="0" max="30" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp8-color); border-color:rgba(21, 128, 61, 0.3);">
                             </div>
                             <div>
                                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                                     <label class="dim-label" style="margin:0; color:var(--hp10-color);">HP10 — Keusahawanan</label>
                                     <span style="font-size:10px; color:var(--text-muted);">Max: 30</span>
                                 </div>
-                                <input type="number" id="h10" oninput="calc()" min="0" max="30" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp10-color); border-color:rgba(180, 83, 9, 0.3);">
+                                <input type="number" id="h10" step="0.1" oninput="calc()" min="0" max="30" class="w-full font-mono-score text-xl font-bold bg-white" style="color:var(--hp10-color); border-color:rgba(180, 83, 9, 0.3);">
                             </div>
                         </div>
                     </div>
@@ -461,7 +461,7 @@
                         <div>
                             <div style="font-size:12px; color:slate-400; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; opacity:0.8;">Pencapaian Keseluruhan</div>
                             <div style="display:flex; align-items:baseline; gap:12px;">
-                                <span id="tm" class="font-mono-score" style="font-size:56px; font-weight:800; line-height:1; color:#38bdf8;">0</span>
+                                <span id="tm" class="font-mono-score" style="font-size:56px; font-weight:800; line-height:1; color:#38bdf8;">0.0</span>
                                 <span style="font-size:20px; font-weight:600; color:rgba(255,255,255,0.5);">/ 100</span>
                             </div>
                         </div>
@@ -1011,6 +1011,16 @@ let currentSimSuggestions = [];
 let baseSimStats = null;
 let _simOriginalSnapshot = null;
 
+// PEMBANTU PEMBUNDARAN 1 TITIK PERPULUHAN (digunakan di seluruh sistem)
+function roundTo1(n) {
+    const v = Number(n);
+    if (isNaN(v)) return 0;
+    return Math.round(v * 10) / 10;
+}
+function fmt1(n) {
+    return roundTo1(n).toFixed(1);
+}
+
 // HAD MAKSIMUM MARKAH CADANGAN A+ ADALAH 96.0%
 const BAND_MIN = {"A+":90,"A":80,"A-":75,"B+":70,"B":65,"B-":60,"C+":55,"C":50,"C-":40,"D+":30,"D":20,"E":10,"F":0};
 const BAND_MAX = {"A+":96.0,"A":89.9,"A-":79.9,"B+":74.9,"B":69.9,"B-":64.9,"C+":59.9,"C":54.9,"C-":49.9,"D+":39.9,"D":29.9,"E":19.9,"F":9.9};
@@ -1500,10 +1510,10 @@ async function selectStudent(kp) {
     document.getElementById('gradingEmpty').style.display = 'none';
     
     if (curS.markahSediaAda) {
-        document.getElementById('h1').value = curS.markahSediaAda.hp1 || 0;
-        document.getElementById('h5').value = curS.markahSediaAda.hp5 || 0;
-        document.getElementById('h8').value = curS.markahSediaAda.hp8 || 0;
-        document.getElementById('h10').value = curS.markahSediaAda.hp10 || 0;
+        document.getElementById('h1').value = fmt1(curS.markahSediaAda.hp1 || 0);
+        document.getElementById('h5').value = fmt1(curS.markahSediaAda.hp5 || 0);
+        document.getElementById('h8').value = fmt1(curS.markahSediaAda.hp8 || 0);
+        document.getElementById('h10').value = fmt1(curS.markahSediaAda.hp10 || 0);
         document.getElementById('justTxt').value = curS.markahSediaAda.just === "-" ? "" : curS.markahSediaAda.just;
     } else { 
         ['h1','h5','h8','h10','justTxt'].forEach(id => document.getElementById(id).value = ''); 
@@ -1527,17 +1537,17 @@ async function selectStudent(kp) {
 
 async function saveManualScores() {
     if(!curS) return;
-    const h1 = Number(document.getElementById('h1').value)||0;
-    const h5 = Number(document.getElementById('h5').value)||0;
-    const h8 = Number(document.getElementById('h8').value)||0;
-    const h10 = Number(document.getElementById('h10').value)||0;
+    const h1 = roundTo1(document.getElementById('h1').value);
+    const h5 = roundTo1(document.getElementById('h5').value);
+    const h8 = roundTo1(document.getElementById('h8').value);
+    const h10 = roundTo1(document.getElementById('h10').value);
     const just = document.getElementById('justTxt').value.trim();
 
     if (h1>30||h5>10||h8>30||h10>30||h1<0||h5<0||h8<0||h10<0) {
         return showToast('Markah melebihi had maksimum/minimum bagi komponen berkenaan.', 'warn');
     }
 
-    const total = h1 + h5 + h8 + h10;
+    const total = roundTo1(h1 + h5 + h8 + h10);
     if (total >= 90 && just === "") {
         const jt = document.getElementById('justTxt');
         jt.style.borderColor = '#ef4444';
@@ -1569,8 +1579,7 @@ function renderLecRubrikInputs(dataObj) {
     const cont = document.getElementById('lecRubrikContainer');
     cont.innerHTML = RUBRIK_CONFIG.map(cat => {
         const inputs = cat.items.map((item, idx) => {
-            const k = cat.prefix + (idx+1); const v = dataObj && dataObj[k] !== undefined ? Number(dataObj[k]) : 0;
-            const step = cat.max % 1 !== 0 ? '0.5' : '1';
+            const k = cat.prefix + (idx+1); const v = dataObj && dataObj[k] !== undefined ? roundTo1(dataObj[k]) : 0;
             const isFull = v === item.max;
             return `<div class="flex items-center gap-4 p-4 border rounded-lg bg-white mb-2 shadow-sm transition hover:border-slate-400" style="border-left:4px solid ${isFull ? cat.color : '#e2e8f0'};">
                 <div class="flex-1">
@@ -1579,7 +1588,7 @@ function renderLecRubrikInputs(dataObj) {
                 </div>
                 <div class="flex flex-col items-end shrink-0">
                     <span class="text-[10px] font-bold text-slate-400 mb-1 uppercase">Markah (/ ${item.max})</span>
-                    <input type="number" id="rub_${k}" min="0" max="${item.max}" step="${step}" value="${v}" 
+                    <input type="number" id="rub_${k}" min="0" max="${item.max}" step="0.1" value="${fmt1(v)}" 
                         oninput="clampRubrik('${k}', ${item.max}); calcLecRubrikTotal();" 
                         class="w-20 text-center font-mono-score text-lg font-bold bg-slate-50 border-slate-300 rounded focus:ring-2" style="color:${cat.color};">
                 </div>
@@ -1593,7 +1602,7 @@ function renderLecRubrikInputs(dataObj) {
             <div class="p-5 flex justify-between items-center bg-white">
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jumlah Sub-Markah Kategori Ini</span>
                 <div class="flex items-end gap-2 bg-slate-100 px-4 py-2 rounded-lg border">
-                    <span id="tot_${cat.id}" class="font-mono-score text-3xl font-black" style="color:${cat.color}; line-height:1;">0</span>
+                    <span id="tot_${cat.id}" class="font-mono-score text-3xl font-black" style="color:${cat.color}; line-height:1;">0.0</span>
                     <span class="text-sm font-bold text-slate-400 mb-1">/ ${cat.max}</span>
                 </div>
             </div>
@@ -1603,7 +1612,11 @@ function renderLecRubrikInputs(dataObj) {
 }
 
 function clampRubrik(k, max) { 
-    const el=document.getElementById('rub_'+k); let v=parseFloat(el.value)||0; if(v>max) el.value=max; if(v<0) el.value=0; 
+    const el=document.getElementById('rub_'+k); 
+    let v = roundTo1(el.value); 
+    if(v>max) v = roundTo1(max); 
+    if(v<0) v = 0; 
+    el.value = fmt1(v);
     const parent = el.closest('.flex.items-center');
     if(v === max && parent) { parent.style.borderLeftColor = el.style.color; parent.style.background = '#f8fafc'; } 
     else if (parent) { parent.style.borderLeftColor = '#e2e8f0'; parent.style.background = 'white'; }
@@ -1611,8 +1624,8 @@ function clampRubrik(k, max) {
 
 function calcLecRubrikTotal() {
     RUBRIK_CONFIG.forEach(cat => {
-        let sum = 0; cat.items.forEach((item, idx) => { sum += parseFloat(document.getElementById('rub_'+cat.prefix+(idx+1))?.value) || 0; });
-        const el = document.getElementById('tot_'+cat.id); if(el) el.textContent = sum;
+        let sum = 0; cat.items.forEach((item, idx) => { sum += roundTo1(document.getElementById('rub_'+cat.prefix+(idx+1))?.value); });
+        const el = document.getElementById('tot_'+cat.id); if(el) el.textContent = fmt1(sum);
     });
 }
 
@@ -1629,7 +1642,7 @@ async function showRubrikLecPanel(s) {
 async function saveRubrik() {
     if(!curS) return; const btn=document.getElementById('saveRubrikBtn'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Memproses dan Menyimpan...';
     const pl = { action:"submitRubrik", noKP:curS.No_KP.toString(), nama:curS.Nama_Pelajar, kelas:curS.Kelas, penilai:curLecEmail, data:{} };
-    RUBRIK_CONFIG.forEach(cat => cat.items.forEach((it,idx) => pl.data[cat.prefix+(idx+1)] = parseFloat(document.getElementById('rub_'+cat.prefix+(idx+1))?.value)||0 ));
+    RUBRIK_CONFIG.forEach(cat => cat.items.forEach((it,idx) => pl.data[cat.prefix+(idx+1)] = roundTo1(document.getElementById('rub_'+cat.prefix+(idx+1))?.value) ));
     try {
         await fetch(API, { method:'POST', mode:'no-cors', body:JSON.stringify(pl) });
         let vD=null; for(let i=1; i<=5; i++) {
@@ -1651,10 +1664,10 @@ async function _refreshLecData() {
         renderSummaryTable();
 
         if(curS.markahSediaAda) {
-            document.getElementById('h1').value = curS.markahSediaAda.hp1 || 0;
-            document.getElementById('h5').value = curS.markahSediaAda.hp5 || 0;
-            document.getElementById('h8').value = curS.markahSediaAda.hp8 || 0;
-            document.getElementById('h10').value = curS.markahSediaAda.hp10 || 0;
+            document.getElementById('h1').value = fmt1(curS.markahSediaAda.hp1 || 0);
+            document.getElementById('h5').value = fmt1(curS.markahSediaAda.hp5 || 0);
+            document.getElementById('h8').value = fmt1(curS.markahSediaAda.hp8 || 0);
+            document.getElementById('h10').value = fmt1(curS.markahSediaAda.hp10 || 0);
             document.getElementById('justTxt').value = curS.markahSediaAda.just === "-" ? "" : curS.markahSediaAda.just;
         } else {
             ['h1','h5','h8','h10','justTxt'].forEach(id => document.getElementById(id).value = '');
@@ -1779,8 +1792,9 @@ function buildRC(dims) {
 }
 
 function calc() {
-    const v=['h1','h5','h8','h10'].map(id=>Math.max(0,Number(document.getElementById(id).value)||0)); const t=v.reduce((a,b)=>a+b,0);
-    document.getElementById('tm').textContent=t; const g=calculateGred(t); document.getElementById('gd').textContent=g;
+    const v=['h1','h5','h8','h10'].map(id=>Math.max(0, roundTo1(document.getElementById(id).value))); 
+    const t=roundTo1(v.reduce((a,b)=>a+b,0));
+    document.getElementById('tm').textContent=fmt1(t); const g=calculateGred(t); document.getElementById('gd').textContent=g;
     document.getElementById('justArea').style.display=g==='A+'?'block':'none';
     
     document.getElementById('tm').style.color = t >= 80 ? '#0284c7' : t >= 50 ? '#d97706' : '#dc2626';
@@ -1801,7 +1815,7 @@ function renderSummaryTable() {
     }
 
     tbody.innerHTML = filteredData.map((s, index)=>{
-        const m=s.markahSediaAda||{}, t=(m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0), g=t>0?calculateGred(t):'--';
+        const m=s.markahSediaAda||{}, t=roundTo1((m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0)), g=t>0?calculateGred(t):'--';
         const isOdd = index % 2 !== 0;
         const bg = isOdd ? 'bg-slate-50' : 'bg-white';
         const gBadge = g.includes('A') ? 'bg-green-100 text-green-800' : g.includes('B') ? 'bg-blue-100 text-blue-800' : g.includes('C') ? 'bg-amber-100 text-amber-800' : g==='--' ? 'bg-slate-100 text-slate-500' : 'bg-red-100 text-red-800';
@@ -1811,11 +1825,11 @@ function renderSummaryTable() {
                 <div class="font-bold text-[13px] text-slate-800">${s.Nama_Pelajar}</div>
                 <div class="font-mono-score text-[10px] text-slate-500 mt-1">${s.No_KP} <span class="mx-1">•</span> ${s.Kelas}</div>
             </td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp1-color);">${m.hp1 ?? '-'}</td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp5-color);">${m.hp5 ?? '-'}</td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp8-color);">${m.hp8 ?? '-'}</td>
-            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp10-color);">${m.hp10 ?? '-'}</td>
-            <td class="p-3 text-center font-mono-score text-[15px] font-black text-slate-800 bg-slate-100 border-l border-r">${t || '-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp1-color);">${m.hp1 !== undefined ? fmt1(m.hp1) : '-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp5-color);">${m.hp5 !== undefined ? fmt1(m.hp5) : '-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp8-color);">${m.hp8 !== undefined ? fmt1(m.hp8) : '-'}</td>
+            <td class="p-3 text-center font-mono-score text-[13px] font-bold" style="color:var(--hp10-color);">${m.hp10 !== undefined ? fmt1(m.hp10) : '-'}</td>
+            <td class="p-3 text-center font-mono-score text-[15px] font-black text-slate-800 bg-slate-100 border-l border-r">${t ? fmt1(t) : '-'}</td>
             <td class="p-3 text-center">
                 <span class="inline-block px-2 py-1 rounded font-serif-title font-bold text-sm ${gBadge}">${g}</span>
             </td>
@@ -1913,7 +1927,7 @@ function filterLaporanStudents() {
     let list = sData.filter(s => {
         const matchClass = !classFilter || (s.Kelas || "").toString() === classFilter;
         const m = s.markahSediaAda || {};
-        const total = (m.hp1 || 0) + (m.hp5 || 0) + (m.hp8 || 0) + (m.hp10 || 0);
+        const total = roundTo1((m.hp1 || 0) + (m.hp5 || 0) + (m.hp8 || 0) + (m.hp10 || 0));
         const gred = total > 0 ? calculateGred(total) : "F";
         const matchGrade = !gradeFilter || gred === gradeFilter;
         const matchSearch = !searchQ || s.Nama_Pelajar.toLowerCase().includes(searchQ) || (s.No_KP && s.No_KP.includes(searchQ));
@@ -1923,8 +1937,8 @@ function filterLaporanStudents() {
     const gradeRank = {"A+":13,"A":12,"A-":11,"B+":10,"B":9,"B-":8,"C+":7,"C":6,"C-":5,"D+":4,"D":3,"E":2,"F":1};
 
     list.sort((a, b) => {
-        const mA = a.markahSediaAda || {}, tA = (mA.hp1||0)+(mA.hp5||0)+(mA.hp8||0)+(mA.hp10||0), gA = tA > 0 ? calculateGred(tA) : "F";
-        const mB = b.markahSediaAda || {}, tB = (mB.hp1||0)+(mB.hp5||0)+(mB.hp8||0)+(mB.hp10||0), gB = tB > 0 ? calculateGred(tB) : "F";
+        const mA = a.markahSediaAda || {}, tA = roundTo1((mA.hp1||0)+(mA.hp5||0)+(mA.hp8||0)+(mA.hp10||0)), gA = tA > 0 ? calculateGred(tA) : "F";
+        const mB = b.markahSediaAda || {}, tB = roundTo1((mB.hp1||0)+(mB.hp5||0)+(mB.hp8||0)+(mB.hp10||0)), gB = tB > 0 ? calculateGred(tB) : "F";
 
         if (sortVal === "gred_desc") return (gradeRank[gB] || 0) - (gradeRank[gA] || 0) || tB - tA;
         if (sortVal === "gred_asc") return (gradeRank[gA] || 0) - (gradeRank[gB] || 0) || tA - tB;
@@ -1942,7 +1956,7 @@ function filterLaporanStudents() {
 
     tbody.innerHTML = list.map((s, idx) => {
         const m = s.markahSediaAda || {};
-        const total = (m.hp1 || 0) + (m.hp5 || 0) + (m.hp8 || 0) + (m.hp10 || 0);
+        const total = roundTo1((m.hp1 || 0) + (m.hp5 || 0) + (m.hp8 || 0) + (m.hp10 || 0));
         const gred = total > 0 ? calculateGred(total) : "F";
         const gBadge = gred.includes('A') ? 'bg-green-100 text-green-800 border-green-200' : gred.includes('B') ? 'bg-blue-100 text-blue-800 border-blue-200' : gred.includes('C') ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-red-100 text-red-800 border-red-200';
 
@@ -1951,7 +1965,7 @@ function filterLaporanStudents() {
             <td class="font-bold text-slate-800">${s.Nama_Pelajar}</td>
             <td class="font-mono-score text-xs text-slate-500">${s.No_KP}</td>
             <td class="text-xs font-bold text-slate-600">${s.Kelas}</td>
-            <td class="text-center font-mono-score font-bold text-slate-900">${total}</td>
+            <td class="text-center font-mono-score font-bold text-slate-900">${fmt1(total)}</td>
             <td class="text-center"><span class="px-2.5 py-0.5 rounded font-serif-title font-bold text-xs border ${gBadge}">${gred}</span></td>
             <td class="text-xs text-slate-600">${m.penilai || s.Penilai || '--'}</td>
             <td class="text-center">
@@ -2033,7 +2047,7 @@ function renderModerationSampling(o) {
             <td class="font-bold">${s.nama}</td>
             <td class="font-mono-score text-slate-500">${s.kp}</td>
             <td>${s.kelas}</td>
-            <td class="text-center font-mono-score font-bold">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+            <td class="text-center font-mono-score font-bold">${fmt1(s.markah)} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
             <td class="text-center font-bold">${s.gred}</td>
             <td>${s.penilai}</td>
             <td class="text-center text-red-700 font-bold text-[11px]"><i class="fas fa-pen-alt me-1 text-green-600"></i> Semakan Pen Hijau Khas</td>
@@ -2068,7 +2082,7 @@ function renderModerationSampling(o) {
         } else {
             const opts = s.allOptions || [s];
             nameDisplayHTML = `<select id="mod_select_${idx}" onchange="onSelectSampleCandidate(${idx})" class="w-full text-xs font-bold p-1.5 bg-amber-50 border border-amber-300 rounded focus:ring-2 focus:ring-amber-500">
-                ${opts.map(opt => `<option value="${opt.kp}" ${opt.kp === s.kp ? 'selected' : ''}>${opt.nama} (${opt.markah}/${opt.maxPossible})</option>`).join('')}
+                ${opts.map(opt => `<option value="${opt.kp}" ${opt.kp === s.kp ? 'selected' : ''}>${opt.nama} (${fmt1(opt.markah)}/${opt.maxPossible})</option>`).join('')}
             </select>`;
         }
 
@@ -2078,7 +2092,7 @@ function renderModerationSampling(o) {
             <td>${nameDisplayHTML}</td>
             <td class="font-mono-score text-slate-500 text-xs" id="mod_kp_${idx}">${s.kp}</td>
             <td id="mod_kelas_${idx}">${s.kelas}</td>
-            <td class="text-center font-mono-score font-bold" id="mod_score_${idx}">${s.markah} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
+            <td class="text-center font-mono-score font-bold" id="mod_score_${idx}">${fmt1(s.markah)} / ${s.maxPossible} (${s.markahPct.toFixed(1)}%)</td>
             <td class="text-center font-bold" id="mod_gred_${idx}">${s.gred}</td>
             <td class="text-center" id="mod_kelompok_${idx}"><span class="px-2.5 py-1 rounded text-[10px] font-bold border ${kelBg}">${s.kelompok}</span></td>
             <td class="text-center">
@@ -2116,7 +2130,7 @@ function onSelectSampleCandidate(idx) {
 
         document.getElementById(`mod_kp_${idx}`).textContent = chosen.kp;
         document.getElementById(`mod_kelas_${idx}`).textContent = chosen.kelas;
-        document.getElementById(`mod_score_${idx}`).textContent = `${chosen.markah} / ${chosen.maxPossible} (${chosen.markahPct.toFixed(1)}%)`;
+        document.getElementById(`mod_score_${idx}`).textContent = `${fmt1(chosen.markah)} / ${chosen.maxPossible} (${chosen.markahPct.toFixed(1)}%)`;
         document.getElementById(`mod_gred_${idx}`).textContent = chosen.gred;
         
         const bandCat = item.kelompok;
@@ -2269,7 +2283,7 @@ function renderSingleDossierHTML(d) {
             </div>
             <div style="text-align:right; border-left:2px solid #cbd5e1; padding-left:14px;">
                 <div style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b;">JUMLAH MARKAH</div>
-                <div style="font-size:22px; font-weight:800; font-family:'Space Mono', monospace; color:#1e3a8a;">${m.total || 0}<span style="font-size:11px; color:#94a3b8;">/100</span></div>
+                <div style="font-size:22px; font-weight:800; font-family:'Space Mono', monospace; color:#1e3a8a;">${fmt1(m.total || 0)}<span style="font-size:11px; color:#94a3b8;">/100</span></div>
                 <div style="font-size:11px; font-weight:800; color:#b45309;">GRED: ${m.gred || '--'}</div>
             </div>
         </div>
@@ -2292,27 +2306,27 @@ function renderSingleDossierHTML(d) {
             <tbody>
                 <tr>
                     <td><strong>Tugasan 1: HP1 — Pengetahuan &amp; Artifak</strong> (Maks 30)</td>
-                    <td class="center">${r.r1??0}</td><td class="center">${r.r2??0}</td><td class="center">${r.r3??0}</td>
-                    <td class="center">${r.r4??0}</td><td class="center">${r.r5??0}</td><td class="center">${r.r6??0}</td>
-                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp1||0}/30</td>
+                    <td class="center">${fmt1(r.r1||0)}</td><td class="center">${fmt1(r.r2||0)}</td><td class="center">${fmt1(r.r3||0)}</td>
+                    <td class="center">${fmt1(r.r4||0)}</td><td class="center">${fmt1(r.r5||0)}</td><td class="center">${fmt1(r.r6||0)}</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${fmt1(m.hp1||0)}/30</td>
                 </tr>
                 <tr>
                     <td><strong>Tugasan 1: HP5 — Komunikasi Penulisan</strong> (Maks 10)</td>
-                    <td class="center">${r.g1??0}</td><td class="center">${r.g2??0}</td><td class="center">${r.g3??0}</td>
-                    <td class="center">${r.g4??0}</td><td class="center">-</td><td class="center">-</td>
-                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp5||0}/10</td>
+                    <td class="center">${fmt1(r.g1||0)}</td><td class="center">${fmt1(r.g2||0)}</td><td class="center">${fmt1(r.g3||0)}</td>
+                    <td class="center">${fmt1(r.g4||0)}</td><td class="center">-</td><td class="center">-</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${fmt1(m.hp5||0)}/10</td>
                 </tr>
                 <tr>
                     <td><strong>Tugasan 2: HP8 — Kapasiti Kepimpinan</strong> (Maks 30)</td>
-                    <td class="center">${r.p1??0}</td><td class="center">${r.p2??0}</td><td class="center">${r.p3??0}</td>
+                    <td class="center">${fmt1(r.p1||0)}</td><td class="center">${fmt1(r.p2||0)}</td><td class="center">${fmt1(r.p3||0)}</td>
                     <td class="center">-</td><td class="center">-</td><td class="center">-</td>
-                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp8||0}/30</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${fmt1(m.hp8||0)}/30</td>
                 </tr>
                 <tr>
                     <td><strong>Tugasan 2: HP10 — Minda Keusahawanan</strong> (Maks 30)</td>
-                    <td class="center">${r.k1??0}</td><td class="center">${r.k2??0}</td><td class="center">${r.k3??0}</td>
+                    <td class="center">${fmt1(r.k1||0)}</td><td class="center">${fmt1(r.k2||0)}</td><td class="center">${fmt1(r.k3||0)}</td>
                     <td class="center">-</td><td class="center">-</td><td class="center">-</td>
-                    <td class="center font-bold" style="background:#f1f5f9;">${m.hp10||0}/30</td>
+                    <td class="center font-bold" style="background:#f1f5f9;">${fmt1(m.hp10||0)}/30</td>
                 </tr>
             </tbody>
         </table>
@@ -2358,17 +2372,17 @@ async function printReport(fromLaporanTab) {
     if (!filtered.length) return showToast('Tiada pelajar untuk dicetak dalam skop ini.', 'warn');
 
     document.getElementById('pStudentBody').innerHTML = filtered.map((s, i) => {
-        const m = s.markahSediaAda || {}, t = (m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0), g = t>0 ? calculateGred(t) : '--';
+        const m = s.markahSediaAda || {}, t = roundTo1((m.hp1||0)+(m.hp5||0)+(m.hp8||0)+(m.hp10||0)), g = t>0 ? calculateGred(t) : '--';
         return `<tr>
             <td class="center">${i+1}</td>
             <td>${s.Nama_Pelajar}</td>
             <td>${s.No_KP}</td>
             <td>${s.Kelas}</td>
-            <td class="center">${m.hp1 ?? '-'}</td>
-            <td class="center">${m.hp5 ?? '-'}</td>
-            <td class="center">${m.hp8 ?? '-'}</td>
-            <td class="center">${m.hp10 ?? '-'}</td>
-            <td class="center"><strong>${t||'-'}</strong></td>
+            <td class="center">${m.hp1 !== undefined ? fmt1(m.hp1) : '-'}</td>
+            <td class="center">${m.hp5 !== undefined ? fmt1(m.hp5) : '-'}</td>
+            <td class="center">${m.hp8 !== undefined ? fmt1(m.hp8) : '-'}</td>
+            <td class="center">${m.hp10 !== undefined ? fmt1(m.hp10) : '-'}</td>
+            <td class="center"><strong>${t ? fmt1(t) : '-'}</strong></td>
             <td class="center"><strong>${g}</strong></td>
         </tr>`;
     }).join('');
@@ -2454,7 +2468,7 @@ function janaCadanganPintar() {
     const metadata = {};
     pool.forEach(s => {
         const normKP = normalizeKP(s.No_KP);
-        currentScores[normKP] = Number(s.markahSediaAda.total) || 0;
+        currentScores[normKP] = roundTo1(s.markahSediaAda.total);
         metadata[normKP] = { nama: s.Nama_Pelajar, kelas: s.Kelas, origKP: s.No_KP };
     });
 
@@ -2475,8 +2489,8 @@ function janaCadanganPintar() {
 
             const score = workingScores[normKP];
             const gred = calculateGred(score);
-            const bMin = BAND_MIN[gred];
-            const bMax = BAND_MAX[gred];
+            const bMin = roundTo1(BAND_MIN[gred]);
+            const bMax = roundTo1(BAND_MAX[gred]);
 
             [bMin, bMax].forEach(targetBoundary => {
                 const delta = Math.abs(targetBoundary - score);
@@ -2512,9 +2526,9 @@ function janaCadanganPintar() {
             nama: metadata[bestCandidate.normKP].nama,
             kelas: metadata[bestCandidate.normKP].kelas,
             gred: bestCandidate.gred,
-            val: currentScores[bestCandidate.normKP],
-            target: bestCandidate.targetScore,
-            delta: bestCandidate.targetScore - currentScores[bestCandidate.normKP]
+            val: roundTo1(currentScores[bestCandidate.normKP]),
+            target: roundTo1(bestCandidate.targetScore),
+            delta: roundTo1(bestCandidate.targetScore - currentScores[bestCandidate.normKP])
         });
 
         iter++;
@@ -2548,10 +2562,10 @@ function renderSimulationUI(initialStats, suggestions, targetSD) {
                 <td class="font-bold text-[13px]">${s.nama}</td>
                 <td class="font-mono-score text-[11px] text-slate-500">${s.kp}</td>
                 <td class="text-center font-bold"><span class="px-2 py-0.5 rounded bg-slate-100 border">${s.gred}</span></td>
-                <td class="text-center font-mono-score">${s.val.toFixed(1)}</td>
-                <td class="text-center font-mono-score font-bold text-purple-700">${s.target.toFixed(1)}</td>
+                <td class="text-center font-mono-score">${fmt1(s.val)}</td>
+                <td class="text-center font-mono-score font-bold text-purple-700">${fmt1(s.target)}</td>
                 <td class="text-center font-mono-score ${s.delta > 0 ? 'text-green-600' : 'text-red-600'}">
-                    ${s.delta > 0 ? '+' : ''}${s.delta.toFixed(1)}
+                    ${s.delta > 0 ? '+' : ''}${fmt1(s.delta)}
                 </td>
                 <td class="text-center">
                     <button onclick="selectStudent('${s.kp}'); showLecTab('marking');" class="px-2 py-1 text-[11px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 rounded-lg shadow-xs flex items-center gap-1 mx-auto" title="Semak markah pelajar ini">
@@ -2674,7 +2688,7 @@ async function terapkanCadanganSim() {
     checks.forEach(c => {
         const s = window._simCurrentSuggestions[c.dataset.idx];
         if (s) {
-            payload.push({ noKP: s.kp, newTotal: s.target, gredAsal: s.gred });
+            payload.push({ noKP: s.kp, newTotal: roundTo1(s.target), gredAsal: s.gred });
         }
     });
 
