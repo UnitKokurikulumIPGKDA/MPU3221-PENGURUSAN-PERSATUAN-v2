@@ -148,7 +148,6 @@
 
 <div class="shell" id="loginScreen">
     <div class="academic-card w-full shadow-2xl p-8 sm:p-10 border-t-4" style="max-width:440px; border-top-color: var(--primary);">
-        
         <div class="text-center mb-8">
             <div style="display:inline-flex; align-items:center; justify-content:center; width:90px; height:90px; margin-bottom:12px;">
                 <img src="https://lh3.googleusercontent.com/d/10kap54x0sqPu4bFZdju9P2fXKMpyMVi8" referrerpolicy="no-referrer" crossorigin="anonymous" alt="Logo IPGKDA" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fas fa-university\\' style=\\'font-size:2.5rem; color:var(--primary);\\'></i>';">
@@ -342,6 +341,7 @@
             <button class="tab" onclick="showLecTab('laporan')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-chart-column me-1"></i> Laporan Rumusan</button>
             <button class="tab" onclick="showLecTab('peerstatus')" style="border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px;"><i class="fas fa-user-check me-1"></i> Status Rakan</button>
             <button class="tab" id="tabBtnModerasi" onclick="showLecTab('moderasi')" style="display:none; border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px; color:#b45309;"><i class="fas fa-balance-scale me-1"></i> Moderasi LAM-PT-04-02</button>
+            <button class="tab" id="tabBtnSimulasi" onclick="showLecTab('simulasi')" style="display:none; border-radius:0; border-bottom:3px solid transparent; padding:12px 12px; font-size:11px; color:#7c3aed;"><i class="fas fa-flask me-1"></i> Simulasi SP</button>
         </div>
         <style>
             #lecturerDash .tab-bar .tab.active { background:transparent; color:var(--primary); border-bottom-color:var(--primary); box-shadow:none; }
@@ -749,7 +749,6 @@
                     </div>
                 </div>
 
-                <!-- Kad Statistik Kelompok -->
                 <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; margin-bottom:24px;">
                     <div class="academic-card p-4 text-center" style="border-top:4px solid var(--primary);">
                         <div class="dim-label mb-1">Status Menanda</div>
@@ -778,7 +777,6 @@
                     </div>
                 </div>
 
-                <!-- Jadual Kes Ekstrem -->
                 <div class="academic-card p-6 mb-6">
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-red-700 flex items-center gap-2">
@@ -805,7 +803,6 @@
                     </div>
                 </div>
 
-                <!-- Jadual 13 Sampel Moderasi Manual -->
                 <div class="academic-card p-6">
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <div>
@@ -837,6 +834,105 @@
                     </div>
                 </div>
             </div>
+
+            <div id="ltab-simulasi" style="display:none;">
+                <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color:#7c3aed;">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Alat Simulasi Statistik</span>
+                            <span class="text-xs text-slate-400 font-mono-score">Khas Super Admin</span>
+                        </div>
+                        <h3 class="font-serif-title text-xl font-bold text-slate-800">Saranan Pintar — Sisihan Piawai (SP)</h3>
+                        <p class="text-[13px] text-slate-500 mt-1">Mencari penyesuaian markah optimum ke sempadan julat gred sedia ada untuk lonjakan SP terbesar, tanpa menukar gred asal mana-mana pelajar.</p>
+                    </div>
+                </div>
+
+                <div class="academic-card p-6 mb-6">
+                    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:end;">
+                        <div>
+                            <label class="dim-label mb-2">Sasaran Sisihan Piawai (≥)</label>
+                            <input type="number" id="simTargetSP" value="5.0" step="0.1" min="0" class="w-full font-mono-score font-bold">
+                        </div>
+                        <div>
+                            <label class="dim-label mb-2">Had Maksimum Perubahan / Pelajar</label>
+                            <input type="number" id="simMaxDelta" value="5.0" step="0.5" min="0.5" class="w-full font-mono-score font-bold">
+                        </div>
+                        <div>
+                            <label class="dim-label mb-2">Skop Kelas</label>
+                            <select id="simClassFilter" class="w-full text-xs py-3 px-3 bg-slate-50 font-bold border rounded">
+                                <option value="">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <button onclick="janaCadanganPintar()" class="btn-primary py-3 rounded-lg text-[12px]" style="background:#7c3aed; border-color:#7c3aed;">
+                            <i class="fas fa-magic me-2"></i> Jana Cadangan Pintar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="simResultsEmpty" class="academic-card p-12 flex items-center justify-center border-dashed border-2 bg-slate-50 min-h-[300px]">
+                    <div style="text-align:center; color:var(--text-muted);">
+                        <i class="fas fa-flask text-4xl mb-3 opacity-40"></i>
+                        <h4 class="font-serif-title text-lg font-bold text-slate-700 mb-1">Belum Ada Simulasi</h4>
+                        <p style="font-size:13px;">Tetapkan sasaran SP dan tekan "Jana Cadangan Pintar" untuk memulakan pengiraan.</p>
+                    </div>
+                </div>
+
+                <div id="simResults" style="display:none;" class="fade-in">
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px;">
+                        <div class="academic-card p-5 text-center" style="border-top:4px solid #94a3b8;">
+                            <div class="dim-label mb-2">SP Sekarang</div>
+                            <div id="simSPBefore" class="font-mono-score" style="font-size:28px; font-weight:800; color:#475569;">--</div>
+                        </div>
+                        <div class="academic-card p-5 text-center" style="border-top:4px solid #7c3aed;">
+                            <div class="dim-label mb-2">SP Selepas Simulasi (Live)</div>
+                            <div id="simSPAfter" class="font-mono-score" style="font-size:28px; font-weight:800; color:#7c3aed;">--</div>
+                        </div>
+                        <div class="academic-card p-5 text-center" style="border-top:4px solid #15803d;">
+                            <div class="dim-label mb-2">Bilangan Pelajar Terlibat</div>
+                            <div id="simCount" class="font-mono-score" style="font-size:28px; font-weight:800; color:#15803d;">0</div>
+                        </div>
+                    </div>
+
+                    <div class="academic-card p-6 mb-6">
+                        <div style="position:relative; width:100%; height:320px;">
+                            <canvas id="simChart"></canvas>
+                        </div>
+                        <p class="text-[11px] text-slate-500 text-center mt-3">Carta Perbandingan Bersebelahan (Sekarang vs Selepas Simulasi). Ketinggian bar yang identikal membuktikan gred asal tidak berubah.</p>
+                    </div>
+
+                    <div class="academic-card p-6">
+                        <div class="flex justify-between items-center mb-4 border-b pb-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-purple-700 flex items-center gap-2">
+                                <i class="fas fa-list-check"></i> Senarai Cadangan Penyesuaian
+                            </h4>
+                            <span id="simSuggestBadge" class="font-mono-score text-xs font-bold text-purple-800 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">0 Cadangan</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="academic-table">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center; width:40px;"><input type="checkbox" id="simSelectAll" onchange="toggleAllSim(this)" checked></th>
+                                        <th>Nama Pelajar</th>
+                                        <th>No. KP</th>
+                                        <th style="text-align:center;">Gred Asal</th>
+                                        <th style="text-align:center;">Markah Asal</th>
+                                        <th style="text-align:center;">Markah Cadangan</th>
+                                        <th style="text-align:center;">Beza (&Delta;)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="simSuggestBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="alert-warn mt-4">
+                            <i class="fas fa-exclamation-triangle mt-1"></i>
+                            <div><strong>Perhatian:</strong> Ini adalah simulasi langsung. Data tidak akan bertukar dalam pangkalan data sehingga anda menekan "Terapkan Perubahan Dipilih".</div>
+                        </div>
+                        <button onclick="terapkanCadanganSim()" id="btnTerapkanSim" class="btn-primary w-full py-4 rounded-lg text-[14px] mt-3" style="background:#7c3aed; border-color:#7c3aed;">
+                            <i class="fas fa-check-double me-2"></i> Terapkan Perubahan Dipilih ke Pangkalan Data
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -846,14 +942,21 @@ const API = "https://script.google.com/macros/s/AKfycbxufZgAB9OWBbVzGzBascudDu49
 
 let mode = 'student', sData = [], curS = null, curUser = null, curLecEmail = null;
 let peerScores = {}, peerTarget = null, radarChart = null;
-let isAdminUser = false, gradeBarChart = null;
+let isAdminUser = false, gradeBarChart = null, simChart = null;
 let window_modSamplesData = [];
+
+// KONFIGURASI SIMULASI SP
+let currentSimSuggestions = [];
+let baseSimStats = null;
+let _simOriginalSnapshot = null;
+
+const BAND_MIN = {"A+":90,"A":80,"A-":75,"B+":70,"B":65,"B-":60,"C+":55,"C":50,"C-":40,"D+":30,"D":20,"E":10,"F":0};
+const BAND_MAX = {"A+":100,"A":89.9,"A-":79.9,"B+":74.9,"B":69.9,"B-":64.9,"C+":59.9,"C":54.9,"C-":49.9,"D+":39.9,"D":29.9,"E":19.9,"F":9.9};
 
 const GRADE_CHART_COLORS = { 'A+':'#16a34a','A':'#22c55e','A-':'#4ade80','B+':'#2563eb','B':'#3b82f6','B-':'#60a5fa','C+':'#d97706','C':'#f59e0b','C-':'#fbbf24','D+':'#dc2626','D':'#ef4444','E':'#f87171','F':'#7f1d1d' };
 const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
 const DIM_COLORS = ['#3b82f6', '#0ea5e9', '#10b981', '#8b5cf6', '#ec4899'];
 
-// Memastikan No KP sentiasa 12 digit (string)
 function normalizeKP(kp) {
     if (!kp) return "";
     let clean = kp.toString().trim().replace(/['"\s]/g, '');
@@ -1178,6 +1281,8 @@ async function initLecturer(email, name, isAdminFlag) {
     document.getElementById('adminBadge').style.display = isAdminUser ? 'inline-block' : 'none';
     const modTabBtn = document.getElementById('tabBtnModerasi');
     if (modTabBtn) modTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
+    const simTabBtn = document.getElementById('tabBtnSimulasi');
+    if (simTabBtn) simTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
 
     try {
         const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(email)}`); const o = await r.json();
@@ -1185,6 +1290,7 @@ async function initLecturer(email, name, isAdminFlag) {
         
         document.getElementById('adminBadge').style.display = isAdminUser ? 'inline-block' : 'none';
         if (modTabBtn) modTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
+        if (simTabBtn) simTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
         
         renderLecStudentList(); renderSummaryTable(); loadGradeSummary(); renderLecturerNotice(o.moderationNotice);
     } catch(e) { showToast('Gagal memuat turun data pelajar.', 'warn'); }
@@ -1241,7 +1347,7 @@ function renderLecStudentList() {
     const classes = [...new Set(sData.map(s=>s.Kelas))].filter(Boolean).sort();
     document.getElementById('classInfo').textContent = isAdminUser ? `SEMUA KELAS (${classes.length})` : (classes.length>0 ? classes.join(', ') : '');
 
-    ['classFilter','laporanClassFilter','printClassFilter','peerStatusClassFilter','moderationClassFilter'].forEach(id => {
+    ['classFilter','laporanClassFilter','printClassFilter','peerStatusClassFilter','moderationClassFilter','simClassFilter'].forEach(id => {
         const sel = document.getElementById(id); const prev = sel ? sel.value : "";
         if (sel) {
             sel.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(k => `<option value="${k}">${k}</option>`).join('');
@@ -1277,8 +1383,12 @@ function showLecTab(t) {
         showToast('Akses Terhad: Modul Moderasi khusus untuk Super Admin sahaja.', 'warn');
         t = 'marking';
     }
+    if (t === 'simulasi' && !isAdminUser) {
+        showToast('Akses Terhad: Simulasi SP khusus untuk Super Admin sahaja.', 'warn');
+        t = 'marking';
+    }
 
-    ['marking','peer','rubrik','summary','laporan','peerstatus','moderasi'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
+    ['marking','peer','rubrik','summary','laporan','peerstatus','moderasi','simulasi'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
     const tgt = document.getElementById('ltab-'+t); if(tgt) tgt.style.display='block';
     
     document.querySelectorAll('#lecturerDash .tab-bar .tab').forEach(btn => {
@@ -1486,6 +1596,8 @@ async function _refreshLecData() {
 
         const modTabBtn = document.getElementById('tabBtnModerasi');
         if (modTabBtn) modTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
+        const simTabBtn = document.getElementById('tabBtnSimulasi');
+        if (simTabBtn) simTabBtn.style.display = isAdminUser ? 'inline-block' : 'none';
 
         loadPeerData(curS.No_KP);
         renderLecturerNotice(o.moderationNotice);
@@ -1665,7 +1777,7 @@ function renderGradeSummary(o, kelasFilter) {
             <td class="p-3 text-center font-mono-score">${b.peratus.toFixed(2)}</td>
         </tr>`).join('');
     document.getElementById('gradeSummaryTotal').textContent = o.jumlah;
-    document.getElementById('gradeMinVal').textContent = o.jumlah > 0 ? o.min.toFixed(2) : '--';
+    document.getElementById('gradeMinVal').textContent = o.jumlah > 0 ? o.purata.toFixed(2) : '--';
     document.getElementById('gradeSDVal').textContent = o.jumlah > 0 ? o.sisihanPiawai.toFixed(2) : '--';
     document.getElementById('gradeSummaryEmptyNote').style.display = o.jumlah > 0 ? 'none' : 'flex';
 
@@ -2147,21 +2259,278 @@ async function printModerationReport() {
     setTimeout(() => window.print(), 150);
 }
 
+function calculateStats(scoreMap) {
+    const values = Object.values(scoreMap);
+    const n = values.length;
+    if (n === 0) return { mean: 0, sd: 0, n: 0 };
+
+    const mean = values.reduce((a, b) => a + b, 0) / n;
+    const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
+    return { mean, sd: Math.sqrt(variance), n };
+}
+
+function janaCadanganPintar() {
+    if (!isAdminUser) {
+        showToast('Akses Terhad: Khusus untuk Super Admin sahaja.', 'warn');
+        return;
+    }
+
+    const targetSD = parseFloat(document.getElementById('simTargetSP').value) || 5.0;
+    const maxDelta = parseFloat(document.getElementById('simMaxDelta').value) || 5.0;
+    const kelasFilter = document.getElementById('simClassFilter').value;
+
+    let pool = sData.filter(s => s.markahSediaAda && s.markahSediaAda.total > 0);
+    if (kelasFilter) {
+        pool = pool.filter(s => (s.Kelas || '').toString() === kelasFilter);
+    }
+
+    if (pool.length < 3) {
+        showToast('Bilangan pelajar terlalu sedikit untuk simulasi.', 'warn');
+        return;
+    }
+
+    const currentScores = {};
+    const metadata = {};
+    pool.forEach(s => {
+        currentScores[s.No_KP] = s.markahSediaAda.total;
+        metadata[s.No_KP] = { nama: s.Nama_Pelajar, kelas: s.Kelas };
+    });
+
+    const initialStats = calculateStats(currentScores);
+    let workingScores = Object.assign({}, currentScores);
+    let currentSD = initialStats.sd;
+
+    const suggestions = [];
+    const processedKPs = new Set();
+    const MAX_ITERATIONS = 25;
+    let iter = 0;
+
+    // Greedy search algorithm
+    while (currentSD < targetSD && iter < MAX_ITERATIONS) {
+        let bestCandidate = null;
+
+        for (const kp in workingScores) {
+            if (processedKPs.has(kp)) continue;
+
+            const score = workingScores[kp];
+            const gred = calculateGred(score);
+            const bMin = BAND_MIN[gred];
+            const bMax = BAND_MAX[gred];
+
+            [bMin, bMax].forEach(targetBoundary => {
+                const delta = Math.abs(targetBoundary - score);
+                if (delta < 0.1 || delta > maxDelta) return;
+
+                const tempScores = Object.assign({}, workingScores, { [kp]: targetBoundary });
+                const tempStats = calculateStats(tempScores);
+
+                if (!bestCandidate || tempStats.sd > bestCandidate.newSD) {
+                    bestCandidate = {
+                        kp,
+                        originalScore: score,
+                        targetScore: targetBoundary,
+                        gred,
+                        newSD: tempStats.sd,
+                        delta: targetBoundary - score
+                    };
+                }
+            });
+        }
+
+        if (!bestCandidate || bestCandidate.newSD <= currentSD) break;
+
+        workingScores[bestCandidate.kp] = bestCandidate.targetScore;
+        processedKPs.add(bestCandidate.kp);
+        currentSD = bestCandidate.newSD;
+        
+        suggestions.push({
+            kp: bestCandidate.kp,
+            nama: metadata[bestCandidate.kp].nama,
+            kelas: metadata[bestCandidate.kp].kelas,
+            gred: bestCandidate.gred,
+            val: bestCandidate.originalScore,
+            target: bestCandidate.targetScore,
+            delta: bestCandidate.delta
+        });
+
+        iter++;
+    }
+
+    window._simOriginalSnapshot = currentScores;
+    window._simCurrentSuggestions = suggestions;
+    baseSimStats = initialStats;
+
+    renderSimulationUI(initialStats, suggestions, targetSD);
+}
+
+function renderSimulationUI(initialStats, suggestions, targetSD) {
+    document.getElementById('simResultsEmpty').style.display = 'none';
+    document.getElementById('simResults').style.display = 'block';
+
+    document.getElementById('simSPBefore').textContent = initialStats.sd.toFixed(4);
+    document.getElementById('simSuggestBadge').textContent = `${suggestions.length} Cadangan`;
+
+    const tbody = document.getElementById('simSuggestBody');
+    if (suggestions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400">
+            ${initialStats.sd >= targetSD ? 'Sasaran SP telah sedia dicapai tanpa sebarang perubahan!' : 'Tiada pergerakan markah yang sesuai dijumpai. Cuba naikkan Had Maksimum Perubahan.'}
+        </td></tr>`;
+    } else {
+        tbody.innerHTML = suggestions.map((s, idx) => `
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox" class="sim-check w-4 h-4 text-purple-600 rounded" data-idx="${idx}" checked onchange="updateSimPreviewLive()">
+                </td>
+                <td class="font-bold text-[13px]">${s.nama}</td>
+                <td class="font-mono-score text-[11px] text-slate-500">${s.kp}</td>
+                <td class="text-center font-bold"><span class="px-2 py-0.5 rounded bg-slate-100 border">${s.gred}</span></td>
+                <td class="text-center font-mono-score">${s.val.toFixed(1)}</td>
+                <td class="text-center font-mono-score font-bold text-purple-700">${s.target.toFixed(1)}</td>
+                <td class="text-center font-mono-score ${s.delta > 0 ? 'text-green-600' : 'text-red-600'}">
+                    ${s.delta > 0 ? '+' : ''}${s.delta.toFixed(1)}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    updateSimPreviewLive();
+}
+
+function updateSimPreviewLive() {
+    const activeScores = Object.assign({}, window._simOriginalSnapshot);
+    const checkboxes = document.querySelectorAll('.sim-check');
+    let selectedCount = 0;
+
+    checkboxes.forEach(cb => {
+        if (cb.checked) {
+            const idx = cb.dataset.idx;
+            const item = window._simCurrentSuggestions[idx];
+            activeScores[item.kp] = item.target;
+            selectedCount++;
+        }
+    });
+
+    const newStats = calculateStats(activeScores);
+
+    document.getElementById('simSPAfter').textContent = newStats.sd.toFixed(4);
+    document.getElementById('simCount').textContent = selectedCount;
+
+    renderSimGroupedChart(window._simOriginalSnapshot, activeScores);
+}
+
+function toggleAllSim(masterCheckbox) {
+    document.querySelectorAll('.sim-check').forEach(cb => cb.checked = masterCheckbox.checked);
+    updateSimPreviewLive();
+}
+
+function renderSimGroupedChart(beforeScores, afterScores) {
+    const bands = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "E", "F"];
+
+    const getDistribution = (scoresMap) => {
+        const dist = {};
+        bands.forEach(b => dist[b] = 0);
+        Object.values(scoresMap).forEach(score => {
+            const gred = calculateGred(score);
+            dist[gred]++;
+        });
+        return bands.map(b => dist[b]);
+    };
+
+    const dataBefore = getDistribution(beforeScores);
+    const dataAfter = getDistribution(afterScores);
+
+    if (simChart) {
+        simChart.destroy();
+        simChart = null;
+    }
+
+    const ctx = document.getElementById('simChart').getContext('2d');
+    simChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: bands,
+            datasets: [
+                {
+                    label: 'Markah Sekarang',
+                    data: dataBefore,
+                    backgroundColor: '#cbd5e1',
+                    borderColor: '#94a3b8',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Selepas Simulasi (Cadangan)',
+                    data: dataAfter,
+                    backgroundColor: '#7c3aed',
+                    borderColor: '#6d28d9',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+async function terapkanCadanganSim() {
+    if (!isAdminUser) { showToast('Akses Terhad: Khusus untuk Super Admin.', 'warn'); return; }
+
+    const checks = document.querySelectorAll('.sim-check:checked');
+    if (checks.length === 0) return showToast('Tiada cadangan dipilih.', 'warn');
+
+    const btn = document.getElementById('btnTerapkanSim');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Menerapkan...';
+
+    const payload = [];
+    checks.forEach(c => {
+        const s = window._simCurrentSuggestions[c.dataset.idx];
+        payload.push({ noKP: s.kp, newTotal: s.target, gredAsal: s.gred });
+    });
+
+    try {
+        await fetch(API, { method:'POST', mode:'no-cors', body: JSON.stringify({
+            action: "applySimulationChanges",
+            changes: payload,
+            by: curLecEmail
+        })});
+        await new Promise(r => setTimeout(r, 1500));
+        showToast(`${payload.length} rekod berjaya dikemas kini.`, 'success');
+        await _refreshLecData();
+        document.getElementById('simResults').style.display = 'none';
+        document.getElementById('simResultsEmpty').style.display = 'flex';
+        _simOriginalSnapshot = null;
+        currentSimSuggestions = [];
+    } catch(e) {
+        showToast('Ralat menerapkan perubahan.', 'warn');
+    }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-double me-2"></i> Terapkan Perubahan Dipilih ke Pangkalan Data';
+}
+
 window.addEventListener('afterprint', () => {
     document.body.classList.remove('printing-mode');
     document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
 });
 
 function logout() { localStorage.clear(); location.reload(); }
-window.onload = () => { 
-    const u=localStorage.getItem('userMPU'); 
-    if(u){try{renderStudent(JSON.parse(u));}catch(e){localStorage.clear();}} 
-    const le=localStorage.getItem('le'); 
-    if(le) initLecturer(le,localStorage.getItem('leName'), localStorage.getItem('leAdmin')==='1'); 
+
+window.onload = () => {
+    const u = localStorage.getItem('userMPU');
+    if(u){ try{ renderStudent(JSON.parse(u)); } catch(e){ localStorage.clear(); } }
+    const le = localStorage.getItem('le');
+    if(le) initLecturer(le, localStorage.getItem('leName'), localStorage.getItem('leAdmin') === '1');
 };
 </script>
 
-<!-- ================= FOOTER ================= -->
 <div class="disclaimer-footer">
     <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;"><i class="fas fa-university text-slate-300 text-lg"></i></div>
     <div class="font-bold text-slate-600 uppercase tracking-wider mb-2">Aplikasi Maklumat Penilaian Akademik Tertutup</div>
@@ -2169,7 +2538,6 @@ window.onload = () => {
     <div class="mt-2 text-[10px]">Penyelaras Kursus MPU3221 &copy; 2026 Hak Cipta Terpelihara.</div>
 </div>
 
-<!-- ================= CETAKAN BUKU REKOD ================= -->
 <div id="printArea">
     <div class="print-header">
         <h1>INSTITUT PENDIDIKAN GURU KAMPUS DARULAMAN</h1>
@@ -2211,7 +2579,6 @@ window.onload = () => {
     <div class="print-footer-note">Dokumen ini dijana secara automatik oleh Sistem Portal Pemarkahan MPU3221, Unit Kokurikulum IPGKDA. Sulit &amp; Terhad.</div>
 </div>
 
-<!-- ================= CETAKAN BORANG MODERASI LAM-PT-04-02 ================= -->
 <div id="printModerationArea">
     <div class="print-header">
         <h1>BORANG MODERASI PEMARKAHAN (LAM-PT-04-02)</h1>
@@ -2253,7 +2620,6 @@ window.onload = () => {
     <div class="print-footer-note">Borang ini dijana secara rasmi di bawah Tatacara Pengurusan Pentaksiran IPGKDA (LAM-PT-04-02). Sulit &amp; Terhad.</div>
 </div>
 
-<!-- ================= CETAKAN INDIVIDU / PUKAL (DOSSIER) ================= -->
 <div id="printIndividualArea"></div>
 
 </body>
