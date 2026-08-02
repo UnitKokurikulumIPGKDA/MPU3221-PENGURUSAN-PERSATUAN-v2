@@ -354,7 +354,6 @@
 
     <div style="padding:24px 32px; display:grid; grid-template-columns:320px 1fr; gap:24px; flex:1;">
         
-        <!-- Sidebar Senarai Pelajar -->
         <div class="academic-card p-4" style="align-self: start; position: sticky; top: 110px; max-height: calc(100vh - 130px); display: flex; flex-direction: column;">
             <div style="font-size:11px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; padding:0 4px; display:flex; justify-content:space-between; align-items:center;">
                 <span>Senarai Calon</span>
@@ -618,6 +617,7 @@
                 </div>
             </div>
 
+            <!-- TAB LAPORAN RUMUSAN DENGAN SORTING & LIST TERPERINCI -->
             <div id="ltab-laporan" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color: var(--secondary);">
                     <div>
@@ -633,12 +633,8 @@
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start;">
+                <div style="display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start;" class="mb-8">
                     <div class="academic-card p-4 overflow-hidden">
-                        <div class="text-[11px] font-extrabold text-slate-600 mb-2 uppercase tracking-wide flex justify-between items-center">
-                            <span>Taburan Skala Gred</span>
-                            <span class="text-[10px] text-blue-600 normal-case font-normal">*Klik gred untuk senarai nama</span>
-                        </div>
                         <table class="academic-table" id="gradeSummaryTable">
                             <thead>
                                 <tr>
@@ -682,74 +678,59 @@
                     </div>
                 </div>
 
-                <!-- KAD SENARAI PELAJAR BERDASARKAN GRED & SUSUNAN (BAHARU) -->
-                <div class="academic-card p-6 mt-6" id="laporanStudentListCard">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
+                <!-- SENARAI PELAJAR DENGAN SORTING & FILTERING -->
+                <div class="academic-card p-6" id="laporanStudentSection">
+                    <div class="flex justify-between items-center mb-6 flex-wrap gap-4 border-b pb-4">
                         <div>
-                            <h4 class="font-serif-title text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fas fa-users-line text-blue-800"></i>
-                                Senarai Nama Pelajar Mengikut Gred
-                            </h4>
-                            <p class="text-xs text-slate-500 mt-0.5">Klik gred di jadual/graf di atas atau guna penapis untuk menyusun senarai nama pelajar.</p>
+                            <h3 class="font-serif-title text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-users-line text-indigo-700"></i> Senarai Nama Pelajar Mengikut Gred
+                            </h3>
+                            <p class="text-[12px] text-slate-500 mt-1">Gunakan susunan dan penapis gred untuk menyemak perincian markah setiap pelajar.</p>
                         </div>
-                        <span id="laporanStudentListBadge" class="font-mono-score text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
-                            0 Pelajar
-                        </span>
-                    </div>
-
-                    <!-- PENAPIS & SUSUNAN (SORTING) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                        <div>
-                            <label class="dim-label mb-1">Tapis Mengikut Gred</label>
-                            <select id="laporanGradeFilter" onchange="filterLaporanStudents()" class="w-full text-xs font-bold py-2 px-3 bg-white border rounded-md">
-                                <option value="">Semua Gred</option>
-                                <option value="A+">Gred A+</option>
-                                <option value="A">Gred A</option>
-                                <option value="A-">Gred A-</option>
-                                <option value="B+">Gred B+</option>
-                                <option value="B">Gred B</option>
-                                <option value="B-">Gred B-</option>
-                                <option value="C+">Gred C+</option>
-                                <option value="C">Gred C</option>
-                                <option value="C-">Gred C-</option>
-                                <option value="D+">Gred D+</option>
-                                <option value="D">Gred D</option>
-                                <option value="E">Gred E</option>
-                                <option value="F">Gred F</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="dim-label mb-1">Susunan (Sorting)</label>
-                            <select id="laporanSortFilter" onchange="filterLaporanStudents()" class="w-full text-xs font-bold py-2 px-3 bg-white border rounded-md">
-                                <option value="gred_desc">Gred (Tinggi &rarr; Rendah)</option>
-                                <option value="gred_asc">Gred (Rendah &rarr; Tinggi)</option>
-                                <option value="markah_desc">Markah Akhir (Tinggi &rarr; Rendah)</option>
-                                <option value="markah_asc">Markah Akhir (Rendah &rarr; Tinggi)</option>
-                                <option value="nama_asc">Nama Pelajar (A &rarr; Z)</option>
-                                <option value="kelas_asc">Kelas (A &rarr; Z)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="dim-label mb-1">Carian Calon</label>
-                            <input type="text" id="laporanSearchInput" onkeyup="filterLaporanStudents()" placeholder="Cari nama atau No. KP..." class="w-full text-xs py-2 px-3 bg-white border rounded-md">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div>
+                                <label class="dim-label mb-1">Tapis Gred</label>
+                                <select id="filterGradeSelect" onchange="filterLaporanStudents()" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg min-w-[130px]">
+                                    <option value="">Semua Gred</option>
+                                    <option value="A+">A+</option><option value="A">A</option><option value="A-">A-</option>
+                                    <option value="B+">B+</option><option value="B">B</option><option value="B-">B-</option>
+                                    <option value="C+">C+</option><option value="C">C</option><option value="C-">C-</option>
+                                    <option value="D+">D+</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="dim-label mb-1">Susun Mengikut</label>
+                                <select id="sortGradeSelect" onchange="filterLaporanStudents()" class="text-xs py-2 px-3 bg-slate-50 font-bold border rounded-lg min-w-[170px]">
+                                    <option value="gred_desc">Gred (Tinggi ke Rendah)</option>
+                                    <option value="gred_asc">Gred (Rendah ke Tinggi)</option>
+                                    <option value="score_desc">Markah (Tinggi ke Rendah)</option>
+                                    <option value="score_asc">Markah (Rendah ke Tinggi)</option>
+                                    <option value="nama_asc">Nama Pelajar (A-Z)</option>
+                                    <option value="kelas_asc">Kelas (A-Z)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="dim-label mb-1">Cari Pelajar</label>
+                                <input type="text" id="searchLaporanStudent" onkeyup="filterLaporanStudents()" placeholder="Cari nama / KP..." class="text-xs py-2 px-3 bg-slate-50 border rounded-lg min-w-[180px]">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- JADUAL SENARAI NAMA PELAJAR -->
-                    <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                        <table class="academic-table">
+                    <div class="overflow-x-auto">
+                        <table class="academic-table" id="laporanStudentTable">
                             <thead>
                                 <tr>
-                                    <th style="text-align:center; width:45px;">Bil</th>
+                                    <th style="width:40px; text-align:center;">Bil</th>
                                     <th>Nama Pelajar</th>
+                                    <th>No. KP</th>
                                     <th>Kelas</th>
-                                    <th style="text-align:center;">Jumlah Markah</th>
+                                    <th style="text-align:center;">Markah (100%)</th>
                                     <th style="text-align:center;">Gred</th>
                                     <th>Pensyarah Penilai</th>
-                                    <th style="text-align:center; width:100px;">Tindakan</th>
+                                    <th style="text-align:center;">Tindakan</th>
                                 </tr>
                             </thead>
-                            <tbody id="laporanStudentListBody"></tbody>
+                            <tbody id="laporanStudentBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -914,7 +895,6 @@
                 </div>
             </div>
 
-            <!-- MODUL SIMULASI SP -->
             <div id="ltab-simulasi" style="display:none;">
                 <div class="academic-card p-6 mb-6 flex justify-between items-center bg-white border-l-4" style="border-left-color:#7c3aed;">
                     <div>
@@ -923,7 +903,7 @@
                             <span class="text-xs text-slate-400 font-mono-score">Khas Super Admin</span>
                         </div>
                         <h3 class="font-serif-title text-xl font-bold text-slate-800">Saranan Pintar — Sisihan Piawai (SP)</h3>
-                        <p class="text-[13px] text-slate-500 mt-1">Mencari penyesuaian markah optimum ke sempadan julat gred sedia ada untuk lonjakan SP terbesar, tanpa menukar gred asal mana-mana pelajar.</p>
+                        <p class="text-[13px] text-slate-500 mt-1">Mencari penyesuaian markah optimum ke sempadan julat gred sedia ada untuk lonjakan SP terbesar, tanpa menukar gred asal mana-mana pelajar (maksimum 96.0%).</p>
                     </div>
                 </div>
 
@@ -997,7 +977,8 @@
                                         <th style="text-align:center;">Gred Asal</th>
                                         <th style="text-align:center;">Markah Asal</th>
                                         <th style="text-align:center;">Markah Cadangan</th>
-                                        <th style="text-align:center;">Beza (&Delta;)</th>
+                                        <th style="text-align:center;">Beza ($\Delta$)</th>
+                                        <th style="text-align:center;">Tindakan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="simSuggestBody"></tbody>
@@ -1030,9 +1011,9 @@ let currentSimSuggestions = [];
 let baseSimStats = null;
 let _simOriginalSnapshot = null;
 
+// HAD MAKSIMUM MARKAH CADANGAN A+ ADALAH 96.0%
 const BAND_MIN = {"A+":90,"A":80,"A-":75,"B+":70,"B":65,"B-":60,"C+":55,"C":50,"C-":40,"D+":30,"D":20,"E":10,"F":0};
-const BAND_MAX = {"A+":100,"A":89.9,"A-":79.9,"B+":74.9,"B":69.9,"B-":64.9,"C+":59.9,"C":54.9,"C-":49.9,"D+":39.9,"D":29.9,"E":19.9,"F":9.9};
-const GRADE_RANK = { "A+":1, "A":2, "A-":3, "B+":4, "B":5, "B-":6, "C+":7, "C":8, "C-":9, "D+":10, "D":11, "E":12, "F":13, "--":99 };
+const BAND_MAX = {"A+":96.0,"A":89.9,"A-":79.9,"B+":74.9,"B":69.9,"B-":64.9,"C+":59.9,"C":54.9,"C-":49.9,"D+":39.9,"D":29.9,"E":19.9,"F":9.9};
 
 const GRADE_CHART_COLORS = { 'A+':'#16a34a','A':'#22c55e','A-':'#4ade80','B+':'#2563eb','B':'#3b82f6','B-':'#60a5fa','C+':'#d97706','C':'#f59e0b','C-':'#fbbf24','D+':'#dc2626','D':'#ef4444','E':'#f87171','F':'#7f1d1d' };
 const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
@@ -1469,65 +1450,79 @@ function showLecTab(t) {
         t = 'marking';
     }
 
-    ['marking','peer','rubrik','summary','laporan','peerstatus','moderasi','simulasi'].forEach(id=>{ const el=document.getElementById('ltab-'+id); if(el) el.style.display='none'; });
-    const tgt = document.getElementById('ltab-'+t); if(tgt) tgt.style.display='block';
+    ['marking','peer','rubrik','summary','laporan','peerstatus','moderasi','simulasi'].forEach(id => { 
+        const el = document.getElementById('ltab-' + id); 
+        if (el) el.style.display = 'none'; 
+    });
+    const tgt = document.getElementById('ltab-' + t); 
+    if (tgt) tgt.style.display = 'block';
     
     document.querySelectorAll('#lecturerDash .tab-bar .tab').forEach(btn => {
         const isTarget = btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${t}'`);
         btn.classList.toggle('active', !!isTarget);
     });
     
-    if(t==='marking' && curS) { document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none'; }
-    if(t==='rubrik') { if(curS) showRubrikLecPanel(curS); else { document.getElementById('rubrikLecPanel').style.display='none'; document.getElementById('rubrikLecEmpty').style.display='flex'; } }
-    
-    if(t==='peer') { 
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                if (window._cachedRadarDims) {
-                    const c = document.getElementById('radarChart');
-                    if (c) {
-                        if (radarChart) { radarChart.destroy(); radarChart = null; }
-                        radarChart = new Chart(c.getContext('2d'), buildRC(window._cachedRadarDims));
-                    }
-                }
-            }, 100); 
-        });
+    if (t === 'marking' && curS) { 
+        document.getElementById('gradingPanel').style.display = 'block'; 
+        document.getElementById('gradingEmpty').style.display = 'none'; 
     }
-    
-    if(t==='summary') renderSummaryTable();
-    if(t==='laporan') loadGradeSummary();
-    if(t==='peerstatus') loadPeerCompletionStatus();
-    if(t==='moderasi' && isAdminUser) loadModerationSampling();
+    if (t === 'rubrik') { 
+        if (curS) showRubrikLecPanel(curS); 
+        else { 
+            document.getElementById('rubrikLecPanel').style.display = 'none'; 
+            document.getElementById('rubrikLecEmpty').style.display = 'flex'; 
+        } 
+    }
+    if (t === 'summary') renderSummaryTable();
+    if (t === 'laporan') loadGradeSummary();
+    if (t === 'peerstatus') loadPeerCompletionStatus();
+    if (t === 'moderasi' && isAdminUser) loadModerationSampling();
 }
 
 async function selectStudent(kp) {
-    curS = sData.find(s=>s.No_KP==kp); if(!curS) return;
-    document.querySelectorAll('#sList .s-card').forEach(c=>c.classList.remove('selected')); document.querySelector(`#sList .s-card[data-kp="${kp}"]`)?.classList.add('selected');
+    if (!kp) return;
+    const targetKP = normalizeKP(kp);
+    curS = sData.find(s => normalizeKP(s.No_KP) === targetKP) || sData.find(s => s.No_KP == kp);
+    if (!curS) {
+        showToast('Rekod pelajar tidak dijumpai.', 'warn');
+        return;
+    }
+
+    document.querySelectorAll('#sList .s-card').forEach(c => c.classList.remove('selected'));
+    const activeCard = document.querySelector(`#sList .s-card[data-kp="${curS.No_KP}"]`);
+    if (activeCard) activeCard.classList.add('selected');
     
-    document.getElementById('ln').textContent = curS.Nama_Pelajar; document.getElementById('lk').textContent = `ID: ${curS.No_KP}`; 
+    document.getElementById('ln').textContent = curS.Nama_Pelajar;
+    document.getElementById('lk').textContent = `ID: ${curS.No_KP}`;
     loadImage(document.getElementById('li'), document.getElementById('liPh'), curS.Link_Gambar);
     
-    document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none';
+    document.getElementById('gradingPanel').style.display = 'block';
+    document.getElementById('gradingEmpty').style.display = 'none';
     
-    if(curS.markahSediaAda) {
+    if (curS.markahSediaAda) {
         document.getElementById('h1').value = curS.markahSediaAda.hp1 || 0;
         document.getElementById('h5').value = curS.markahSediaAda.hp5 || 0;
         document.getElementById('h8').value = curS.markahSediaAda.hp8 || 0;
         document.getElementById('h10').value = curS.markahSediaAda.hp10 || 0;
         document.getElementById('justTxt').value = curS.markahSediaAda.just === "-" ? "" : curS.markahSediaAda.just;
     } else { 
-        ['h1','h5','h8','h10','justTxt'].forEach(id=>document.getElementById(id).value=''); 
+        ['h1','h5','h8','h10','justTxt'].forEach(id => document.getElementById(id).value = ''); 
     }
     calc();
 
     const badgeRubrik = document.getElementById('badge-rubrik');
-    if(curS.markahSediaAda) { badgeRubrik.innerHTML = `<i class="fas fa-check-circle me-1"></i> Disahkan`; badgeRubrik.style.background = "#f0fdf4"; badgeRubrik.style.color = "#15803d"; badgeRubrik.style.borderColor = "#bbf7d0"; } 
-    else { badgeRubrik.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> Data Tiada`; badgeRubrik.style.background = "#fef2f2"; badgeRubrik.style.color = "#b91c1c"; badgeRubrik.style.borderColor = "#fecaca"; }
+    if (curS.markahSediaAda) { 
+        badgeRubrik.innerHTML = `<i class="fas fa-check-circle me-1"></i> Disahkan`; 
+        badgeRubrik.style.background = "#f0fdf4"; badgeRubrik.style.color = "#15803d"; badgeRubrik.style.borderColor = "#bbf7d0"; 
+    } else { 
+        badgeRubrik.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> Data Tiada`; 
+        badgeRubrik.style.background = "#fef2f2"; badgeRubrik.style.color = "#b91c1c"; badgeRubrik.style.borderColor = "#fecaca"; 
+    }
 
     const act = ['marking','rubrik','peer','summary'].find(id => document.getElementById('ltab-'+id)?.style.display !== 'none');
-    if(act==='rubrik') showRubrikLecPanel(curS);
+    if (act === 'rubrik') showRubrikLecPanel(curS);
     
-    loadPeerData(kp);
+    loadPeerData(curS.No_KP);
 }
 
 async function saveManualScores() {
@@ -1851,15 +1846,12 @@ function renderGradeSummary(o, kelasFilter) {
         : `Analisis Pentaksiran Berterusan — ${kelasFilter ? 'Kelas: ' + kelasFilter : 'semua kelas anda'} (berdasarkan markah akhir keseluruhan)`);
 
     document.getElementById('gradeSummaryBody').innerHTML = o.bands.map(b => `
-        <tr data-gred="${b.gred}" onclick="filterLaporanStudents('${b.gred}'); scrollToStudentList();" class="cursor-pointer hover:bg-blue-50 transition" title="Klik untuk lihat senarai pelajar Gred ${b.gred}">
-            <td class="p-3 text-center font-mono-score text-slate-600">${b.skala}</td>
-            <td class="p-3 text-center font-bold">
-                <span class="inline-block px-2 py-0.5 rounded text-xs font-serif-title" style="background:${(GRADE_CHART_COLORS[b.gred]||'#94a3b8')}15; color:${GRADE_CHART_COLORS[b.gred]||'#334155'}; font-weight:800;">${b.gred}</span>
-            </td>
+        <tr onclick="filterBySpecificGrade('${b.gred}')" class="cursor-pointer hover:bg-indigo-50 transition" title="Klik untuk lihat senarai pelajar Gred ${b.gred}">
+            <td class="p-3 text-center font-mono-score">${b.skala}</td>
+            <td class="p-3 text-center font-bold text-indigo-800">${b.gred}</td>
             <td class="p-3 text-center font-mono-score font-bold">${b.jumlah}</td>
-            <td class="p-3 text-center font-mono-score">${b.peratus.toFixed(2)}%</td>
+            <td class="p-3 text-center font-mono-score">${b.peratus.toFixed(2)}</td>
         </tr>`).join('');
-        
     document.getElementById('gradeSummaryTotal').textContent = o.jumlah;
     document.getElementById('gradeMinVal').textContent = o.jumlah > 0 ? o.purata.toFixed(2) : '--';
     document.getElementById('gradeSDVal').textContent = o.jumlah > 0 ? o.sisihanPiawai.toFixed(2) : '--';
@@ -1882,12 +1874,11 @@ function renderGradeSummary(o, kelasFilter) {
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                onClick: (evt, elements) => {
-                    if (elements && elements.length > 0) {
-                        const chartIndex = elements[0].index;
-                        const clickedGred = o.bands[chartIndex].gred;
-                        filterLaporanStudents(clickedGred);
-                        scrollToStudentList();
+                onClick: (evt, activeEls) => {
+                    if (activeEls.length > 0) {
+                        const clickedIndex = activeEls[0].index;
+                        const clickedGrade = o.bands[clickedIndex].gred;
+                        filterBySpecificGrade(clickedGrade);
                     }
                 },
                 scales: {
@@ -1898,121 +1889,74 @@ function renderGradeSummary(o, kelasFilter) {
         });
     }
 
-    // Panggil paparan senarai pelajar laporan
     filterLaporanStudents();
 }
 
-function getStudentTotal(s) {
-    if (!s.markahSediaAda) return 0;
-    const m = s.markahSediaAda;
-    const calcSum = (Number(m.hp1)||0) + (Number(m.hp5)||0) + (Number(m.hp8)||0) + (Number(m.hp10)||0);
-    return calcSum > 0 ? calcSum : (Number(m.total)||0);
-}
-
-function scrollToStudentList() {
-    const listCard = document.getElementById('laporanStudentListCard');
-    if (listCard) {
-        listCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function filterBySpecificGrade(gred) {
+    const sel = document.getElementById('filterGradeSelect');
+    if (sel) {
+        sel.value = gred;
+        filterLaporanStudents();
+        document.getElementById('laporanStudentSection')?.scrollIntoView({ behavior: 'smooth' });
     }
 }
 
-function filterLaporanStudents(selectedGradeOverride) {
-    if (selectedGradeOverride !== undefined) {
-        const gradeSel = document.getElementById('laporanGradeFilter');
-        if (gradeSel) gradeSel.value = selectedGradeOverride;
-    }
+function filterLaporanStudents() {
+    const tbody = document.getElementById('laporanStudentBody');
+    if (!tbody) return;
 
-    const classFilter = document.getElementById('laporanClassFilter') ? document.getElementById('laporanClassFilter').value : "";
-    const gradeFilter = document.getElementById('laporanGradeFilter') ? document.getElementById('laporanGradeFilter').value : "";
-    const sortFilter = document.getElementById('laporanSortFilter') ? document.getElementById('laporanSortFilter').value : "gred_desc";
-    const searchQuery = document.getElementById('laporanSearchInput') ? document.getElementById('laporanSearchInput').value.toLowerCase().trim() : "";
+    const classFilter = document.getElementById('laporanClassFilter')?.value || "";
+    const gradeFilter = document.getElementById('filterGradeSelect')?.value || "";
+    const sortVal = document.getElementById('sortGradeSelect')?.value || "gred_desc";
+    const searchQ = document.getElementById('searchLaporanStudent')?.value.toLowerCase().trim() || "";
 
     let list = sData.filter(s => {
-        const total = getStudentTotal(s);
-        if (total <= 0) return false;
-
         const matchClass = !classFilter || (s.Kelas || "").toString() === classFilter;
-        const gred = calculateGred(total);
+        const m = s.markahSediaAda || {};
+        const total = (m.hp1 || 0) + (m.hp5 || 0) + (m.hp8 || 0) + (m.hp10 || 0);
+        const gred = total > 0 ? calculateGred(total) : "F";
         const matchGrade = !gradeFilter || gred === gradeFilter;
-        const matchSearch = !searchQuery || s.Nama_Pelajar.toLowerCase().includes(searchQuery) || (s.No_KP && s.No_KP.includes(searchQuery));
-
+        const matchSearch = !searchQ || s.Nama_Pelajar.toLowerCase().includes(searchQ) || (s.No_KP && s.No_KP.includes(searchQ));
         return matchClass && matchGrade && matchSearch;
     });
 
-    // Susunan (Sorting Logic)
-    list.sort((a, b) => {
-        const tA = getStudentTotal(a), tB = getStudentTotal(b);
-        const gA = calculateGred(tA), gB = calculateGred(tB);
+    const gradeRank = {"A+":13,"A":12,"A-":11,"B+":10,"B":9,"B-":8,"C+":7,"C":6,"C-":5,"D+":4,"D":3,"E":2,"F":1};
 
-        if (sortFilter === 'gred_desc') {
-            const rA = GRADE_RANK[gA] || 99, rB = GRADE_RANK[gB] || 99;
-            if (rA !== rB) return rA - rB; 
-            return tB - tA; 
-        } else if (sortFilter === 'gred_asc') {
-            const rA = GRADE_RANK[gA] || 99, rB = GRADE_RANK[gB] || 99;
-            if (rA !== rB) return rB - rA;
-            return tA - tB;
-        } else if (sortFilter === 'markah_desc') {
-            return tB - tA;
-        } else if (sortFilter === 'markah_asc') {
-            return tA - tB;
-        } else if (sortFilter === 'nama_asc') {
-            return a.Nama_Pelajar.localeCompare(b.Nama_Pelajar);
-        } else if (sortFilter === 'kelas_asc') {
-            return (a.Kelas || "").localeCompare(b.Kelas || "");
-        }
+    list.sort((a, b) => {
+        const mA = a.markahSediaAda || {}, tA = (mA.hp1||0)+(mA.hp5||0)+(mA.hp8||0)+(mA.hp10||0), gA = tA > 0 ? calculateGred(tA) : "F";
+        const mB = b.markahSediaAda || {}, tB = (mB.hp1||0)+(mB.hp5||0)+(mB.hp8||0)+(mB.hp10||0), gB = tB > 0 ? calculateGred(tB) : "F";
+
+        if (sortVal === "gred_desc") return (gradeRank[gB] || 0) - (gradeRank[gA] || 0) || tB - tA;
+        if (sortVal === "gred_asc") return (gradeRank[gA] || 0) - (gradeRank[gB] || 0) || tA - tB;
+        if (sortVal === "score_desc") return tB - tA;
+        if (sortVal === "score_asc") return tA - tB;
+        if (sortVal === "nama_asc") return a.Nama_Pelajar.localeCompare(b.Nama_Pelajar);
+        if (sortVal === "kelas_asc") return (a.Kelas || "").localeCompare(b.Kelas || "");
         return 0;
     });
 
-    // Highlight row in summary table
-    document.querySelectorAll('#gradeSummaryBody tr').forEach(row => {
-        const rowGred = row.getAttribute('data-gred');
-        if (rowGred && gradeFilter && rowGred === gradeFilter) {
-            row.style.background = '#eff6ff';
-            row.style.borderLeft = '4px solid var(--primary)';
-        } else {
-            row.style.background = '';
-            row.style.borderLeft = '';
-        }
-    });
-
-    // Kemaskini Badge
-    const badge = document.getElementById('laporanStudentListBadge');
-    if (badge) {
-        const labelText = gradeFilter ? `Gred ${gradeFilter}` : 'Semua Gred';
-        badge.textContent = `${list.length} Pelajar (${labelText})`;
-    }
-
-    // Render Jadual Nama Pelajar
-    const tbody = document.getElementById('laporanStudentListBody');
-    if (!tbody) return;
-
-    if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-slate-400">Tiada pelajar dijumpai bagi kriteria penapis ini.</td></tr>`;
+    if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-slate-400">Tiada pelajar dijumpai mengikut penapis ini.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = list.map((s, idx) => {
-        const total = getStudentTotal(s);
-        const gred = calculateGred(total);
-        const gBadge = gred.includes('A') ? 'bg-green-100 text-green-800' : gred.includes('B') ? 'bg-blue-100 text-blue-800' : gred.includes('C') ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800';
-        const penilaiName = (s.markahSediaAda && s.markahSediaAda.penilai) || s.Penilai || '--';
+        const m = s.markahSediaAda || {};
+        const total = (m.hp1 || 0) + (m.hp5 || 0) + (m.hp8 || 0) + (m.hp10 || 0);
+        const gred = total > 0 ? calculateGred(total) : "F";
+        const gBadge = gred.includes('A') ? 'bg-green-100 text-green-800 border-green-200' : gred.includes('B') ? 'bg-blue-100 text-blue-800 border-blue-200' : gred.includes('C') ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-red-100 text-red-800 border-red-200';
 
-        return `<tr class="hover:bg-slate-50 transition">
-            <td class="p-3 text-center font-bold text-slate-500 text-xs">${idx + 1}</td>
-            <td class="p-3">
-                <div class="font-bold text-[13px] text-slate-800">${s.Nama_Pelajar}</div>
-                <div class="font-mono-score text-[10px] text-slate-500">${s.No_KP}</div>
-            </td>
-            <td class="p-3 text-xs font-semibold text-slate-700">${s.Kelas || '--'}</td>
-            <td class="p-3 text-center font-mono-score font-black text-slate-800 text-sm bg-slate-50">${total.toFixed(1)}</td>
-            <td class="p-3 text-center">
-                <span class="inline-block px-2.5 py-1 rounded font-serif-title font-bold text-xs ${gBadge}">${gred}</span>
-            </td>
-            <td class="p-3 text-xs text-slate-600">${penilaiName}</td>
-            <td class="p-3 text-center">
-                <button onclick="selectStudent('${s.No_KP}'); showLecTab('marking');" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[11px] font-bold border border-blue-200 transition" title="Lihat Pemarkahan">
-                    <i class="fas fa-edit mr-1"></i> Semak
+        return `<tr class="hover:bg-slate-50 transition border-b">
+            <td class="text-center font-bold text-slate-400">${idx + 1}</td>
+            <td class="font-bold text-slate-800">${s.Nama_Pelajar}</td>
+            <td class="font-mono-score text-xs text-slate-500">${s.No_KP}</td>
+            <td class="text-xs font-bold text-slate-600">${s.Kelas}</td>
+            <td class="text-center font-mono-score font-bold text-slate-900">${total}</td>
+            <td class="text-center"><span class="px-2.5 py-0.5 rounded font-serif-title font-bold text-xs border ${gBadge}">${gred}</span></td>
+            <td class="text-xs text-slate-600">${m.penilai || s.Penilai || '--'}</td>
+            <td class="text-center">
+                <button onclick="selectStudent('${s.No_KP}'); showLecTab('marking');" class="px-2.5 py-1 text-[11px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 rounded-lg shadow-xs flex items-center gap-1 mx-auto">
+                    <i class="fas fa-search me-1"></i> Semak
                 </button>
             </td>
         </tr>`;
@@ -2438,7 +2382,7 @@ async function printReport(fromLaporanTab) {
         if (o.status === 'success') {
             document.getElementById('pGradeBody').innerHTML = o.bands.map(b => `<tr><td>${b.skala}</td><td class="center">${b.gred}</td><td class="center">${b.jumlah}</td><td class="center">${b.peratus.toFixed(2)}</td></tr>`).join('');
             document.getElementById('pJumlah').textContent = o.jumlah;
-            document.getElementById('pMin').textContent = o.jumlah > 0 ? o.min.toFixed(2) : '--';
+            document.getElementById('pMin').textContent = o.jumlah > 0 ? o.purata.toFixed(2) : '--';
             document.getElementById('pSD').textContent = o.jumlah > 0 ? o.sisihanPiawai.toFixed(2) : '--';
         }
     } catch(e) {
@@ -2471,11 +2415,16 @@ async function printModerationReport() {
     setTimeout(() => window.print(), 150);
 }
 
+window.addEventListener('afterprint', () => {
+    document.body.classList.remove('printing-mode');
+    document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
+});
+
 function calculateStats(scoreMap) {
     const values = Object.values(scoreMap);
     const n = values.length;
     if (n === 0) return { mean: 0, sd: 0, n: 0 };
-
+    
     const mean = values.reduce((a, b) => a + b, 0) / n;
     const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
     return { mean, sd: Math.sqrt(variance), n };
@@ -2504,27 +2453,27 @@ function janaCadanganPintar() {
     const currentScores = {};
     const metadata = {};
     pool.forEach(s => {
-        currentScores[s.No_KP] = s.markahSediaAda.total;
-        metadata[s.No_KP] = { nama: s.Nama_Pelajar, kelas: s.Kelas };
+        const normKP = normalizeKP(s.No_KP);
+        currentScores[normKP] = Number(s.markahSediaAda.total) || 0;
+        metadata[normKP] = { nama: s.Nama_Pelajar, kelas: s.Kelas, origKP: s.No_KP };
     });
 
     const initialStats = calculateStats(currentScores);
-    let workingScores = Object.assign({}, currentScores);
+    let workingScores = JSON.parse(JSON.stringify(currentScores));
     let currentSD = initialStats.sd;
 
     const suggestions = [];
     const processedKPs = new Set();
-    const MAX_ITERATIONS = 25;
+    const MAX_ITERATIONS = 50;
     let iter = 0;
 
-    // Greedy search algorithm
     while (currentSD < targetSD && iter < MAX_ITERATIONS) {
         let bestCandidate = null;
 
-        for (const kp in workingScores) {
-            if (processedKPs.has(kp)) continue;
+        for (const normKP in workingScores) {
+            if (processedKPs.has(normKP)) continue;
 
-            const score = workingScores[kp];
+            const score = workingScores[normKP];
             const gred = calculateGred(score);
             const bMin = BAND_MIN[gred];
             const bMax = BAND_MAX[gred];
@@ -2533,12 +2482,15 @@ function janaCadanganPintar() {
                 const delta = Math.abs(targetBoundary - score);
                 if (delta < 0.1 || delta > maxDelta) return;
 
-                const tempScores = Object.assign({}, workingScores, { [kp]: targetBoundary });
+                // ENSURE CANDIDATE TARGET KEEPS THE EXACT SAME GRADE
+                if (calculateGred(targetBoundary) !== gred) return;
+
+                const tempScores = Object.assign({}, workingScores, { [normKP]: targetBoundary });
                 const tempStats = calculateStats(tempScores);
 
                 if (!bestCandidate || tempStats.sd > bestCandidate.newSD) {
                     bestCandidate = {
-                        kp,
+                        normKP,
                         originalScore: score,
                         targetScore: targetBoundary,
                         gred,
@@ -2551,24 +2503,24 @@ function janaCadanganPintar() {
 
         if (!bestCandidate || bestCandidate.newSD <= currentSD) break;
 
-        workingScores[bestCandidate.kp] = bestCandidate.targetScore;
-        processedKPs.add(bestCandidate.kp);
+        workingScores[bestCandidate.normKP] = bestCandidate.targetScore;
+        processedKPs.add(bestCandidate.normKP);
         currentSD = bestCandidate.newSD;
-        
+
         suggestions.push({
-            kp: bestCandidate.kp,
-            nama: metadata[bestCandidate.kp].nama,
-            kelas: metadata[bestCandidate.kp].kelas,
+            kp: bestCandidate.normKP,
+            nama: metadata[bestCandidate.normKP].nama,
+            kelas: metadata[bestCandidate.normKP].kelas,
             gred: bestCandidate.gred,
-            val: bestCandidate.originalScore,
+            val: currentScores[bestCandidate.normKP],
             target: bestCandidate.targetScore,
-            delta: bestCandidate.delta
+            delta: bestCandidate.targetScore - currentScores[bestCandidate.normKP]
         });
 
         iter++;
     }
 
-    window._simOriginalSnapshot = currentScores;
+    window._simOriginalSnapshot = JSON.parse(JSON.stringify(currentScores));
     window._simCurrentSuggestions = suggestions;
     baseSimStats = initialStats;
 
@@ -2584,7 +2536,7 @@ function renderSimulationUI(initialStats, suggestions, targetSD) {
 
     const tbody = document.getElementById('simSuggestBody');
     if (suggestions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400">
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">
             ${initialStats.sd >= targetSD ? 'Sasaran SP telah sedia dicapai tanpa sebarang perubahan!' : 'Tiada pergerakan markah yang sesuai dijumpai. Cuba naikkan Had Maksimum Perubahan.'}
         </td></tr>`;
     } else {
@@ -2601,6 +2553,11 @@ function renderSimulationUI(initialStats, suggestions, targetSD) {
                 <td class="text-center font-mono-score ${s.delta > 0 ? 'text-green-600' : 'text-red-600'}">
                     ${s.delta > 0 ? '+' : ''}${s.delta.toFixed(1)}
                 </td>
+                <td class="text-center">
+                    <button onclick="selectStudent('${s.kp}'); showLecTab('marking');" class="px-2 py-1 text-[11px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 rounded-lg shadow-xs flex items-center gap-1 mx-auto" title="Semak markah pelajar ini">
+                        <i class="fas fa-search me-1"></i> Semak
+                    </button>
+                </td>
             </tr>
         `).join('');
     }
@@ -2609,7 +2566,7 @@ function renderSimulationUI(initialStats, suggestions, targetSD) {
 }
 
 function updateSimPreviewLive() {
-    const activeScores = Object.assign({}, window._simOriginalSnapshot);
+    const activeScores = JSON.parse(JSON.stringify(window._simOriginalSnapshot || {}));
     const checkboxes = document.querySelectorAll('.sim-check');
     let selectedCount = 0;
 
@@ -2617,8 +2574,10 @@ function updateSimPreviewLive() {
         if (cb.checked) {
             const idx = cb.dataset.idx;
             const item = window._simCurrentSuggestions[idx];
-            activeScores[item.kp] = item.target;
-            selectedCount++;
+            if (item) {
+                activeScores[item.kp] = item.target;
+                selectedCount++;
+            }
         }
     });
 
@@ -2627,7 +2586,7 @@ function updateSimPreviewLive() {
     document.getElementById('simSPAfter').textContent = newStats.sd.toFixed(4);
     document.getElementById('simCount').textContent = selectedCount;
 
-    renderSimGroupedChart(window._simOriginalSnapshot, activeScores);
+    renderSimGroupedChart(window._simOriginalSnapshot || {}, activeScores);
 }
 
 function toggleAllSim(masterCheckbox) {
@@ -2656,8 +2615,10 @@ function renderSimGroupedChart(beforeScores, afterScores) {
         simChart = null;
     }
 
-    const ctx = document.getElementById('simChart').getContext('2d');
-    simChart = new Chart(ctx, {
+    const c = document.getElementById('simChart');
+    if (!c) return;
+
+    simChart = new Chart(c.getContext('2d'), {
         type: 'bar',
         data: {
             labels: bands,
@@ -2684,7 +2645,12 @@ function renderSimGroupedChart(beforeScores, afterScores) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top' }
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        afterBody: () => "Nota: Ketinggian bar yang identikal membuktikan gred tidak berubah!"
+                    }
+                }
             },
             scales: {
                 y: { beginAtZero: true, ticks: { precision: 0 } },
@@ -2699,14 +2665,17 @@ async function terapkanCadanganSim() {
 
     const checks = document.querySelectorAll('.sim-check:checked');
     if (checks.length === 0) return showToast('Tiada cadangan dipilih.', 'warn');
+    if (!confirm(`Anda pasti mahu terapkan ${checks.length} perubahan markah ke pangkalan data?`)) return;
 
     const btn = document.getElementById('btnTerapkanSim');
-    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Menerapkan...';
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Menerapkan Perubahan...';
 
     const payload = [];
     checks.forEach(c => {
         const s = window._simCurrentSuggestions[c.dataset.idx];
-        payload.push({ noKP: s.kp, newTotal: s.target, gredAsal: s.gred });
+        if (s) {
+            payload.push({ noKP: s.kp, newTotal: s.target, gredAsal: s.gred });
+        }
     });
 
     try {
@@ -2716,30 +2685,34 @@ async function terapkanCadanganSim() {
             by: curLecEmail
         })});
         await new Promise(r => setTimeout(r, 1500));
-        showToast(`${payload.length} rekod berjaya dikemas kini.`, 'success');
+        showToast(`${payload.length} rekod berjaya dikemas kini dalam pangkalan data.`, 'success');
         await _refreshLecData();
         document.getElementById('simResults').style.display = 'none';
         document.getElementById('simResultsEmpty').style.display = 'flex';
-        _simOriginalSnapshot = null;
-        currentSimSuggestions = [];
+        window._simOriginalSnapshot = null;
+        window._simCurrentSuggestions = [];
     } catch(e) {
         showToast('Ralat menerapkan perubahan.', 'warn');
     }
     btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-double me-2"></i> Terapkan Perubahan Dipilih ke Pangkalan Data';
 }
 
-window.addEventListener('afterprint', () => {
-    document.body.classList.remove('printing-mode');
-    document.querySelectorAll('.active-print').forEach(el => el.classList.remove('active-print'));
-});
-
 function logout() { localStorage.clear(); location.reload(); }
 
-window.onload = () => {
-    const u = localStorage.getItem('userMPU');
-    if(u){ try{ renderStudent(JSON.parse(u)); } catch(e){ localStorage.clear(); } }
-    const le = localStorage.getItem('le');
-    if(le) initLecturer(le, localStorage.getItem('leName'), localStorage.getItem('leAdmin') === '1');
+window.selectStudent = selectStudent;
+window.showLecTab = showLecTab;
+window.janaCadanganPintar = janaCadanganPintar;
+window.updateSimPreviewLive = updateSimPreviewLive;
+window.toggleAllSim = toggleAllSim;
+window.terapkanCadanganSim = terapkanCadanganSim;
+window.filterLaporanStudents = filterLaporanStudents;
+window.filterBySpecificGrade = filterBySpecificGrade;
+
+window.onload = () => { 
+    const u=localStorage.getItem('userMPU'); 
+    if(u){try{renderStudent(JSON.parse(u));}catch(e){localStorage.clear();}} 
+    const le=localStorage.getItem('le'); 
+    if(le) initLecturer(le,localStorage.getItem('leName'), localStorage.getItem('leAdmin')==='1'); 
 };
 </script>
 
